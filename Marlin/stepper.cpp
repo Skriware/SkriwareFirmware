@@ -62,10 +62,6 @@ Stepper stepper; // Singleton
 
 // public:
 
-#if ENABLED(AUTO_BED_LEVELING_UBL) && ENABLED(ULTIPANEL)
-  extern bool ubl_lcd_map_control;
-#endif
-
 block_t* Stepper::current_block = NULL;  // A pointer to the block currently being traced
 
 #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
@@ -77,7 +73,7 @@ block_t* Stepper::current_block = NULL;  // A pointer to the block currently bei
 #endif
 
 #if HAS_MOTOR_CURRENT_PWM
-  uint32_t Stepper::motor_current_setting[3]; // Initialized by settings.load()
+  uint32_t Stepper::motor_current_setting[3] = PWM_MOTOR_CURRENT;
 #endif
 
 // private:
@@ -94,6 +90,13 @@ long Stepper::counter_X = 0,
      Stepper::counter_Y = 0,
      Stepper::counter_Z = 0,
      Stepper::counter_E = 0;
+
+#if ENABLED(FILAMENT_JAM_SENSOR)
+long Stepper::extruder_counts = 0;
+int Stepper::extruder_id = 0;
+bool Stepper::filament_sensor_state = false;  //ukikoza
+#endif
+
 
 volatile uint32_t Stepper::step_events_completed = 0; // The number of step events executed in the current block
 
@@ -149,6 +152,8 @@ uint8_t Stepper::step_loops, Stepper::step_loops_nominal;
 unsigned short Stepper::OCR1A_nominal;
 
 volatile long Stepper::endstops_trigsteps[XYZ];
+
+#define JAM_SENSOR_PIN(VAL) FILAMENT_JAM_SENSOR_PIN_E## VAL     //ukikoza
 
 #if ENABLED(X_DUAL_STEPPER_DRIVERS)
   #define X_APPLY_DIR(v,Q) do{ X_DIR_WRITE(v); X2_DIR_WRITE((v) != INVERT_X2_VS_X_DIR); }while(0)
@@ -640,6 +645,7 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_START(E);
+         if (_COUNTER(E) > 0)extruder_counts++; //ukikoza
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE
 
@@ -676,6 +682,46 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_STOP(E);
+        #if ENABLED(FILAMENT_JAM_SENSOR) //ukikoza
+        extruder_id = current_block->active_extruder;
+        if(current_block->active_extruder == 1){
+        if(digitalRead(JAM_SENSOR_PIN(1)) == LOW){
+          if(filament_sensor_state == true){
+            filament_sensor_state = false;
+          }
+        }else if(digitalRead(JAM_SENSOR_PIN(1)) == HIGH){
+          if(filament_sensor_state == false){
+            #if ENABLED(FILAMENT_JAM_SENSOR_DEBUG)
+            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED!");
+             char buf[50];
+            SERIAL_ECHOLN("EXTRUDER_STEPS:");
+            sprintf(buf, "\"%lu\"", extruder_counts); 
+            SERIAL_ECHOLN(buf);
+            #endif
+            filament_sensor_state = true;
+            extruder_counts = 0;
+          }     
+         } 
+        }else{
+          if(digitalRead(JAM_SENSOR_PIN(0)) == LOW){
+          if(filament_sensor_state == true){
+            filament_sensor_state = false;
+          }
+          }else if(digitalRead(JAM_SENSOR_PIN(0)) == HIGH){
+          if(filament_sensor_state == false){
+            #if ENABLED(FILAMENT_JAM_SENSOR_DEBUG)
+            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED!");
+             char buf[50];
+            SERIAL_ECHOLN("EXTRUDER_STEPS:");
+            sprintf(buf, "\"%lu\"", extruder_counts); 
+            SERIAL_ECHOLN(buf);
+            #endif
+            filament_sensor_state = true;
+            extruder_counts = 0;
+          }     
+         } //ukikoza
+       }
+        #endif
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE
 
@@ -1285,12 +1331,7 @@ void Stepper::finish_and_disable() {
 }
 
 void Stepper::quick_stop() {
-  #if ENABLED(AUTO_BED_LEVELING_UBL) && ENABLED(ULTIPANEL)
-    if (!ubl_lcd_map_control)
-      cleaning_buffer_counter = 5000;
-  #else
-    cleaning_buffer_counter = 5000;
-  #endif
+  cleaning_buffer_counter = 5000;
   DISABLE_STEPPER_DRIVER_INTERRUPT();
   while (planner.blocks_queued()) planner.discard_current_block();
   current_block = NULL;

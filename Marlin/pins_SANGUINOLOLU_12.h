@@ -27,14 +27,15 @@
  *
  *  AZTEEG_X1
  *  MELZI
- *  MELZI_CREALITY
  *  MELZI_MAKR3D
  *  SANGUINOLOLU_12
  *  STB_11
  */
 
-#ifndef BOARD_NAME
-  #define BOARD_NAME "Sanguinololu 1.2"
+#define BOARD_NAME "Sanguinololu 1.2"
+
+#ifdef __AVR_ATmega1284P__
+  #define LARGE_FLASH true
 #endif
 
 #define SANGUINOLOLU_V_1_2

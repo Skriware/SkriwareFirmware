@@ -121,7 +121,7 @@ typedef struct {
   #endif
 
   #if ENABLED(BARICUDA)
-    uint8_t valve_pressure, e_to_p_pressure;
+    uint32_t valve_pressure, e_to_p_pressure;
   #endif
 
   uint32_t segment_time;

@@ -39,7 +39,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #ifndef STEPPER_H
 #define STEPPER_H
 
@@ -85,6 +84,13 @@ class Stepper {
 
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
       static bool abort_on_endstop_hit;
+    #endif
+
+     #if ENABLED(FILAMENT_JAM_SENSOR)        //ukikoza
+    static bool filament_sensor_state;
+    static long extruder_counts; 
+    static int extruder_id;
+
     #endif
 
     #if ENABLED(Z_DUAL_ENDSTOPS)
