@@ -645,7 +645,9 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_START(E);
-         if (_COUNTER(E) > 0)extruder_counts++; //ukikoza
+         if (_COUNTER(E) > 0){
+          motor_direction(E_AXIS) ?  extruder_counts-- : extruder_counts++;;  
+         }//ukikoza
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE
 
