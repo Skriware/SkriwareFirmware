@@ -12666,7 +12666,7 @@ void disable_all_steppers() {
 void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
 
   #if ENABLED(FILAMENT_JAM_SENSOR)
-   if(filament_sensor_on && Stepper::extruder_counts > FILAMENT_JAM_ALARM){
+   if(filament_sensor_on && abs(Stepper::extruder_counts) > FILAMENT_JAM_ALARM){
      handle_filament_jam();                           //ukikoza
    }
    #endif
