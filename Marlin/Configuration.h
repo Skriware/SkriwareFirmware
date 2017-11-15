@@ -865,13 +865,13 @@
 
   // Set the number of grid points per dimension.
   #define GRID_MAX_POINTS_X 5
-  #define GRID_MAX_POINTS_Y 3//GRID_MAX_POINTS_X
+  #define GRID_MAX_POINTS_Y 5//GRID_MAX_POINTS_X
 
   // Set the boundaries for probing (where the probe can reach).
   #define LEFT_PROBE_BED_POSITION 18
   #define RIGHT_PROBE_BED_POSITION 180
   #define FRONT_PROBE_BED_POSITION 32
-  #define BACK_PROBE_BED_POSITION 270
+  #define BACK_PROBE_BED_POSITION 272
 
   // The Z probe minimum outer margin (to validate G29 parameters).
   #define MIN_PROBE_EDGE 0
