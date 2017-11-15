@@ -12427,7 +12427,7 @@ void prepare_move_to_destination() {
 
   void handle_filament_jam() {
     if (!filament_jam) {
-      if(Stepper::extruder_counts > FILAMENT_JAM_ERROR){
+      if(abs(Stepper::extruder_counts) > FILAMENT_JAM_ERROR){
            filament_jam = true;
            SERIAL_ECHO("FILAMENT_JAM_ERROR ");
            SERIAL_ECHO("E");

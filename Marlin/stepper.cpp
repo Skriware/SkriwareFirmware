@@ -93,6 +93,7 @@ long Stepper::counter_X = 0,
 
 #if ENABLED(FILAMENT_JAM_SENSOR)
 long Stepper::extruder_counts = 0;
+long Stepper::retract_counts = 0;
 int Stepper::extruder_id = 0;
 bool Stepper::filament_sensor_state = false;  //ukikoza
 #endif
@@ -645,9 +646,19 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_START(E);
-         if (_COUNTER(E) > 0){
-          motor_direction(E_AXIS) ?  extruder_counts-- : extruder_counts++;;  
-         }//ukikoza
+         if(_COUNTER(E) > 0){
+          if(motor_direction(E_AXIS)){
+            retract_counts++;
+         }else{
+          if(retract_counts == 0){
+            extruder_counts++;
+          }else{
+            retract_counts--;
+          }
+          
+          }
+         }
+         //ukikoza
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE
 
@@ -690,11 +701,19 @@ void Stepper::isr() {
         if(digitalRead(JAM_SENSOR_PIN(1)) == LOW){
           if(filament_sensor_state == true){
             filament_sensor_state = false;
+             #if ENABLED(FILAMENT_JAM_SENSOR_DEBUG)
+            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED(LOW)!");
+             char buf[50];
+            SERIAL_ECHOLN("EXTRUDER_STEPS:");
+            sprintf(buf, "\"%lu\"", extruder_counts); 
+            SERIAL_ECHOLN(buf);
+            #endif
+            extruder_counts = 0;
           }
         }else if(digitalRead(JAM_SENSOR_PIN(1)) == HIGH){
           if(filament_sensor_state == false){
             #if ENABLED(FILAMENT_JAM_SENSOR_DEBUG)
-            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED!");
+            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED(HIGH)!");
              char buf[50];
             SERIAL_ECHOLN("EXTRUDER_STEPS:");
             sprintf(buf, "\"%lu\"", extruder_counts); 
@@ -707,12 +726,20 @@ void Stepper::isr() {
         }else{
           if(digitalRead(JAM_SENSOR_PIN(0)) == LOW){
           if(filament_sensor_state == true){
+            #if ENABLED(FILAMENT_JAM_SENSOR_DEBUG)
+            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED(LOW)!");
+             char buf[50];
+            SERIAL_ECHOLN("EXTRUDER_STEPS:");
+            sprintf(buf, "\"%lu\"", extruder_counts); 
+            SERIAL_ECHOLN(buf);
+            #endif
+            extruder_counts = 0;
             filament_sensor_state = false;
           }
           }else if(digitalRead(JAM_SENSOR_PIN(0)) == HIGH){
           if(filament_sensor_state == false){
             #if ENABLED(FILAMENT_JAM_SENSOR_DEBUG)
-            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED!");
+            SERIAL_ECHOLN("FILAMENT_JAM_SENSOR_CYCLE_ENDED(HIGH)!");
              char buf[50];
             SERIAL_ECHOLN("EXTRUDER_STEPS:");
             sprintf(buf, "\"%lu\"", extruder_counts); 

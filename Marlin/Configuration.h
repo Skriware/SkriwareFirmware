@@ -789,8 +789,8 @@
 
 #define FILAMENT_JAM_SENSOR     //ukikoza
 #if ENABLED(FILAMENT_JAM_SENSOR)
-#define FILAMENT_JAM_ALARM 1200
-#define FILAMENT_JAM_ERROR 2000
+#define FILAMENT_JAM_ALARM 700
+#define FILAMENT_JAM_ERROR 900
 #define FILAMENT_JAM_SENSOR_PIN_E0 2
 #define FILAMENT_JAM_SENSOR_PIN_E1 19
 //#define FILAMENT_JAM_SENSOR_DEBUG
@@ -1153,7 +1153,7 @@
  *
  * View the current statistics with M78.
  */
-//#define PRINTCOUNTER
+#define PRINTCOUNTER
 
 //=============================================================================
 //============================= LCD and SD support ============================

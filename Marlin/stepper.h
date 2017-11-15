@@ -89,6 +89,7 @@ class Stepper {
      #if ENABLED(FILAMENT_JAM_SENSOR)        //ukikoza
     static bool filament_sensor_state;
     static long extruder_counts; 
+    static long retract_counts;
     static int extruder_id;
 
     #endif
