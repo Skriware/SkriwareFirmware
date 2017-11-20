@@ -93,7 +93,7 @@ long Stepper::counter_X = 0,
 
 #if ENABLED(FILAMENT_JAM_SENSOR)
 long Stepper::extruder_counts = 0;
-long Stepper::retract_counts = 0;
+long Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
 int Stepper::extruder_id = 0;
 bool Stepper::filament_sensor_state = false;  //ukikoza
 #endif

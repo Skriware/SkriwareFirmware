@@ -10657,6 +10657,10 @@ void process_next_command() {
       case 71:
           filament_sensor_on = true;
           Stepper::extruder_counts = 0;
+          Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
+      break;
+      case 72:
+        Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
       break;
       case 75: // M75: Start print timer
         gcode_M75(); break;
