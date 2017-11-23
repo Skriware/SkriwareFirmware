@@ -10633,8 +10633,6 @@ void process_next_command() {
         case 43: // M43: Read pin state
           gcode_M43(); break;
       #endif
-
-
       #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
         case 48: // M48: Z probe repeatability test
           gcode_M48();
