@@ -84,10 +84,10 @@ volatile byte Bbreath;
 // Specify LED RGB outputs
 
 #define   SlaveFlagPin  A3
-#define   SCALE1_DT     A1
-#define   SCALE2_DT     A2
-#define   SCALE1_SCK    9
-#define   SCALE2_SCK    10
+#define   SCALE1_DT     9
+#define   SCALE2_DT     10
+#define   SCALE1_SCK    13
+#define   SCALE2_SCK    13
 #define   POWERPin  8
 #define   PowerButtonInterruptPin  2
 #define   LEDPIN 6
