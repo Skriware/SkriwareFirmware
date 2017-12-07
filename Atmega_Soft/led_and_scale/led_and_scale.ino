@@ -92,9 +92,9 @@ volatile byte Bbreath;
 #define   PowerButtonInterruptPin  2
 #define   LEDPIN 6
 #define   LEDPIN_RIGHT 7
-#define   NUMPIXELS 40
+#define   NUMPIXELS 39
 #define   NLED_LEFT 12
-#define   NLED_CENTER 16
+#define   NLED_CENTER 15
 #define   NLED_RIGHT 12
 bool MKSPower = false;
 long int LastClick = 0;
