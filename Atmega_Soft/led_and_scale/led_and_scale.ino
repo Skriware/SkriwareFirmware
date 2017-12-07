@@ -91,7 +91,6 @@ volatile byte Bbreath;
 #define   POWERPin  8
 #define   PowerButtonInterruptPin  2
 #define   LEDPIN 6
-#define   LEDPIN_RIGHT 7
 #define   NUMPIXELS 39
 #define   NLED_LEFT 12
 #define   NLED_CENTER 15
@@ -120,7 +119,6 @@ void setup() {
   
   Serial.begin(9600);           // start serial for output
   pinMode(POWERPin, OUTPUT);
-  pinMode(2,INPUT);
   digitalWrite(POWERPin,HIGH);
   pinMode(SlaveFlagPin,OUTPUT);
   pinMode(PowerButtonInterruptPin,INPUT);
