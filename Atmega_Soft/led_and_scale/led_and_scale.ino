@@ -256,10 +256,10 @@ void control_lights(byte mode, byte R, byte G, byte B) {
       flashing = !flashing;
       break;
     case 0x06:
-        for(int i = 0 ; i < NLED_LEFT+1 ; i++){
+        for(int i = 0 ; i <NLED_LEFT; i++){
         delay(650);
-         lightsUpToUP(2,i,R,G,B);
-         lightsUpToUP(0,i,R,G,B);
+         lightsUpToDOWN(2,i,255,255,255);
+         lightsUpToDOWN(0,i,255,255,255);
       }
     break;
   }
