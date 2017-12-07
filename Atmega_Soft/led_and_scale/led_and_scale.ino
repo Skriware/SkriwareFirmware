@@ -219,11 +219,11 @@ void handle_message(byte frame[5]) {
 }
 
 void centerLightUp(byte R, byte G, byte B){
-  lightsUpToUP(1,12,R,G,B);
+  lightsUpToUP(1,NLED_CENTER,R,G,B);
 }
 
 void centerLightDown(){
-  lightsUpToUP(1,12,0,0,0);
+  lightsUpToUP(1,NLED_CENTER,0,0,0);
 }
 
 void control_lights(byte mode, byte R, byte G, byte B) {
@@ -258,8 +258,8 @@ void control_lights(byte mode, byte R, byte G, byte B) {
     case 0x06:
         for(int i = 0 ; i < NLED_LEFT+1 ; i++){
         delay(650);
-         lightsUpToDOWN(2,i,R,G,B);
-         lightsUpToDOWN(0,i,R,G,B);
+         lightsUpToUP(2,i,R,G,B);
+         lightsUpToUP(0,i,R,G,B);
       }
     break;
   }
