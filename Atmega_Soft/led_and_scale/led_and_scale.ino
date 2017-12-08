@@ -164,10 +164,11 @@ void handle_message(byte frame[5]) {
       control_lights(frame[1], frame[2], frame[3], frame[4]);
       break;
     case 0xFF:
+        centerLightDown();
       for(int i = NLED_LEFT ; i > -1; i--){
         delay(350);
-         lightsUpToDOWN(2,i,255,255,255);
-         lightsUpToDOWN(0,i,255,255,255);
+         lightsUpToDOWN(2,i,frame[2],frame[3],frame[4]);
+         lightsUpToDOWN(0,i,frame[2],frame[3],frame[4]);
       }
       delay(15000);
       digitalWrite(POWERPin,HIGH);
@@ -267,9 +268,10 @@ void control_lights(byte mode, byte R, byte G, byte B) {
     case 0x06:
         for(int i = 0 ; i <NLED_LEFT+1; i++){
         delay(650);
-         lightsUpToDOWN(2,i,255,255,255);
-         lightsUpToDOWN(0,i,255,255,255);
+         lightsUpToDOWN(2,i,R,G,B);
+         lightsUpToDOWN(0,i,R,G,B);
       }
+      centerLightUp(R,G,B);
     break;
   }
 }
