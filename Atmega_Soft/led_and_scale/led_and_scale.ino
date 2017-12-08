@@ -142,7 +142,7 @@ void loop() {
     flash();
     detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
   }
-  
+
   if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
 }
 
@@ -386,7 +386,7 @@ void receiveEvent(int howMany) {
 // function that executes whenever data is requested by master
 void requestEvent() {
   int count = Wire.write(out_buffer);
-  Serial.print(" "); Serial.print(count); Serial.println(" bytes sent");
+  //Serial.print(" "); Serial.print(count); Serial.println(" bytes sent");
 }
 
 void fade(byte R, byte G, byte B) {
