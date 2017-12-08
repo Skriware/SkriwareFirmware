@@ -440,8 +440,8 @@ void breath() {
   fade(Rbreath, Gbreath, Bbreath);
 }
 
-void flash(byte R,byte G, byte B) {
-    lights_up(R, G, B);
+void flash() {
+    lights_up(Rbreath, Gbreath, Bbreath);
     delay(300);
     lights_down();
     delay(300);
