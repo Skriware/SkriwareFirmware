@@ -131,9 +131,18 @@ void setup() {
 
 void loop() {
   
-  while(breathing) {
+  if(breathing) {
+    attachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin),PowerButtonPressed,HIGH);
     breath();
+    detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
   }
+
+  if(flashing){
+    attachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin),PowerButtonPressed,HIGH);
+    flash();
+    detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
+  }
+  
   if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
 }
 
@@ -256,7 +265,7 @@ void control_lights(byte mode, byte R, byte G, byte B) {
       flashing = !flashing;
       break;
     case 0x06:
-        for(int i = 0 ; i <NLED_LEFT; i++){
+        for(int i = 0 ; i <NLED_LEFT+1; i++){
         delay(650);
          lightsUpToDOWN(2,i,255,255,255);
          lightsUpToDOWN(0,i,255,255,255);
@@ -382,21 +391,21 @@ void requestEvent() {
 
 void fade(byte R, byte G, byte B) {
   
-  byte Rstep = R/10 + 1;
-  byte Gstep = G/10 + 1;
-  byte Bstep = B/10 + 1;
+  byte Rstep = R/20 + 1;
+  byte Gstep = G/20 + 1;
+  byte Bstep = B/20 + 1;
 
   if(R == 0) Rstep = 0;
   if(G == 0) Gstep = 0;
   if(B == 0) Bstep = 0;
 
-  for (int f = 10; f > 0; f--) {
+  for (int f = 20; f > -1; f--) {
     for(int i = 0 ; i < NUMPIXELS; i++){
       pixels.setPixelColor(i, pixels.Color(f*Rstep,
                                                   f*Gstep,
                                                   f*Bstep));     
     }
-  delay(500);
+  delay(200);
   pixels.show();
 
   }
@@ -405,24 +414,25 @@ void fade(byte R, byte G, byte B) {
 
 void brighten(byte R, byte G, byte B) {
   // brighten from 0 to RGB in 5 points steps
-  byte Rstep = R/10;
-  byte Gstep = G/10;
-  byte Bstep = B/10;
+  byte Rstep = R/20 + 1;
+  byte Gstep = G/20 + 1;
+  byte Bstep = B/20 + 1;
 
   if(R == 0) Rstep = 0;
   if(G == 0) Gstep = 0;
   if(B == 0) Bstep = 0;
 
-  for (int f = 0; f <= 10; f++) {
+  for (int f = 0; f <= 20; f++) {
     for(int i = 0 ; i < NUMPIXELS; i++){
       pixels.setPixelColor(i, pixels.Color(f*Rstep,
                                            f*Gstep,
                                            f*Bstep)); 
            
     }
-  delay(500);
+  delay(200);
   pixels.show();
     }
+
 }
 
 void breath() {
