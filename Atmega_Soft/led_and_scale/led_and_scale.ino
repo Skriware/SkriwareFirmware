@@ -382,16 +382,21 @@ void requestEvent() {
 
 void fade(byte R, byte G, byte B) {
   
-  byte Rstep = R/51 + 1;
-  byte Gstep = G/51 + 1;
-  byte Bstep = B/51 + 1;
-  for (int f = 255; f > 0; f -= 5) {
+  byte Rstep = R/10 + 1;
+  byte Gstep = G/10 + 1;
+  byte Bstep = B/10 + 1;
+
+  if(R == 0) Rstep = 0;
+  if(G == 0) Gstep = 0;
+  if(B == 0) Bstep = 0;
+
+  for (int f = 10; f > 0; f--) {
     for(int i = 0 ; i < NUMPIXELS; i++){
       pixels.setPixelColor(i, pixels.Color(f*Rstep,
                                                   f*Gstep,
                                                   f*Bstep));     
     }
-  delay(50);
+  delay(500);
   pixels.show();
 
   }
@@ -400,17 +405,22 @@ void fade(byte R, byte G, byte B) {
 
 void brighten(byte R, byte G, byte B) {
   // brighten from 0 to RGB in 5 points steps
-  byte Rstep = R/51+1;
-  byte Gstep = G/51+1;
-  byte Bstep = B/51+1;
-  for (int f = 0; f <= 255; f += 5) {
+  byte Rstep = R/10;
+  byte Gstep = G/10;
+  byte Bstep = B/10;
+
+  if(R == 0) Rstep = 0;
+  if(G == 0) Gstep = 0;
+  if(B == 0) Bstep = 0;
+
+  for (int f = 0; f <= 10; f++) {
     for(int i = 0 ; i < NUMPIXELS; i++){
       pixels.setPixelColor(i, pixels.Color(f*Rstep,
-                                                  f*Gstep,
-                                                  f*Bstep)); 
+                                           f*Gstep,
+                                           f*Bstep)); 
            
     }
-  delay(50);
+  delay(500);
   pixels.show();
     }
 }
