@@ -90,6 +90,9 @@ class Stepper {
     static bool filament_sensor_state;
     static long extruder_counts; 
     static long retract_counts;
+    static long filament_error_level;
+    static long filament_alarm_level;
+    static long filament_retract_buffor; //ukikoza
     static int extruder_id;
 
     #endif

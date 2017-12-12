@@ -137,6 +137,13 @@ class Planner {
     /**
      * A ring buffer of moves described in steps
      */
+    #if ENABLED(FILAMENT_JAM_SENSOR)                    //ukikoza
+    #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+    static uint8_t filament_sensor_type;          //(0 - binary sensor ; 1 - ful filament sensor)
+
+    #endif
+    #endif
+
     static block_t block_buffer[BLOCK_BUFFER_SIZE];
     static volatile uint8_t block_buffer_head,  // Index of the next block to be pushed
                             block_buffer_tail;

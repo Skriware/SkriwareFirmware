@@ -95,7 +95,11 @@ long Stepper::counter_X = 0,
 long Stepper::extruder_counts = 0;
 long Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
 int Stepper::extruder_id = 0;
-bool Stepper::filament_sensor_state = false;  //ukikoza
+bool Stepper::filament_sensor_state = false; 
+
+long Stepper::filament_error_level = FILAMENT_JAM_ERROR;
+long Stepper::filament_alarm_level = FILAMENT_JAM_ALARM;
+long Stepper::filament_retract_buffor = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR; //ukikoza
 #endif
 
 
