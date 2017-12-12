@@ -8253,6 +8253,7 @@ inline void gcode_M205() {
   if (parser.seen('Y')) planner.max_jerk[Y_AXIS] = parser.value_linear_units();
   if (parser.seen('Z')) planner.max_jerk[Z_AXIS] = parser.value_linear_units();
   if (parser.seen('E')) planner.max_jerk[E_AXIS] = parser.value_linear_units();
+
 }
 
 #if HAS_M206_COMMAND
@@ -10660,6 +10661,40 @@ void process_next_command() {
       case 72:
         Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
       break;
+      case 68:
+        Planner::filament_sensor_type = 0;
+        gcode_M500();
+      break;
+
+      case 67:
+        Planner::filament_sensor_type = 1;
+        gcode_M500();
+      break;
+
+      case 66:
+        if(Planner::filament_sensor_type == 0){
+          SERIAL_ECHOLN("USING BINARY FILAMENT SENSOR");
+        }else{
+          SERIAL_ECHOLN("USING ROTATION FILAMET SENSOR");
+        }
+      break;
+      case 65:
+        if (parser.seen('E')) Stepper::filament_error_level = parser.value_linear_units();
+        if (parser.seen('A')) Stepper::filament_alarm_level = parser.value_linear_units();
+        if (parser.seen('R')) Stepper::filament_retract_buffor = parser.value_linear_units();
+        gcode_M500();
+      break;
+
+      case 64:
+        SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
+        SERIAL_ECHOLN("ERROR LEVEL:");
+        SERIAL_ECHOLN(Stepper::filament_error_level);
+        SERIAL_ECHOLN("ALARM LEVEL:");
+        SERIAL_ECHOLN(Stepper::filament_alarm_level);
+        SERIAL_ECHOLN("RETRACT BUFFOR LEVEL:");
+        SERIAL_ECHOLN(Stepper::filament_retract_buffor);
+      break;
+
       case 75: // M75: Start print timer
         gcode_M75(); break;
       case 76: // M76: Pause print timer
@@ -12429,7 +12464,7 @@ void prepare_move_to_destination() {
 
   void handle_filament_jam() {
     if (!filament_jam) {
-      if(abs(Stepper::extruder_counts) > FILAMENT_JAM_ERROR){
+      if(abs(Stepper::extruder_counts) > Stepper::filament_error_level){
            filament_jam = true;
            SERIAL_ECHO("FILAMENT_JAM_ERROR ");
            SERIAL_ECHO("E");
@@ -12668,7 +12703,7 @@ void disable_all_steppers() {
 void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
 
   #if ENABLED(FILAMENT_JAM_SENSOR)
-   if(filament_sensor_on && abs(Stepper::extruder_counts) > FILAMENT_JAM_ALARM){
+   if(filament_sensor_on && abs(Stepper::extruder_counts) > Stepper::filament_alarm_level){
      handle_filament_jam();                           //ukikoza
    }
    #endif
