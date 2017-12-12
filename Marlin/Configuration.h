@@ -193,8 +193,8 @@
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
 // For the other hotends it is their distance from the extruder 0 hotend.
-#define HOTEND_OFFSET_X {0.0, -30.7} // (in mm) for each extruder, offset of the hotend on the X axis
-#define HOTEND_OFFSET_Y {0.0, 1.25}  // (in mm) for each extruder, offset of the hotend on the Y axis
+#define HOTEND_OFFSET_X {0.0, -30.5} // (in mm) for each extruder, offset of the hotend on the X axis
+#define HOTEND_OFFSET_Y {0.0, 0.0}  // (in mm) for each extruder, offset of the hotend on the Y axis
 
 // @section machine
 
@@ -534,7 +534,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 270, 270, 50, 1500 }
+#define DEFAULT_MAX_ACCELERATION      { 250, 250, 50, 1500 }
 
 /**
  * Default Acceleration (change/s) change = mm/s
@@ -550,10 +550,10 @@
 
  /*value set here, it may happen instantaneously.
  */
-#define DEFAULT_XJERK                 7.0
-#define DEFAULT_YJERK                 7.0
-#define DEFAULT_ZJERK                  0.4
-#define DEFAULT_EJERK                  5.0
+#define DEFAULT_XJERK                 5.0
+#define DEFAULT_YJERK                 5.0
+#define DEFAULT_ZJERK                 0.4
+#define DEFAULT_EJERK                 5.0
 
 
 //===========================================================================
