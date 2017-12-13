@@ -92,11 +92,10 @@ float Planner::max_feedrate_mm_s[XYZE_N], // Max speeds in mm per second
 #endif
 
 
-  #if ENABLED(FILAMENT_JAM_SENSOR)                    //ukikoza
-  #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+  #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)                 //ukikoza
+  
    uint8_t Planner::filament_sensor_type = 0;          //(0 - binary sensor ; 1 - ful filament sensor)
 
-  #endif
   #endif
 
 uint32_t Planner::max_acceleration_steps_per_s2[XYZE_N],

@@ -333,10 +333,16 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(planner.min_segment_time);
     EEPROM_WRITE(planner.max_jerk);
 
+    #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR) 
     EEPROM_WRITE(planner.filament_sensor_type);           //ukikoza
+    
+    #if ENABLED(FILAMENT_JAM_SENSOR)
     EEPROM_WRITE(stepper.filament_error_level); 
     EEPROM_WRITE(stepper.filament_alarm_level); 
-    EEPROM_WRITE(stepper.filament_retract_buffor);  
+    EEPROM_WRITE(stepper.filament_retract_buffor); 
+    #endif 
+
+    #endif
     #if !HAS_HOME_OFFSET
       const float home_offset[XYZ] = { 0 };
     #endif
@@ -736,10 +742,17 @@ void MarlinSettings::postprocess() {
       EEPROM_READ(planner.min_segment_time);
       EEPROM_READ(planner.max_jerk);
 
+      #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
       EEPROM_READ(planner.filament_sensor_type);    
+      
+      #if ENABLED(FILAMENT_JAM_SENSOR)
       EEPROM_READ(stepper.filament_error_level); 
       EEPROM_READ(stepper.filament_alarm_level); 
       EEPROM_READ(stepper.filament_retract_buffor);  
+
+      #endif
+
+      #endif
 
 
         //ukikoza
@@ -1206,11 +1219,19 @@ void MarlinSettings::reset() {
   planner.max_jerk[Y_AXIS] = DEFAULT_YJERK;
   planner.max_jerk[Z_AXIS] = DEFAULT_ZJERK;
   planner.max_jerk[E_AXIS] = DEFAULT_EJERK;
+
+
+  #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
   planner.filament_sensor_type = 0;
+
+  #if ENABLED(FILAMENT_JAM_SENSOR)
 
   stepper.filament_error_level = FILAMENT_JAM_ERROR;
   stepper.filament_alarm_level = FILAMENT_JAM_ALARM;
   stepper.filament_retract_buffor = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;        //ukikoza
+  #endif
+  #endif
+
 
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
     planner.z_fade_height = 0.0;

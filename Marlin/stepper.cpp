@@ -650,18 +650,21 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_START(E);
+        #if ENABLED(FILAMENT_JAM_SENSOR)
          if(_COUNTER(E) > 0){
           if(motor_direction(E_AXIS)){
+            
             retract_counts++;
+            
          }else{
           if(retract_counts == 0){
             extruder_counts++;
           }else{
             retract_counts--;
-          }
-          
+          } 
           }
          }
+         #endif
          //ukikoza
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE

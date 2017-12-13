@@ -652,6 +652,14 @@ static bool filament_alarm = false;
 static bool filament_sensor_on = true;
 #endif
 
+#if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+static bool filament_binary_sensor_E0_on = true;
+static bool filament_binary_sensor_E1_on = true;
+static bool filament_runout_E0 = false;
+static bool filament_runout_E1 = false;
+
+#endif
+
 #if ENABLED(MIXING_EXTRUDER)
   float mixing_factor[MIXING_STEPPERS]; // Reciprocal of mix proportion. 0.0 = off, otherwise >= 1.0.
   #if MIXING_VIRTUAL_TOOLS > 1
@@ -10645,7 +10653,74 @@ void process_next_command() {
           gcode_M49();
           break;
       #endif // AUTO_BED_LEVELING_UBL && UBL_G26_MESH_VALIDATION
-      case 69:    //ukikoza
+      //ukikoza
+     
+      #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+      case 63:
+        if (parser.seen('L')) filament_runout_E0 = false; 
+        if (parser.seen('R')) filament_runout_E1 = false;
+        if (parser.seen('A')){
+          filament_runout_E1 = false;
+          filament_runout_E0 = false;
+        }
+      break;
+      case 62:
+        if (parser.seen('L')) filament_binary_sensor_E0_on = false;
+        if (parser.seen('R')) filament_binary_sensor_E1_on = false;
+        if (parser.seen('A')){
+          filament_binary_sensor_E0_on = false;
+          filament_binary_sensor_E1_on = false;
+        }
+        break;
+      case 61:
+        if (parser.seen('L')) filament_binary_sensor_E0_on = true;
+        if (parser.seen('R')) filament_binary_sensor_E1_on = true;
+        if (parser.seen('A')){
+          filament_binary_sensor_E0_on = true;
+          filament_binary_sensor_E1_on = true;
+        }
+        break;
+      #endif
+
+      #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+           case 68:
+        Planner::filament_sensor_type = 0;
+        gcode_M500();
+      break;
+      case 67:
+        Planner::filament_sensor_type = 1;
+        gcode_M500();
+      break;
+
+      #endif
+
+      #if ENABLED(FILAMENT_JAM_SENSOR)
+
+      case 66:
+        if(Planner::filament_sensor_type == 0){
+          SERIAL_ECHOLN("USING BINARY FILAMENT SENSOR");
+        }else if(Planner::filament_sensor_type == 1) {
+          SERIAL_ECHOLN("USING ROTATION FILAMET SENSOR");
+        }else{
+          SERIAL_ECHOLN("USING ROTATION FILAMET SENSOR AND BINARY FILAMENT SENSOR");
+        }
+      break;
+      case 65:
+        if (parser.seen('E')) Stepper::filament_error_level = parser.value_linear_units();
+        if (parser.seen('A')) Stepper::filament_alarm_level = parser.value_linear_units();
+        if (parser.seen('R')) Stepper::filament_retract_buffor = parser.value_linear_units();
+        gcode_M500();
+      break;
+      case 64:
+        SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
+        SERIAL_ECHOLN("ERROR LEVEL:");
+        SERIAL_ECHOLN(Stepper::filament_error_level);
+        SERIAL_ECHOLN("ALARM LEVEL:");
+        SERIAL_ECHOLN(Stepper::filament_alarm_level);
+        SERIAL_ECHOLN("RETRACT BUFFOR LEVEL:");
+        SERIAL_ECHOLN(Stepper::filament_retract_buffor);
+      break;
+      case 69:    
           Stepper::extruder_counts = 0;
           filament_jam = false;
           filament_alarm = false;
@@ -10661,40 +10736,7 @@ void process_next_command() {
       case 72:
         Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
       break;
-      case 68:
-        Planner::filament_sensor_type = 0;
-        gcode_M500();
-      break;
-
-      case 67:
-        Planner::filament_sensor_type = 1;
-        gcode_M500();
-      break;
-
-      case 66:
-        if(Planner::filament_sensor_type == 0){
-          SERIAL_ECHOLN("USING BINARY FILAMENT SENSOR");
-        }else{
-          SERIAL_ECHOLN("USING ROTATION FILAMET SENSOR");
-        }
-      break;
-      case 65:
-        if (parser.seen('E')) Stepper::filament_error_level = parser.value_linear_units();
-        if (parser.seen('A')) Stepper::filament_alarm_level = parser.value_linear_units();
-        if (parser.seen('R')) Stepper::filament_retract_buffor = parser.value_linear_units();
-        gcode_M500();
-      break;
-
-      case 64:
-        SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
-        SERIAL_ECHOLN("ERROR LEVEL:");
-        SERIAL_ECHOLN(Stepper::filament_error_level);
-        SERIAL_ECHOLN("ALARM LEVEL:");
-        SERIAL_ECHOLN(Stepper::filament_alarm_level);
-        SERIAL_ECHOLN("RETRACT BUFFOR LEVEL:");
-        SERIAL_ECHOLN(Stepper::filament_retract_buffor);
-      break;
-
+      #endif
       case 75: // M75: Start print timer
         gcode_M75(); break;
       case 76: // M76: Pause print timer
@@ -12703,11 +12745,22 @@ void disable_all_steppers() {
 void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
 
   #if ENABLED(FILAMENT_JAM_SENSOR)
-   if(filament_sensor_on && abs(Stepper::extruder_counts) > Stepper::filament_alarm_level){
+   if((Planner::filament_sensor_type == 1 || Planner::filament_sensor_type == 2) && filament_sensor_on && abs(Stepper::extruder_counts) > Stepper::filament_alarm_level){
      handle_filament_jam();                           //ukikoza
    }
    #endif
-
+   #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+   if(Planner::filament_sensor_type == 0 || Planner::filament_sensor_type == 2){
+    if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
+      SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+      filament_runout_E0 = true;
+    }
+    if(filament_binary_sensor_E1_on && !filament_runout_E1 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){
+      SERIAL_ECHOLN("FILAMENT_RUNOUT_E1");
+      filament_runout_E1 = true;
+    }
+   } 
+   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     if ((IS_SD_PRINTING || print_job_timer.isRunning()) && (READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_INVERTING))
       handle_filament_runout();
