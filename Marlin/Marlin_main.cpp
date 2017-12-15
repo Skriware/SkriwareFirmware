@@ -657,6 +657,8 @@ static bool filament_binary_sensor_E0_on = true;
 static bool filament_binary_sensor_E1_on = true;
 static bool filament_runout_E0 = false;
 static bool filament_runout_E1 = false;
+static long Last_runout_Signal_E0 = 0;
+static long Last_runout_Signal_E1 = 0;
 
 #endif
 
@@ -12752,12 +12754,20 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
    #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
    if(Planner::filament_sensor_type == 0 || Planner::filament_sensor_type == 2){
     if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
+      if(millis() - Last_runout_Signal_E0 > BINARY_SENSOR_DEBOUNCE_TIME){
       SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
       filament_runout_E0 = true;
+      }else{
+        Last_runout_Signal_E0 = millis();
+      }
     }
     if(filament_binary_sensor_E1_on && !filament_runout_E1 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){
+      if(millis() - Last_runout_Signal_E1 > BINARY_SENSOR_DEBOUNCE_TIME){
       SERIAL_ECHOLN("FILAMENT_RUNOUT_E1");
       filament_runout_E1 = true;
+      }else{
+        Last_runout_Signal_E1 = millis();
+      }
     }
    } 
    #endif
