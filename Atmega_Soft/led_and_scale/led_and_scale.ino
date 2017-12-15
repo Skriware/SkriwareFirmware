@@ -557,7 +557,16 @@ void lightsUpToUP(byte LEDbar,byte n, byte R, byte G, byte B){
 void PowerButtonPressed(){
   Serial.println("Interrupt!");
   if((millis() - LastClick) > 500){ 
-    if(!MKSPower){
+    LastClick = millis();
+    Clicks = 0;
+  }else{
+    Clicks++;
+    delay(10);
+    LastClick = millis();
+    Serial.println(Clicks);
+  }
+  if(Clicks > 20){
+     if(!MKSPower){
       digitalWrite(POWERPin,LOW);
       lights_down();
       digitalWrite(SlaveFlagPin,HIGH);
@@ -570,16 +579,9 @@ void PowerButtonPressed(){
       digitalWrite(SlaveFlagPin,LOW);
       delay(500);
       digitalWrite(SlaveFlagPin,HIGH);
+    }
       //Sendinf to MKS turn off message 
     }
-    LastClick = millis();
-    Clicks = 0;
-  }else{
-    Clicks++;
-    delay(10);
-    LastClick = millis();
-    Serial.println(Clicks);
-  }
   if(Clicks > 220){
     digitalWrite(POWERPin,HIGH);
     MKSPower = false;
