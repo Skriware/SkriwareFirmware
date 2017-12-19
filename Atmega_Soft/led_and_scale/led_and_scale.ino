@@ -578,19 +578,19 @@ void PowerButtonPressed(){
       MKSPower = true;
     }else{
       digitalWrite(SlaveFlagPin,LOW);
-      delay(500);
+      delay(100);
       digitalWrite(SlaveFlagPin,HIGH);
     }
       //Sendinf to MKS turn off message 
     }
   if(Clicks > 220){
     lights_down();
-    digitalWrite(POWERPin,HIGH);
     MKSPower = false;
     breathing = false;
     flashing = false;
     digitalWrite(SlaveFlagPin,HIGH);
     Clicks = 0;
+    digitalWrite(POWERPin,HIGH);
   }
 }
 

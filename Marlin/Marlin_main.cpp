@@ -12754,22 +12754,32 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
    #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
    if(Planner::filament_sensor_type == 0 || Planner::filament_sensor_type == 2){
     if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
-      if(millis() - Last_runout_Signal_E0 > BINARY_SENSOR_DEBOUNCE_TIME){
-      SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
-      filament_runout_E0 = true;
+      if(millis() - Last_runout_Signal_E0 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E0 != 0){
+          SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+          filament_runout_E0 = true;
+          Last_runout_Signal_E0 = 0;
       }else{
-        Last_runout_Signal_E0 = millis();
+          if(Last_runout_Signal_E0 == 0){
+          Last_runout_Signal_E0 = millis();
+          }
       }
+    }else if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == HIGH){
+          Last_runout_Signal_E0 = 0;
     }
     if(filament_binary_sensor_E1_on && !filament_runout_E1 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){
-      if(millis() - Last_runout_Signal_E1 > BINARY_SENSOR_DEBOUNCE_TIME){
-      SERIAL_ECHOLN("FILAMENT_RUNOUT_E1");
-      filament_runout_E1 = true;
+      if(millis() - Last_runout_Signal_E1 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E1 != 0){
+          SERIAL_ECHOLN("FILAMENT_RUNOUT_E1");
+          filament_runout_E1 = true;
+          Last_runout_Signal_E1 = 0;
       }else{
-        Last_runout_Signal_E1 = millis();
+          if(Last_runout_Signal_E1 == 0){
+          Last_runout_Signal_E1 = millis();
+          }
       }
+    }else if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == HIGH){
+          Last_runout_Signal_E1 = 0;
     }
-   } 
+  }
    #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     if ((IS_SD_PRINTING || print_job_timer.isRunning()) && (READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_INVERTING))
