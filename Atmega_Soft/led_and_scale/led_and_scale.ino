@@ -107,7 +107,7 @@ HX711 RightScale;
 char out_buffer[32];
 byte frame[6];
 
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel *pixels; 
 
 void setup() {
   Wire.begin(8);                // join i2c bus with address #8
@@ -168,6 +168,7 @@ void handle_message(byte frame[5]) {
       }
       delay(15000);
       digitalWrite(POWERPin,HIGH);
+      delete pixels;
       MKSPower = false;
       flashing = false;
       breathing = false;
@@ -399,12 +400,12 @@ void fade(byte R, byte G, byte B) {
 
   for (int f = 20; f > -1; f--) {
     for(int i = 0 ; i < NUMPIXELS; i++){
-      pixels.setPixelColor(i, pixels.Color(f*Rstep,
+      pixels->setPixelColor(i, pixels->Color(f*Rstep,
                                                   f*Gstep,
                                                   f*Bstep));     
     }
   delay(200);
-  pixels.show();
+  pixels->show();
 
   }
   
@@ -422,13 +423,13 @@ void brighten(byte R, byte G, byte B) {
 
   for (int f = 0; f <= 20; f++) {
     for(int i = 0 ; i < NUMPIXELS; i++){
-      pixels.setPixelColor(i, pixels.Color(f*Rstep,
+      pixels->setPixelColor(i, pixels->Color(f*Rstep,
                                            f*Gstep,
                                            f*Bstep)); 
            
     }
   delay(200);
-  pixels.show();
+  pixels->show();
     }
 
 }
@@ -447,35 +448,35 @@ void flash() {
 
 void lights_up(byte R, byte G, byte B) {
     for(int i = 0 ; i < NUMPIXELS; i++){
-      pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+      pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
     }
-    pixels.show(); 
+    pixels->show(); 
 }
 
 void lights_down() {
    for(int i = 0 ; i < NUMPIXELS; i++){
-      pixels.setPixelColor(i, pixels.Color(0,0,0));                                              
+      pixels->setPixelColor(i, pixels->Color(0,0,0));                                              
     }
 
-    pixels.show();
+    pixels->show();
 }
 
 void setLED(byte LEDbar,byte LEDid, byte R, byte G,byte B){
   switch (LEDbar){
     case 0:
-      pixels.setPixelColor(LEDid+1, pixels.Color(R,G,B)); 
+      pixels->setPixelColor(LEDid+1, pixels->Color(R,G,B)); 
       break;
     case 1:
-      pixels.setPixelColor(LEDid+NLED_LEFT+1, pixels.Color(R,G,B)); 
+      pixels->setPixelColor(LEDid+NLED_LEFT+1, pixels->Color(R,G,B)); 
       break;
     case 2:
-      pixels.setPixelColor(NUMPIXELS-LEDid-1, pixels.Color(R,G,B)); 
+      pixels->setPixelColor(NUMPIXELS-LEDid-1, pixels->Color(R,G,B)); 
       break;
   }
 }
 
 void showLED(){
-  pixels.show();
+  pixels->show();
 }
 
 void lightsUpToDOWN(byte LEDbar, byte n, byte R, byte G, byte B){
@@ -483,32 +484,32 @@ void lightsUpToDOWN(byte LEDbar, byte n, byte R, byte G, byte B){
     case 0:
       for(int i = 0 ; i < NLED_LEFT; i++){
             if( i < n){ 
-              pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+              pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
             }else{
-              pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+              pixels->setPixelColor(i, pixels->Color(0,0,0)); 
              }
       }
-      pixels.show();
+      pixels->show();
       break;
     case 1:
       for(int i = NLED_LEFT ; i < NLED_LEFT+NLED_CENTER; i++){
             if( i < n+NLED_LEFT){ 
-              pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+              pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
             }else{
-              pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+              pixels->setPixelColor(i, pixels->Color(0,0,0)); 
              }
       }
-      pixels.show();
+      pixels->show();
       break;
     case 2:
        for(int i = NUMPIXELS-1 ; i > NLED_CENTER+NLED_LEFT-1; i--){
             if( i > NUMPIXELS-n-1){ 
-              pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+              pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
             }else{
-              pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+              pixels->setPixelColor(i, pixels->Color(0,0,0)); 
              }
       }
-      pixels.show();
+      pixels->show();
       break;
   }
 }
@@ -518,32 +519,32 @@ void lightsUpToUP(byte LEDbar,byte n, byte R, byte G, byte B){
     case 0:
       for(int i = NLED_LEFT+1 ; i > -1 ; i--){
             if( i > NLED_LEFT-n-1){ 
-              pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+              pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
             }else{
-              pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+              pixels->setPixelColor(i, pixels->Color(0,0,0)); 
              }
       }
-      pixels.show();
+      pixels->show();
       break;
     case 1:
       for(int i = NLED_LEFT+NLED_CENTER-1; i > NLED_LEFT-1; i--){
             if( i > NLED_LEFT+NLED_CENTER-n-1){ 
-              pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+              pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
             }else{
-              pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+              pixels->setPixelColor(i, pixels->Color(0,0,0)); 
              }
       }
-      pixels.show();
+      pixels->show();
       break;
     case 2:
        for(int i =  NLED_LEFT+NLED_CENTER ; i < NUMPIXELS; i++){
             if( i < NLED_LEFT+NLED_CENTER+n-1){ 
-              pixels.setPixelColor(i, pixels.Color(R,G,B));                                              
+              pixels->setPixelColor(i, pixels->Color(R,G,B));                                              
             }else{
-              pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+              pixels->setPixelColor(i, pixels->Color(0,0,0)); 
              }
       }
-      pixels.show();
+      pixels->show();
       break;
   
 }
@@ -566,7 +567,8 @@ void PowerButtonPressed(){
      if(!MKSPower){
       digitalWrite(POWERPin,LOW);
        delay(1000);
-       pixels.begin();
+       pixels = new Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
+       pixels->begin();
       lights_down();
       digitalWrite(SlaveFlagPin,HIGH);
       for(int kk = 0; kk < 20 ; kk++){          // to reduce the effect that leds behave strange when getting power.
@@ -589,6 +591,7 @@ void PowerButtonPressed(){
     flashing = false;
     digitalWrite(SlaveFlagPin,HIGH);
     Clicks = 0;
+    delete pixels;
     digitalWrite(POWERPin,HIGH);
     delay(2500);
     }
