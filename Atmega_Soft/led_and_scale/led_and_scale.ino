@@ -110,7 +110,6 @@ byte frame[6];
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
-  pixels.begin();
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
   Wire.onRequest(requestEvent);
@@ -570,8 +569,8 @@ void PowerButtonPressed(){
   if(Clicks > 20){
      if(!MKSPower){
       digitalWrite(POWERPin,LOW);
-      fade(255, 255, 255);
-      lights_down();
+      delay(100);
+      pixels.begin();
       digitalWrite(SlaveFlagPin,HIGH);
       for(int kk = 0; kk < 20 ; kk++){          // to reduce the effect that leds behave strange when getting power.
         delay(100);
