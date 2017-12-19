@@ -594,7 +594,8 @@ void PowerButtonPressed(){
     digitalWrite(SlaveFlagPin,HIGH);
     Clicks = 0;
     digitalWrite(POWERPin,HIGH);
-  }
+    dealy(2500);
+    }
 }
 
 
