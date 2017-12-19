@@ -97,6 +97,7 @@ volatile byte Bbreath;
 #define   NLED_RIGHT 12
 bool MKSPower = false;
 long int LastClick = 0;
+bool waiting_for_response = false;
 int Clicks = 0;
 long LeftRead;   
 long RightRead;  
@@ -559,6 +560,7 @@ void PowerButtonPressed(){
   if((millis() - LastClick) > 500){ 
     LastClick = millis();
     Clicks = 0;
+    waiting_for_response = false;
   }else{
     Clicks++;
     delay(10);
@@ -576,10 +578,11 @@ void PowerButtonPressed(){
         lights_down();
       }
       MKSPower = true;
-    }else{
+    }else if(!waiting_for_response){
       digitalWrite(SlaveFlagPin,LOW);
       delay(100);
       digitalWrite(SlaveFlagPin,HIGH);
+      waiting_for_response = true;
     }
       //Sendinf to MKS turn off message 
     }
