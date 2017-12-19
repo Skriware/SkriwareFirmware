@@ -569,9 +569,9 @@ void PowerButtonPressed(){
   }
   if(Clicks > 20){
      if(!MKSPower){
-      lights_down();
-      delay(100);
       digitalWrite(POWERPin,LOW);
+       delay(1000);
+      lights_down();
       digitalWrite(SlaveFlagPin,HIGH);
       for(int kk = 0; kk < 20 ; kk++){          // to reduce the effect that leds behave strange when getting power.
         delay(100);
