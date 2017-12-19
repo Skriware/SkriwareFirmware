@@ -570,6 +570,7 @@ void PowerButtonPressed(){
   if(Clicks > 20){
      if(!MKSPower){
       digitalWrite(POWERPin,LOW);
+      fade(255, 255, 255);
       lights_down();
       digitalWrite(SlaveFlagPin,HIGH);
       for(int kk = 0; kk < 20 ; kk++){          // to reduce the effect that leds behave strange when getting power.
