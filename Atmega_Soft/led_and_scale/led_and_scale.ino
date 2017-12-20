@@ -110,6 +110,7 @@ byte frame[6];
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
+  pixels.begin();
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
   Wire.onRequest(requestEvent);
@@ -122,6 +123,7 @@ void setup() {
   digitalWrite(POWERPin,HIGH);
   pinMode(SlaveFlagPin,OUTPUT);
   pinMode(PowerButtonInterruptPin,INPUT);
+  
 
   
   //lights_down();
@@ -467,13 +469,13 @@ void lights_down() {
 void setLED(byte LEDbar,byte LEDid, byte R, byte G,byte B){
   switch (LEDbar){
     case 0:
-      pixels.setPixelColor(LEDid+1, pixels.Color(R,G,B)); 
+      pixels.setPixelColor(LEDid, pixels.Color(R,G,B)); 
       break;
     case 1:
-      pixels.setPixelColor(LEDid+NLED_LEFT+1, pixels.Color(R,G,B)); 
+      pixels.setPixelColor(LEDid+NLED_LEFT-1, pixels.Color(R,G,B)); 
       break;
     case 2:
-      pixels.setPixelColor(NUMPIXELS-LEDid-1, pixels.Color(R,G,B)); 
+      pixels.setPixelColor(NUMPIXELS-LEDid, pixels.Color(R,G,B)); 
       break;
   }
 }
@@ -554,6 +556,40 @@ void lightsUpToUP(byte LEDbar,byte n, byte R, byte G, byte B){
 
 }
 
+void HelloWorld(){
+  lights_up(255,255,255);
+  for(int i = NLED_LEFT ; i > -1; i--){
+        delay(100);
+         lightsUpToUP(2,i,255,255,255);
+         lightsUpToUP(0,i,255,255,255);
+      }
+  for(int jj = 1; jj <8; jj++){
+        delay(100);
+        setLED(1,jj,0,0,0);
+        setLED(1,NLED_CENTER-jj+1,0,0,0);
+        showLED();
+  }
+
+  for(int kk = 1; kk < 8; kk++){
+    delay(100);
+    lights_down();
+    setLED(1,8+kk,255,255,255);
+    setLED(1,8-kk,255,255,255);
+    showLED();
+  }
+
+  for(int jj = NLED_LEFT; jj > 0; jj--){
+    delay(100);
+    lights_down();
+    setLED(0,jj-1,255,255,255);
+    setLED(2,jj,255,255,255);
+    showLED();
+  }
+}
+
+
+
+
 void PowerButtonPressed(){
   Serial.println("Interrupt!");
   if((millis() - LastClick) > 500){ 
@@ -569,8 +605,7 @@ void PowerButtonPressed(){
   if(Clicks > 20){
      if(!MKSPower){
       digitalWrite(POWERPin,LOW);
-      pixels.begin();
-      fade(255,255,255);
+      HelloWorld();
       digitalWrite(SlaveFlagPin,HIGH);
       for(int kk = 0; kk < 20 ; kk++){          // to reduce the effect that leds behave strange when getting power.
         delay(100);
