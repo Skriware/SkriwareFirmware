@@ -607,10 +607,6 @@ void PowerButtonPressed(){
       digitalWrite(POWERPin,LOW);
       HelloWorld();
       digitalWrite(SlaveFlagPin,HIGH);
-      for(int kk = 0; kk < 20 ; kk++){          // to reduce the effect that leds behave strange when getting power.
-        delay(100);
-        lights_down();
-      }
       MKSPower = true;
     }else if(!waiting_for_response){
       digitalWrite(SlaveFlagPin,LOW);
