@@ -168,11 +168,10 @@ void handle_message(byte frame[5]) {
     case 0xFF:
         centerLightDown();
       for(int i = NLED_LEFT ; i > -1; i--){
-        delay(350);
+        delay(1500);
          lightsUpToDOWN(2,i,frame[2],frame[3],frame[4]);
          lightsUpToDOWN(0,i,frame[2],frame[3],frame[4]);
       }
-      delay(15000);
       digitalWrite(POWERPin,HIGH);
       MKSPower = false;
       flashing = false;
