@@ -118,7 +118,6 @@ void setup() {
   Wire.onRequest(requestEvent);
   LeftScale.begin(SCALE1_DT, SCALE1_SCK, 64);
   RightScale.begin(SCALE2_DT, SCALE2_SCK, 64);
-  //attachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin),PowerButtonPressed,HIGH);
   
   Serial.begin(9600);           // start serial for output
   pinMode(POWERPin, OUTPUT);
@@ -127,11 +126,6 @@ void setup() {
   digitalWrite(SlaveFlagPin,HIGH);
   pinMode(PowerButtonInterruptPin,INPUT);
   
-  Serial.println("T1 R1 T2 R2");
-  
-  //lights_down();
-  
-  //showLED();
 }
 
 void loop() {
@@ -278,7 +272,7 @@ void control_lights(byte mode, byte R, byte G, byte B) {
 }
 
 long measure_weight1() {
-  long WL = 0;;
+  long WL = 0;
   long weightLT[5];
   int i = 0;
   while(true){
@@ -315,7 +309,6 @@ long measure_weight1() {
 }
 
 long measure_weight2() {
- //Serial.println("Weight measure");
   long WR = 0;
   long weightRT[5];
   int i = 0;
@@ -325,7 +318,7 @@ long measure_weight2() {
       weightRT[i] = RightScale.read_average(2);
       i++;
     }
-    if(i == 1)break;
+    if(i == 5)break;
   }
   
   long lmax = weightRT[0];
