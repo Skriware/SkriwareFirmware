@@ -80,6 +80,8 @@ volatile bool flashing = false;
 volatile byte Rbreath;
 volatile byte Gbreath;
 volatile byte Bbreath;
+int ii = 0;
+int N = 5;
 
 // Specify LED RGB outputs
 
@@ -122,9 +124,10 @@ void setup() {
   pinMode(POWERPin, OUTPUT);
   digitalWrite(POWERPin,HIGH);
   pinMode(SlaveFlagPin,OUTPUT);
+  digitalWrite(SlaveFlagPin,HIGH);
   pinMode(PowerButtonInterruptPin,INPUT);
   
-
+  Serial.println("T1 R1 T2 R2");
   
   //lights_down();
   
@@ -145,21 +148,18 @@ void loop() {
     detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
   }
 
+  LeftRead   = measure_weight1();
+  if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
+  RightRead  = measure_weight2();
   if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
 }
 
 void handle_message(byte frame[5]) {
   switch (frame[0]) {
     case 0xAF: 
-        attachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin),PowerButtonPressed,HIGH);
-        LeftRead   = measure_weight1();
-        detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
         sprintf(out_buffer,"%ld",LeftRead);
       break; 
     case 0xCF:
-         attachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin),PowerButtonPressed,HIGH);
-        RightRead  = measure_weight2();
-         detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
         sprintf(out_buffer,"%ld",RightRead);
       break;
     case 0xCC: 
@@ -278,21 +278,18 @@ void control_lights(byte mode, byte R, byte G, byte B) {
 }
 
 long measure_weight1() {
-  //Serial.println("Weight measure");
   long WL = 0;;
   long weightLT[5];
   int i = 0;
   while(true){
+    if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
     if(LeftScale.is_ready()) {
-      weightLT[i] = LeftScale.read_average(5);
-      if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
-      //Serial.print(i);
-      //Serial.print(" ");
-      //Serial.println(weightLT[i]);
+      weightLT[i] = LeftScale.read_average(2);
       i++;
     }
     if(i == 5)break;
   }
+  
   long lmax = weightLT[0];
   long lmin = weightLT[0];
   int maxid = 0;
@@ -309,18 +306,11 @@ long measure_weight1() {
    }
   }
 
-  //Serial.print("MAX:");
-  //Serial.println(weightLT[maxid]);
-
-  //Serial.print("MIN:");
-  //Serial.println(weightLT[minid]);
 
   for(byte kk = 0; kk <5 ; kk++){
     if(kk != maxid && kk != minid) WL += weightLT[kk];
   }
 
-  //Serial.print("Final:");
-  //Serial.println(WL/3);
   return(WL/3);
 }
 
@@ -330,16 +320,14 @@ long measure_weight2() {
   long weightRT[5];
   int i = 0;
   while(true){
+    if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
     if(RightScale.is_ready()) {
-      weightRT[i] = RightScale.read_average(5);
-      if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
-      //Serial.print(i);
-      //Serial.print(" ");
-      //Serial.println(weightRT[i]);
+      weightRT[i] = RightScale.read_average(2);
       i++;
     }
-    if(i == 5)break;
+    if(i == 1)break;
   }
+  
   long lmax = weightRT[0];
   long lmin = weightRT[0];
   int maxid = 0;
@@ -356,22 +344,13 @@ long measure_weight2() {
    }
   }
 
-  //Serial.print("MAX:");
-  //Serial.println(weightRT[maxid]);
-
-  //Serial.print("MIN:");
-  //Serial.println(weightRT[minid]);
-
   for(byte kk = 0; kk <5 ; kk++){
     if(kk != maxid && kk != minid) WR += weightRT[kk];
   }
+  
 
-  //Serial.print("Final:");
-  //Serial.println(WR/3);
   return(WR/3);
 }
-
-
 
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
@@ -380,9 +359,7 @@ void receiveEvent(int howMany) {
     frame[counter] = Wire.read();
     Serial.print(counter); Serial.print(" : ");Serial.println(frame[counter]);
     counter++;
-    //if(counter > 5)break;
   }
-  //if(frame[0]^frame[1]^frame[2]^frame[3]^frame
   handle_message(frame);
 }
 
@@ -590,7 +567,7 @@ void HelloWorld(){
 
 
 void PowerButtonPressed(){
-  Serial.println("Interrupt!");
+ // Serial.println("Interrupt!");
   if((millis() - LastClick) > 500){ 
     LastClick = millis();
     Clicks = 0;
@@ -599,7 +576,7 @@ void PowerButtonPressed(){
     Clicks++;
     delay(10);
     LastClick = millis();
-    Serial.println(Clicks);
+    //Serial.println(Clicks);
   }
   if(Clicks > 20){
      if(!MKSPower){
