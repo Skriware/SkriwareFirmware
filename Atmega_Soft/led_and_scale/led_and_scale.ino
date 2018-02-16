@@ -142,12 +142,12 @@ void loop() {
     detachInterrupt(digitalPinToInterrupt(PowerButtonInterruptPin));
   }
 
-  if(MKSPower == true){
+  if(MKSPower){
   LeftRead   = measure_weight1();
   if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
   RightRead  = measure_weight2();
-  if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
   }
+  if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
 }
 
 void handle_message(byte frame[5]) {
