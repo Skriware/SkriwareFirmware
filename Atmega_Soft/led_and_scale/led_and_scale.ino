@@ -123,7 +123,7 @@ void setup() {
   pinMode(POWERPin, OUTPUT);
   digitalWrite(POWERPin,HIGH);
   pinMode(SlaveFlagPin,OUTPUT);
-  digitalWrite(SlaveFlagPin,HIGH);
+  digitalWrite(SlaveFlagPin,LOW);
   pinMode(PowerButtonInterruptPin,INPUT);
   
 }
@@ -169,6 +169,7 @@ void handle_message(byte frame[5]) {
          lightsUpToDOWN(0,i,frame[2],frame[3],frame[4]);
       }
       digitalWrite(POWERPin,HIGH);
+      digitalWrite(SlaveFlagPin,LOW);
       MKSPower = false;
       flashing = false;
       breathing = false;
@@ -576,8 +577,8 @@ void PowerButtonPressed(){
   if(Clicks > 20){
      if(!MKSPower){
       digitalWrite(POWERPin,LOW);
-      HelloWorld();
       digitalWrite(SlaveFlagPin,HIGH);
+      HelloWorld();
       MKSPower = true;
     }else if(!waiting_for_response){
       digitalWrite(SlaveFlagPin,LOW);
@@ -592,9 +593,9 @@ void PowerButtonPressed(){
     MKSPower = false;
     breathing = false;
     flashing = false;
-    digitalWrite(SlaveFlagPin,HIGH);
     Clicks = 0;
     digitalWrite(POWERPin,HIGH);
+    digitalWrite(SlaveFlagPin,LOW);
     delay(2500);
     }
 }
