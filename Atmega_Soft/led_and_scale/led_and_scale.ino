@@ -1,15 +1,6 @@
-/* Code for Skriware Model 2 Atmega328. 
-TO DO:
-
-//Odczyt z obudwu wag.
-//POWER 
-//LED 
-//TESTY 
-
-//CZUJNIK FILA???
- 
+/* Code for Skriware Model 2 Atmega328.  
  *  
- * Atmega currently handles 2 tasks: 
+ * Atmega currently handles 3 tasks: 
  *  - Weight scale measurement using HX711 ADC
  *  - Controll RGB LED lights: 
  *        1. turn on/off, 
@@ -17,6 +8,7 @@ TO DO:
  *        3. brighten, 
  *        4. breath
  *        5. blink
+ *  - Controle power for main Skriware Model 2 printer CPU. 
  *  
  *  MCU is onnected to RPi via I2C interface. 
  *  Communication follows the frame format below:
@@ -25,12 +17,12 @@ TO DO:
  *  |function|  mode  |    R   |   G    |   B    | checksum |
  *  
  *  Function can be: 
- *  0xFF for Power Off
+ *  0xDD for Power Off
  *  0xF0 for Cancel Power Off order
  *  0x0F for weight measurement from scale 1
  *  0xCF for weight measurement from scale 2 // measurements are done as an avreage over 5 mesurements in which we exclude the highest and lowest values.
  *  0xCC for lights predefined actions
- *  
+ *  0xDF for software version request
  *  0x0C for left LED panel direct controll 
  *  0xC0 for right LED panel direct controll 
  *  0xA0 for left LED panel configuration
@@ -72,7 +64,7 @@ TO DO:
  *  
  */
 #include <Wire.h>
-#include <Adafruit_NeoPixel.h>
+#include "Adafruit_NeoPixel.h"
 #include "HX711.h"
 
 volatile bool breathing = false;
@@ -80,11 +72,8 @@ volatile bool flashing = false;
 volatile byte Rbreath;
 volatile byte Gbreath;
 volatile byte Bbreath;
-int ii = 0;
-int N = 5;
-
 // Specify LED RGB outputs
-
+#define   SOFT_VERSION  1
 #define   SlaveFlagPin  A3
 #define   SCALE1_DT     9
 #define   SCALE2_DT     10
@@ -97,6 +86,7 @@ int N = 5;
 #define   NLED_LEFT 12
 #define   NLED_CENTER 15
 #define   NLED_RIGHT 12
+
 bool MKSPower = false;
 long int LastClick = 0;
 bool waiting_for_response = false;
@@ -109,9 +99,23 @@ HX711 RightScale;
 char out_buffer[32];
 byte frame[6];
 
+bool softwareVersionRequest = false;
+int softwareVersion = SOFT_VERSION;
+uint8_t softwareVersionCode[16];
+
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
 
+void setSoftwareVersionCode(){
+softwareVersionCode[0] = softwareVersion;
+ for(int yy = 1 ; yy < 16 ; yy++){
+  uint8_t tmp = (uint8_t)(((softwareVersion+yy)*(softwareVersion+yy)) % 255);
+  softwareVersionCode[yy] = tmp;
+ }
+
+
+}
 void setup() {
+ 
   pixels.begin();
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
@@ -125,6 +129,7 @@ void setup() {
   pinMode(SlaveFlagPin,OUTPUT);
   digitalWrite(SlaveFlagPin,LOW);
   pinMode(PowerButtonInterruptPin,INPUT);
+  setSoftwareVersionCode();
   
 }
 
@@ -151,7 +156,14 @@ void loop() {
 }
 
 void handle_message(byte frame[5]) {
+  byte checksum = 0;
+  for(int kk = 0; kk < 5; kk++) checksum = frame[kk] ^ checksum;
+  checksum += 4;
+  if(checksum  == frame[5]){
   switch (frame[0]) {
+    case 0xDF: 
+        softwareVersionRequest = true;
+      break; 
     case 0xAF: 
         sprintf(out_buffer,"%ld",LeftRead);
       break; 
@@ -161,7 +173,7 @@ void handle_message(byte frame[5]) {
     case 0xCC: 
       control_lights(frame[1], frame[2], frame[3], frame[4]);
       break;
-    case 0xFF:
+    case 0xDD:
         centerLightDown();
       for(int i = NLED_LEFT ; i > -1; i--){
         delay(1500);
@@ -224,6 +236,8 @@ void handle_message(byte frame[5]) {
       Serial.println("I2C error");
       break;
   }
+
+}
 }
 
 void centerLightUp(byte R, byte G, byte B){
@@ -361,8 +375,12 @@ void receiveEvent(int howMany) {
 
 // function that executes whenever data is requested by master
 void requestEvent() {
-  int count = Wire.write(out_buffer);
-  //Serial.print(" "); Serial.print(count); Serial.println(" bytes sent");
+  if(softwareVersionRequest){
+    for(int yy = 0 ; yy < 16 ; yy++)Wire.write(softwareVersionCode[yy]);
+    softwareVersionRequest = false;
+  }else{
+    Wire.write(out_buffer);
+  }//Serial.print(" "); Serial.print(count); Serial.println(" bytes sent");
 }
 
 void fade(byte R, byte G, byte B) {
