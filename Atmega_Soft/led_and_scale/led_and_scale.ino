@@ -72,6 +72,8 @@ volatile bool flashing = false;
 volatile byte Rbreath;
 volatile byte Gbreath;
 volatile byte Bbreath;
+
+//#define DEBUG -//debug mode for Serial communication.
 // Specify LED RGB outputs
 #define   SOFT_VERSION  1
 #define   SlaveFlagPin  A3
@@ -123,7 +125,9 @@ void setup() {
   LeftScale.begin(SCALE1_DT, SCALE1_SCK, 64);
   RightScale.begin(SCALE2_DT, SCALE2_SCK, 64);
   
+  #ifdef DEBUG
   Serial.begin(9600);           // start serial for output
+  #endif
   pinMode(POWERPin, OUTPUT);
   digitalWrite(POWERPin,HIGH);
   pinMode(SlaveFlagPin,OUTPUT);
@@ -233,7 +237,9 @@ void handle_message(byte frame[5]) {
       centerLightDown();
       break;
     default: 
+      #ifdef DEGUB
       Serial.println("I2C error");
+      #endif
       break;
   }
 
@@ -249,7 +255,9 @@ void centerLightDown(){
 }
 
 void control_lights(byte mode, byte R, byte G, byte B) {
+  #ifdef DEBUG
   Serial.print("Mode is: "); Serial.println(mode);
+  #endif
   breathing = 0;
   flashing = 0;
   switch (mode) {
@@ -367,7 +375,9 @@ void receiveEvent(int howMany) {
   int counter = 0;
   while (Wire.available()) { // loop through all but the last
     frame[counter] = Wire.read();
+    #ifdef DEBUG
     Serial.print(counter); Serial.print(" : ");Serial.println(frame[counter]);
+    #endif
     counter++;
   }
   handle_message(frame);
@@ -380,7 +390,7 @@ void requestEvent() {
     softwareVersionRequest = false;
   }else{
     Wire.write(out_buffer);
-  }//Serial.print(" "); Serial.print(count); Serial.println(" bytes sent");
+  }
 }
 
 void fade(byte R, byte G, byte B) {
@@ -407,7 +417,7 @@ void fade(byte R, byte G, byte B) {
 }
 
 void brighten(byte R, byte G, byte B) {
-  // brighten from 0 to RGB in 5 points steps
+  // brighten from 0 to RGB in 20 points steps
   byte Rstep = R/20 + 1;
   byte Gstep = G/20 + 1;
   byte Bstep = B/20 + 1;
