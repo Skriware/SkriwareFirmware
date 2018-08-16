@@ -605,8 +605,8 @@ void PowerButtonPressed(){
   if(Clicks > 20){
      if(!MKSPower){
       digitalWrite(POWERPin,LOW);
-      digitalWrite(SlaveFlagPin,HIGH);
       HelloWorld();
+      digitalWrite(SlaveFlagPin,HIGH);
       MKSPower = true;
     }else if(!waiting_for_response){
       digitalWrite(SlaveFlagPin,LOW);
