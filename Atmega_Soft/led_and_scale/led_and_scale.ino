@@ -591,7 +591,6 @@ void HelloWorld(){
 
 
 void PowerButtonPressed(){
- // Serial.println("Interrupt!");
   if((millis() - LastClick) > 500){ 
     LastClick = millis();
     Clicks = 0;
@@ -600,7 +599,6 @@ void PowerButtonPressed(){
     Clicks++;
     delay(10);
     LastClick = millis();
-    //Serial.println(Clicks);
   }
   if(Clicks > 20){
      if(!MKSPower){
@@ -614,7 +612,6 @@ void PowerButtonPressed(){
       digitalWrite(SlaveFlagPin,HIGH);
       waiting_for_response = true;
     }
-      //Sendinf to MKS turn off message 
     }
   if(Clicks > 220){
     lights_down();
