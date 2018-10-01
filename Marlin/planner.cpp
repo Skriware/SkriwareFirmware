@@ -555,15 +555,18 @@ void Planner::check_axes_activity() {
     #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT) && DISABLED(AUTO_BED_LEVELING_UBL)
       static float z_fade_factor = 1.0, last_raw_lz = -999.0;
       if (z_fade_height) {
-        const float raw_lz = RAW_Z_POSITION(lz);
-        if (raw_lz >= z_fade_height) return;
+        const float raw_lz = lz; //ukikoza (wczesnije RAW_VALUE())
+        //SERIAL_ECHOLN("RAW:");
+        //SERIAL_ECHOLN(lz);
+        if ((raw_lz-0.2) >= z_fade_height) return;       
         if (last_raw_lz != raw_lz) {
           last_raw_lz = raw_lz;
-          z_fade_factor = 1.0 - raw_lz * inverse_z_fade_height;
+          z_fade_factor = 1.0 - (raw_lz-0.2) * inverse_z_fade_height;
         }
       }
-      else
+      else{
         z_fade_factor = 1.0;
+      }
     #endif
 
     #if ENABLED(MESH_BED_LEVELING)
@@ -592,10 +595,11 @@ void Planner::check_axes_activity() {
       float tmp[XYZ] = { lx, ly, 0 };
       lz += bilinear_z_offset(tmp)
         #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-          * z_fade_factor
-        #endif
+          * z_fade_factor   
       ;
-
+      //SERIAL_ECHOLN("CORECTED:");
+      //SERIAL_ECHOLN(bilinear_z_offset(tmp));
+        #endif
     #endif
   }
 
