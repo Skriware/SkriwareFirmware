@@ -558,10 +558,10 @@ void Planner::check_axes_activity() {
         const float raw_lz = lz; //ukikoza (wczesnije RAW_VALUE())
         //SERIAL_ECHOLN("RAW:");
         //SERIAL_ECHOLN(lz);
-        if ((raw_lz-0.2) >= z_fade_height) return;       
+        if ((raw_lz) >= z_fade_height) return;       
         if (last_raw_lz != raw_lz) {
           last_raw_lz = raw_lz;
-          z_fade_factor = 1.0 - (raw_lz-0.2) * inverse_z_fade_height;
+          z_fade_factor = 1.0 - (raw_lz) * inverse_z_fade_height;
         }
       }
       else{
