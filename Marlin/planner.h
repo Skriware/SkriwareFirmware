@@ -175,6 +175,20 @@ class Planner {
 
     #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
       static float z_fade_height, inverse_z_fade_height;
+      static float last_z_gcode;
+      #ifdef E_FADE        //ukikoza
+        static bool use_e_fade;
+        static float dz_gcode;
+        static float last_e_gcode;
+        static float de_real;
+        static float de_gcode;
+        static float e_real;
+        static float last_new_layer_z;
+        static float Retracted_filament;
+        static bool E_fade_applied;
+        static int nLayer;
+      #endif
+
     #endif
 
     #if ENABLED(LIN_ADVANCE)
@@ -260,13 +274,14 @@ class Planner {
       #define ARG_X float lx
       #define ARG_Y float ly
       #define ARG_Z float lz
+      #define ARG_E float e 
 
       /**
        * Apply leveling to transform a cartesian position
        * as it will be given to the planner and steppers.
        */
-      static void apply_leveling(float &lx, float &ly, float &lz);
-      static void apply_leveling(float logical[XYZ]) { apply_leveling(logical[X_AXIS], logical[Y_AXIS], logical[Z_AXIS]); }
+      static void apply_leveling(float &lx, float &ly, float &lz,float &e);
+      static void apply_leveling(float logical[XYZE]) { apply_leveling(logical[X_AXIS], logical[Y_AXIS], logical[Z_AXIS],logical[XYZE]);}
       static void unapply_leveling(float logical[XYZ]);
 
     #else
@@ -274,6 +289,7 @@ class Planner {
       #define ARG_X const float &lx
       #define ARG_Y const float &ly
       #define ARG_Z const float &lz
+      #define ARG_E const float &e
 
     #endif
 
@@ -304,9 +320,9 @@ class Planner {
      *  fr_mm_s      - (target) speed of the move (mm/s)
      *  extruder     - target extruder
      */
-    static FORCE_INLINE void buffer_line(ARG_X, ARG_Y, ARG_Z, const float &e, const float &fr_mm_s, const uint8_t extruder) {
+    static FORCE_INLINE void buffer_line(ARG_X, ARG_Y, ARG_Z, ARG_E, const float &fr_mm_s, const uint8_t extruder) {
       #if PLANNER_LEVELING && IS_CARTESIAN
-        apply_leveling(lx, ly, lz);
+        apply_leveling(lx, ly, lz,e);
       #endif
       _buffer_line(lx, ly, lz, e, fr_mm_s, extruder);
     }
@@ -322,7 +338,7 @@ class Planner {
      */
     static FORCE_INLINE void buffer_line_kinematic(const float ltarget[XYZE], const float &fr_mm_s, const uint8_t extruder) {
       #if PLANNER_LEVELING
-        float lpos[XYZ] = { ltarget[X_AXIS], ltarget[Y_AXIS], ltarget[Z_AXIS] };
+        float lpos[XYZE] = { ltarget[X_AXIS], ltarget[Y_AXIS], ltarget[Z_AXIS], ltarget[E_AXIS] };
         apply_leveling(lpos);
       #else
         const float * const lpos = ltarget;
@@ -344,9 +360,9 @@ class Planner {
      *
      * Clears previous speed values.
      */
-    static FORCE_INLINE void set_position_mm(ARG_X, ARG_Y, ARG_Z, const float &e) {
+    static FORCE_INLINE void set_position_mm(ARG_X, ARG_Y, ARG_Z, float &e) {
       #if PLANNER_LEVELING && IS_CARTESIAN
-        apply_leveling(lx, ly, lz);
+        apply_leveling(lx, ly, lz,e);
       #endif
       _set_position_mm(lx, ly, lz, e);
     }

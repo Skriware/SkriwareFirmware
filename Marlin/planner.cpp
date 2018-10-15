@@ -532,10 +532,23 @@ void Planner::check_axes_activity() {
 }
 
 #if PLANNER_LEVELING
+      float Planner::last_z_gcode = 0.0;
+#ifdef E_FADE
+      bool Planner::use_e_fade = false;
+      float Planner::dz_gcode = 0.0;
+      float Planner::last_e_gcode = 0.0;
+      float Planner::de_real = 0.0;
+      float Planner::de_gcode = 0.0;
+      float Planner::e_real = 0.0;
+      float Planner::last_new_layer_z = 0.0;
+      float Planner::Retracted_filament = 0.0;
+      bool  Planner::E_fade_applied = true;
+      int   Planner::nLayer = 0; 
+#endif
   /**
    * lx, ly, lz - logical (cartesian, not delta) positions in mm
    */
-  void Planner::apply_leveling(float &lx, float &ly, float &lz) {
+  void Planner::apply_leveling(float &lx, float &ly, float &lz,float &e) {
 
     #if ENABLED(AUTO_BED_LEVELING_UBL)
       if (!ubl.state.active) return;
@@ -551,16 +564,38 @@ void Planner::check_axes_activity() {
     #if HAS_ABL
       if (!abl_enabled) return;
     #endif
-
     #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT) && DISABLED(AUTO_BED_LEVELING_UBL)
-      static float z_fade_factor = 1.0, last_raw_lz = -999.0;
+      
+
+      static float z_fade_factor = 1.0;
+      const float raw_lz = lz; //ukikoza (wczesnije RAW_VALUE())
       if (z_fade_height) {
-        const float raw_lz = lz; //ukikoza (wczesnije RAW_VALUE())
-        //SERIAL_ECHOLN("RAW:");
-        //SERIAL_ECHOLN(lz);
-        if ((raw_lz) >= z_fade_height) return;       
-        if (last_raw_lz != raw_lz) {
-          last_raw_lz = raw_lz;
+        if ((raw_lz) >= z_fade_height){
+          #ifdef E_FADE
+          if(use_e_fade){
+            de_gcode = e-last_e_gcode;
+            if(E_fade_applied && (de_gcode > 0 || Retracted_filament < 0.0)){
+                Retracted_filament += de_gcode;
+                if(Retracted_filament > 0.0){
+                Retracted_filament = 0.0;
+                }
+              }
+            if(E_fade_applied && de_gcode > 0 && Retracted_filament == 0.0){
+              e_real = e_real-last_e_gcode;
+              E_fade_applied = false;
+              SERIAL_ECHOLN("END of E_FADE & Z_FADE");
+            }
+            if(E_fade_applied){
+              e = e_real;
+            }else{          //z -hop management
+              e+=e_real;
+            }
+          }
+          #endif
+         return;
+       }
+        if (last_z_gcode != raw_lz) {
+         last_z_gcode = raw_lz;    
           z_fade_factor = 1.0 - (raw_lz) * inverse_z_fade_height;
         }
       }
@@ -597,9 +632,54 @@ void Planner::check_axes_activity() {
         #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
           * z_fade_factor   
       ;
-      //SERIAL_ECHOLN("CORECTED:");
-      //SERIAL_ECHOLN(bilinear_z_offset(tmp));
-        #endif
+      #ifdef E_FADE  //ukikoza
+      if(use_e_fade){
+      if(last_e_gcode != e){
+        de_gcode = e - last_e_gcode;
+
+         if(raw_lz > last_new_layer_z && e-last_e_gcode > 0 && Retracted_filament == 0.0){
+            last_new_layer_z = raw_lz;
+            nLayer++;
+        }
+
+       if(de_gcode > 0 &&  nLayer > 1 && Retracted_filament == 0){                         //retract managment
+          de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
+       }else{
+          de_real = de_gcode; 
+          if(de_gcode < 0 || Retracted_filament != 0.0){
+                Retracted_filament += de_gcode;
+          }
+          if(Retracted_filament > 0){
+            if(nLayer > 1){
+              de_real -= Retracted_filament;
+              de_real += (1-bilinear_z_offset(tmp)/z_fade_height)*Retracted_filament;
+            }
+            Retracted_filament = 0.0;
+          }
+        }
+        }
+        e_real += de_real;
+        last_e_gcode = e;
+//       SERIAL_ECHOLN("dE_G:");
+//       SERIAL_ECHOLN(de_gcode*100);
+//       SERIAL_ECHOLN("Z:");
+//       SERIAL_ECHOLN(raw_lz);
+//       SERIAL_ECHOLN("E_G:");
+//       SERIAL_ECHOLN(e*100);
+          e = e_real;
+          de_gcode = 0;
+          de_real = 0;
+ //       SERIAL_ECHOLN("E_R:");
+ //       SERIAL_ECHOLN(e_real*100);
+ //       SERIAL_ECHO("Printing on Layer:");
+ //       SERIAL_ECHOLN(nLayer);
+ //       SERIAL_ECHOLN("Retracted:");
+ //       SERIAL_ECHOLN(Retracted_filament*100);
+          
+
+      }
+      #endif
+      #endif
     #endif
   }
 
@@ -1487,7 +1567,7 @@ void Planner::_set_position_mm(const float &a, const float &b, const float &c, c
 
 void Planner::set_position_mm_kinematic(const float position[NUM_AXIS]) {
   #if PLANNER_LEVELING
-    float lpos[XYZ] = { position[X_AXIS], position[Y_AXIS], position[Z_AXIS] };
+    float lpos[XYZE] = { position[X_AXIS], position[Y_AXIS], position[Z_AXIS],position[E_AXIS]};
     apply_leveling(lpos);
   #else
     const float * const lpos = position;

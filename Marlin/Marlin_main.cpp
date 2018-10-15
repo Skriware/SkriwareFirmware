@@ -5726,6 +5726,23 @@ inline void gcode_G92() {
       #endif
     }
   }
+
+    #ifdef ENABLE_LEVELING_FADE_HEIGHT
+    Planner::last_z_gcode = 0.0;
+    #ifdef E_FADE
+      Planner::dz_gcode = 0.0;
+      Planner::last_e_gcode = 0.0;
+      Planner::de_real = 0.0;
+      Planner::de_gcode = 0.0;
+      Planner::e_real = 0.0;
+      Planner::last_new_layer_z = 0.0;
+      Planner::E_fade_applied = true;
+      Planner::Retracted_filament = 0.0;
+      Planner::nLayer = 0;
+    #endif
+
+    #endif
+
   if (didXYZ)
     SYNC_PLAN_POSITION_KINEMATIC();
   else if (didE)
@@ -6434,7 +6451,7 @@ static bool pin_is_protected(const int8_t pin) {
  *  S<byte> Pin status from 0 - 255
  */
 inline void gcode_M42() {
-  if (!parser.seenval('S')) return;
+  if (!parser.seenval('S') && !parser.seenval('D')) return;
   const byte pin_status = parser.value_byte();
 
   const int pin_number = parser.intval('P', LED_PIN);
@@ -6445,6 +6462,14 @@ inline void gcode_M42() {
     SERIAL_ERRORLNPGM(MSG_ERR_PROTECTED_PIN);
     return;
   }
+;
+  if(parser.seenval('D')){
+    pinMode(pin_number, OUTPUT);
+    digitalWrite(pin_number,pin_status);
+    return;
+  }  
+
+
 
   pinMode(pin_number, OUTPUT);
   digitalWrite(pin_number, pin_status);
@@ -10548,9 +10573,15 @@ void process_next_command() {
 
       case 90: // G90
         relative_mode = false;
+        #ifdef E_FADE
+        Planner::use_e_fade = true;
+        #endif
         break;
       case 91: // G91
         relative_mode = true;
+        #ifdef E_FADE
+        Planner::use_e_fade = false;
+        #endif
         break;
 
       case 92: // G92
@@ -10682,6 +10713,25 @@ void process_next_command() {
           filament_binary_sensor_E1_on = true;
         }
         break;
+        #ifdef E_FADE
+      case 60:
+          Planner::use_e_fade = true;
+          SERIAL_ECHOLN("E Fade enabled");
+      Planner::dz_gcode = 0.0;
+      Planner::last_e_gcode = 0.0;
+      Planner::de_real = 0.0;
+      Planner::de_gcode = 0.0;
+      Planner::e_real = 0.0;
+      Planner::last_new_layer_z = 0.0;
+      Planner::E_fade_applied = true;
+      Planner::Retracted_filament = 0.0;
+      Planner::nLayer = 0;          
+        break;
+      case 59:
+        Planner::use_e_fade = false;
+          SERIAL_ECHOLN("E Fade disabled");
+        break;
+        #endif
       #endif
 
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
