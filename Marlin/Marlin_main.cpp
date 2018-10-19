@@ -5730,15 +5730,17 @@ inline void gcode_G92() {
     #ifdef ENABLE_LEVELING_FADE_HEIGHT
     Planner::last_z_gcode = 0.0;
     #ifdef E_FADE
+      if(didE){                 //ukikoza
       Planner::dz_gcode = 0.0;
-      Planner::last_e_gcode = 0.0;
       Planner::de_real = 0.0;
       Planner::de_gcode = 0.0;
-      Planner::e_real = 0.0;
       Planner::last_new_layer_z = 0.0;
-      Planner::E_fade_applied = true;
-      Planner::Retracted_filament = 0.0;
-      Planner::nLayer = 0;
+      for(byte yy = 0; yy < EXTRUDERS; yy++){
+      Planner::last_e_gcode[yy] = 0.0;
+      Planner::E_fade_applied[yy] = true;
+      Planner::e_real[yy] = 0.0;
+      }  
+    }
     #endif
 
     #endif
@@ -10715,17 +10717,19 @@ void process_next_command() {
         break;
         #ifdef E_FADE
       case 60:
-          Planner::use_e_fade = true;
+        Planner::use_e_fade = true;
           SERIAL_ECHOLN("E Fade enabled");
-      Planner::dz_gcode = 0.0;
-      Planner::last_e_gcode = 0.0;
-      Planner::de_real = 0.0;
-      Planner::de_gcode = 0.0;
-      Planner::e_real = 0.0;
-      Planner::last_new_layer_z = 0.0;
-      Planner::E_fade_applied = true;
-      Planner::Retracted_filament = 0.0;
-      Planner::nLayer = 0;          
+          Planner::dz_gcode = 0.0;
+          Planner::de_real = 0.0;
+          Planner::de_gcode = 0.0;
+          Planner::last_new_layer_z = 0.0;
+      for(byte yy = 0; yy < EXTRUDERS; yy++){
+          Planner::last_e_gcode[yy] = 0.0;
+          Planner::E_fade_applied[yy] = true;
+          Planner::Retracted_filament[yy] = 0.0;
+          Planner::e_real[yy] = 0.0;
+      }  
+      Planner::nLayer = 0;        
         break;
       case 59:
         Planner::use_e_fade = false;

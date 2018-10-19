@@ -179,13 +179,13 @@ class Planner {
       #ifdef E_FADE        //ukikoza
         static bool use_e_fade;
         static float dz_gcode;
-        static float last_e_gcode;
+        static float last_e_gcode[EXTRUDERS];
         static float de_real;
         static float de_gcode;
-        static float e_real;
+        static float e_real[EXTRUDERS];
         static float last_new_layer_z;
-        static float Retracted_filament;
-        static bool E_fade_applied;
+        static float Retracted_filament[EXTRUDERS];
+        static bool E_fade_applied[EXTRUDERS];
         static int nLayer;
       #endif
 
