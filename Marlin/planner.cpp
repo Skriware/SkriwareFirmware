@@ -645,8 +645,7 @@ void Planner::check_axes_activity() {
         }
        if(de_gcode > 0 &&  nLayer > 1 && Retracted_filament[active_extruder] == 0){                         //retract managment
             de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
-        
-          }
+          
        }else{
           de_real = de_gcode; 
           if(de_gcode < 0 || Retracted_filament[active_extruder] != 0.0){
@@ -674,9 +673,6 @@ void Planner::check_axes_activity() {
           e = e_real[active_extruder];
           de_gcode = 0;
           de_real = 0;
-
-          
-
       }
       #endif
       #endif
