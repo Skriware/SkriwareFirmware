@@ -536,19 +536,77 @@ void Planner::check_axes_activity() {
 #ifdef E_FADE
       bool  Planner::use_e_fade = false;
       float Planner::dz_gcode = 0.0;
-      float Planner::last_e_gcode[] = { };
+      float Planner::last_e_gcode[] = { 0.0 };
       float Planner::de_real = 0.0;
       float Planner::de_gcode = 0.0;
-      float Planner::e_real[] = { };
+      float Planner::e_real[] = { 0.0 };
       float Planner::last_new_layer_z = 0.0;
-      float Planner::Retracted_filament[] = { };
+      float Planner::Retracted_filament[] = { 0.0 };
+      float Planner::E_fade_extrusion_difference[] = { 0.0 };
       bool  Planner::E_fade_applied[] = { true };
       int   Planner::nLayer = 0; 
+       #ifdef START_GCODE_EXTRUSION_CORRECTION
+      float Planner::Retraction_from_start_gcode[] = {0.0};
+      #endif
 #endif
   /**
    * lx, ly, lz - logical (cartesian, not delta) positions in mm
    */
   void Planner::apply_leveling(float &lx, float &ly, float &lz,float &e) {
+    #ifdef E_FADE
+    float tmp[XYZ] = { lx, ly, 0 };
+      de_gcode = e-last_e_gcode[active_extruder];       //calculating extrusion change
+
+      if(E_fade_applied[active_extruder] && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0 && lz > z_fade_height){
+        E_fade_applied[active_extruder] = false;
+        E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
+        //SERIAL_ECHOLN("END O E_FADE");
+      }
+
+    if(E_fade_applied[active_extruder]){
+    if(de_gcode < 0){
+      Retracted_filament[active_extruder] -= de_gcode;    //Retract monitoring
+      de_real = de_gcode;
+    }else if(de_gcode > 0){
+        if(Retracted_filament[active_extruder] > 0.0){        
+                de_real = de_gcode;
+                Retracted_filament[active_extruder] -= de_gcode;
+                if(nLayer > 1){
+                    de_real -= Retracted_filament[active_extruder];
+                    de_real += (1-bilinear_z_offset(tmp)/z_fade_height)*Retracted_filament[active_extruder];
+                }
+                Retracted_filament[active_extruder] = 0.0;
+        }else if(Retracted_filament[active_extruder] == 0.0){
+             if(lz > last_new_layer_z){
+                  last_new_layer_z = lz;
+                  nLayer++;
+                  //SERIAL_ECHO("Printing on layer ");
+                  //SERIAL_ECHOLN(nLayer);
+              } 
+              if(nLayer > 1){
+                de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
+              }else{
+                de_real = de_gcode;
+              }
+        }
+    }
+      e_real[active_extruder] += de_real;
+  }
+
+  if(Retraction_from_start_gcode[active_extruder] != 0.0 && de_gcode > 0){
+    if(E_fade_applied){
+    e_real[active_extruder] += Retraction_from_start_gcode[active_extruder];
+    }else{
+      E_fade_extrusion_difference[active_extruder] += Retraction_from_start_gcode[active_extruder];
+    }
+    Retraction_from_start_gcode[active_extruder] = 0.0;
+  }
+
+  
+      de_real = 0.0;
+      de_gcode = 0.0;
+      last_e_gcode[active_extruder] = e;
+    #endif
 
     #if ENABLED(AUTO_BED_LEVELING_UBL)
       if (!ubl.state.active) return;
@@ -570,27 +628,20 @@ void Planner::check_axes_activity() {
       static float z_fade_factor = 1.0;
       const float raw_lz = lz; //ukikoza (wczesnije RAW_VALUE())
       if (z_fade_height) {
-        if ((raw_lz) >= z_fade_height){
+        if (raw_lz > z_fade_height){
           #ifdef E_FADE
           if(use_e_fade){
-            de_gcode = e-last_e_gcode[active_extruder];
-            if(E_fade_applied[active_extruder] && (de_gcode > 0 || Retracted_filament[active_extruder] < 0.0)){
-                Retracted_filament[active_extruder] += de_gcode;
-                if(Retracted_filament[active_extruder] > 0.0){
-                Retracted_filament[active_extruder] = 0.0;
-                }
-              }
-            if(E_fade_applied[active_extruder] && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0){
-              e_real[active_extruder] = e_real[active_extruder]-last_e_gcode[active_extruder];
-              E_fade_applied[active_extruder] = false;
-              //SERIAL_ECHOLN("END of E_FADE & Z_FADE");
-              //SERIAL_ECHO("ON EXTRUDER ");
-              //SERIAL_ECHOLN(active_extruder*1);
-            }
             if(E_fade_applied[active_extruder]){
               e = e_real[active_extruder];
-            }else{          //z -hop management
-              e+=e_real[active_extruder];
+            }else{ 
+                ////SERIAL_ECHO("E_G: ");
+                ////SERIAL_ECHOLN(e);
+                ////SERIAL_ECHO("E_R: ");       
+                e+=E_fade_extrusion_difference[active_extruder];
+                ////SERIAL_ECHOLN(e);
+                ////SERIAL_ECHO("Retraction:");
+                ////SERIAL_ECHOLN(Retracted_filament[active_extruder]);
+
             }
           }
           #endif
@@ -629,50 +680,22 @@ void Planner::check_axes_activity() {
 
     #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
 
-      float tmp[XYZ] = { lx, ly, 0 };
+      
       lz += bilinear_z_offset(tmp)
         #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
           * z_fade_factor   
       ;
       #ifdef E_FADE  //ukikoza
       if(use_e_fade){
-      if(last_e_gcode[active_extruder] != e){
-        de_gcode = e - last_e_gcode[active_extruder];
-
-         if(raw_lz > last_new_layer_z && e-last_e_gcode[active_extruder] > 0 && Retracted_filament[active_extruder] == 0.0){
-            last_new_layer_z = raw_lz;
-            nLayer++;
-        }
-       if(de_gcode > 0 &&  nLayer > 1 && Retracted_filament[active_extruder] == 0){                         //retract managment
-            de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
-          
-       }else{
-          de_real = de_gcode; 
-          if(de_gcode < 0 || Retracted_filament[active_extruder] != 0.0){
-                Retracted_filament[active_extruder] += de_gcode;
-          }
-          if(Retracted_filament[active_extruder] > 0){
-            if(nLayer > 1){
-              de_real -= Retracted_filament[active_extruder];
-              de_real += (1-bilinear_z_offset(tmp)/z_fade_height)*Retracted_filament[active_extruder];
-            }
-            Retracted_filament[active_extruder] = 0.0;
-          }
-        }
-        }
-        e_real[active_extruder] += de_real;
-        last_e_gcode[active_extruder] = e;
           //SERIAL_ECHO("EXTRUDER: ");
           //SERIAL_ECHOLN(active_extruder*1);
           //SERIAL_ECHO("E_G: ");
-          //SERIAL_ECHOLN(e*100);
+          //SERIAL_ECHOLN(e);
           //SERIAL_ECHO("E_R: ");
-          //SERIAL_ECHOLN(e_real[active_extruder]*100);
-          //SERIAL_ECHO("Retraction:");
-          //SERIAL_ECHOLN(Retracted_filament[active_extruder]*100);
+          //SERIAL_ECHOLN(e_real[active_extruder]);
+         // SERIAL_ECHO("Retraction:");
+          //SERIAL_ECHOLN(Retracted_filament[active_extruder]);
           e = e_real[active_extruder];
-          de_gcode = 0;
-          de_real = 0;
       }
       #endif
       #endif

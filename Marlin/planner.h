@@ -185,8 +185,12 @@ class Planner {
         static float e_real[EXTRUDERS];
         static float last_new_layer_z;
         static float Retracted_filament[EXTRUDERS];
+        static float E_fade_extrusion_difference[EXTRUDERS];
         static bool E_fade_applied[EXTRUDERS];
         static int nLayer;
+      #ifdef START_GCODE_EXTRUSION_CORRECTION
+        static float Retraction_from_start_gcode[EXTRUDERS];
+      #endif
       #endif
 
     #endif
