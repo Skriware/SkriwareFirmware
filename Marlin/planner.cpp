@@ -552,6 +552,7 @@ void Planner::check_axes_activity() {
   /**
    * lx, ly, lz - logical (cartesian, not delta) positions in mm
    */
+      //#define DEBUG_E_FADE
   void Planner::apply_leveling(float &lx, float &ly, float &lz,float &e) {
     #ifdef E_FADE
     float tmp[XYZ] = { lx, ly, 0 };
@@ -579,8 +580,10 @@ void Planner::check_axes_activity() {
              if(lz > last_new_layer_z && e > 0.0){
                   last_new_layer_z = lz;
                   nLayer++;
+                  #ifdef DEBUG_E_FADE
                   SERIAL_ECHO("Printing on layer ");
                   SERIAL_ECHOLN(nLayer);
+                  #endif
               } 
               if(nLayer > 1 && e > 0.0){
                 de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
@@ -625,18 +628,21 @@ void Planner::check_axes_activity() {
         if (raw_lz > z_fade_height){
           #ifdef E_FADE
           if(use_e_fade){
+            #ifdef DEBUG_E_FADE
             SERIAL_ECHO("E_G: ");
             SERIAL_ECHOLN(e);
-            SERIAL_ECHO("E_R: "); 
+            SERIAL_ECHO("E_R: ");
+            #endif 
             if(E_fade_applied[active_extruder]){
                 e = e_real[active_extruder];
             }else{                      
                   e+=E_fade_extrusion_difference[active_extruder];
             }
+            #ifdef DEBUG_E_FADE
              SERIAL_ECHOLN(e);
              SERIAL_ECHO("Retraction:");
              SERIAL_ECHOLN(Retracted_filament[active_extruder]);
-
+            #endif
           }
            de_gcode = 0.0;
            de_real = 0.0;
@@ -683,10 +689,14 @@ void Planner::check_axes_activity() {
       ;
       #ifdef E_FADE  //ukikoza
       if(use_e_fade && E_fade_applied[active_extruder]){
+           
+           #ifdef DEBUG_E_FADE
            SERIAL_ECHO("E_G: ");
            SERIAL_ECHOLN(e);
            SERIAL_ECHO("E_R: "); 
+           #endif
             e = e_real[active_extruder];
+           #ifdef DEBUG_E_FADE
            SERIAL_ECHOLN(e);
            SERIAL_ECHO("Retraction:");
            SERIAL_ECHOLN(Retracted_filament[active_extruder]);
