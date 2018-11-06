@@ -5693,39 +5693,12 @@ void home_all_axes() { gcode_G28(true); }
  * G92: Set current position to given X Y Z E
  */
 inline void gcode_G92() {
+
   bool didXYZ = false,
        didE = parser.seenval('E');
 
   if (!didE) stepper.synchronize();
 
-  LOOP_XYZE(i) {
-    if (parser.seenval(axis_codes[i])) {
-      #if IS_SCARA
-        current_position[i] = parser.value_axis_units((AxisEnum)i);
-        if (i != E_AXIS) didXYZ = true;
-      #else
-        #if HAS_POSITION_SHIFT
-          const float p = current_position[i];
-        #endif
-        const float v = parser.value_axis_units((AxisEnum)i);
-
-        current_position[i] = v;
-
-        if (i != E_AXIS) {
-          didXYZ = true;
-          #if HAS_POSITION_SHIFT
-            position_shift[i] += v - p; // Offset the coordinate space
-            update_software_endstops((AxisEnum)i);
-
-            #if ENABLED(I2C_POSITION_ENCODERS)
-              I2CPEM.encoders[I2CPEM.idx_from_axis((AxisEnum)i)].set_axis_offset(position_shift[i]);
-            #endif
-
-          #endif
-        }
-      #endif
-    }
-  }
 
     #ifdef ENABLE_LEVELING_FADE_HEIGHT
     Planner::last_z_gcode = 0.0;
@@ -5743,6 +5716,43 @@ inline void gcode_G92() {
     #endif
 
     #endif
+
+  LOOP_XYZE(i) {
+    if (parser.seenval(axis_codes[i])) {
+      #if IS_SCARA
+        current_position[i] = parser.value_axis_units((AxisEnum)i);
+        if (i != E_AXIS) didXYZ = true;
+      #else
+        #if HAS_POSITION_SHIFT
+          const float p = current_position[i];
+        #endif
+        float v = parser.value_axis_units((AxisEnum)i);
+
+          if(i == E_AXIS && Planner::Retraction_from_start_gcode[active_extruder] != 0.0 ){
+            v = -Planner::Retraction_from_start_gcode[active_extruder];
+            Planner::last_e_gcode[active_extruder] = v;
+            Planner::e_real[active_extruder] = v;
+            Planner::Retraction_from_start_gcode[active_extruder] = 0.0;
+          }
+            current_position[i] = v;
+          
+        if (i != E_AXIS) {
+          didXYZ = true;
+          #if HAS_POSITION_SHIFT
+            position_shift[i] += v - p; // Offset the coordinate space
+            update_software_endstops((AxisEnum)i);
+
+            #if ENABLED(I2C_POSITION_ENCODERS)
+              I2CPEM.encoders[I2CPEM.idx_from_axis((AxisEnum)i)].set_axis_offset(position_shift[i]);
+            #endif
+
+          #endif
+        }
+      #endif
+    }
+  }
+
+   
 
   if (didXYZ)
     SYNC_PLAN_POSITION_KINEMATIC();
@@ -6464,9 +6474,18 @@ inline void gcode_M42() {
     return;
   }
 ;
+    stepper.synchronize();      //ukikoza
   if(parser.seenval('D')){
     pinMode(pin_number, OUTPUT);
     digitalWrite(pin_number,pin_status);
+    SERIAL_ECHO("Setting ");
+    if(pin_status == 0){
+      SERIAL_ECHO("LOW");
+    }else{
+      SERIAL_ECHO("HIGH");
+    }
+    SERIAL_ECHO(" on pin ");
+    SERIAL_ECHOLN(pin_number);
     return;
   }  
 
@@ -7774,7 +7793,10 @@ inline void gcode_M82() { axis_relative_modes[E_AXIS] = false; }
 /**
  * M83: Set E codes relative while in Absolute Coordinates (G90) mode
  */
-inline void gcode_M83() { axis_relative_modes[E_AXIS] = true; }
+inline void gcode_M83() { 
+  axis_relative_modes[E_AXIS] = true;
+  Planner::use_e_fade = false;
+  }
 
 /**
  * M18, M84: Disable stepper motors
@@ -10750,6 +10772,7 @@ void process_next_command() {
         Planner::last_new_layer_z = 0.0;
         #endif
       #endif
+        break;
 
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
            case 68:
