@@ -629,9 +629,9 @@ void Planner::check_axes_activity() {
           #ifdef E_FADE
           if(use_e_fade){
             #ifdef DEBUG_E_FADE
-            SERIAL_ECHO("E_G: ");
-            SERIAL_ECHOLN(e);
-            SERIAL_ECHO("E_R: ");
+              SERIAL_ECHO("E_G: ");
+              SERIAL_ECHOLN(e);
+              SERIAL_ECHO("E_R: ");
             #endif 
             if(E_fade_applied[active_extruder]){
                 e = e_real[active_extruder];
@@ -639,9 +639,9 @@ void Planner::check_axes_activity() {
                   e+=E_fade_extrusion_difference[active_extruder];
             }
             #ifdef DEBUG_E_FADE
-             SERIAL_ECHOLN(e);
-             SERIAL_ECHO("Retraction:");
-             SERIAL_ECHOLN(Retracted_filament[active_extruder]);
+              SERIAL_ECHOLN(e);
+              SERIAL_ECHO("Retraction:");
+              SERIAL_ECHOLN(Retracted_filament[active_extruder]);
             #endif
           }
            de_gcode = 0.0;

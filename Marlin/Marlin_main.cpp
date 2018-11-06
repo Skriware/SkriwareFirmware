@@ -6474,18 +6474,9 @@ inline void gcode_M42() {
     return;
   }
 ;
-    stepper.synchronize();      //ukikoza
   if(parser.seenval('D')){
     pinMode(pin_number, OUTPUT);
     digitalWrite(pin_number,pin_status);
-    SERIAL_ECHO("Setting ");
-    if(pin_status == 0){
-      SERIAL_ECHO("LOW");
-    }else{
-      SERIAL_ECHO("HIGH");
-    }
-    SERIAL_ECHO(" on pin ");
-    SERIAL_ECHOLN(pin_number);
     return;
   }  
 
