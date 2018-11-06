@@ -700,6 +700,7 @@ void Planner::check_axes_activity() {
            SERIAL_ECHOLN(e);
            SERIAL_ECHO("Retraction:");
            SERIAL_ECHOLN(Retracted_filament[active_extruder]);
+           #endif
       }
       de_gcode = 0.0;
       de_real = 0.0;
