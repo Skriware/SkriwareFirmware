@@ -545,6 +545,7 @@ void Planner::check_axes_activity() {
       float Planner::E_fade_extrusion_difference[] = { 0.0 };
       bool  Planner::E_fade_applied[] = { true };
       int   Planner::nLayer = 0; 
+      bool  Planner::relative_mode = false;
        #ifdef START_GCODE_EXTRUSION_CORRECTION
       float Planner::Retraction_from_start_gcode[] = {0.0};
       #endif
@@ -556,12 +557,14 @@ void Planner::check_axes_activity() {
   void Planner::apply_leveling(float &lx, float &ly, float &lz,float &e) {
     #ifdef E_FADE
     float tmp[XYZ] = { lx, ly, 0 };
+    if(use_e_fade){
         de_gcode = e-last_e_gcode[active_extruder];
-      if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0 &&  e > 0.0){
-        E_fade_applied[active_extruder] = false;
-        E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
-        SERIAL_ECHOLN("END O E_FADE");
-      }
+
+        if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0 &&  e > 0.0){
+          E_fade_applied[active_extruder] = false;
+          E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
+          SERIAL_ECHOLN("END O E_FADE");
+        }
 
     if(E_fade_applied[active_extruder]){
     if(de_gcode < 0){
@@ -592,19 +595,13 @@ void Planner::check_axes_activity() {
               }
         }
     }
+        if(relative_mode) de_real = de_gcode;
         e_real[active_extruder] += de_real;
   }
 
-  /*if(Retraction_from_start_gcode[active_extruder] != 0.0 && de_gcode > 0){
-    if(E_fade_applied){
-      e_real[active_extruder] += Retraction_from_start_gcode[active_extruder];
-    }else{
-        E_fade_extrusion_difference[active_extruder] += Retraction_from_start_gcode[active_extruder];
-    }
-    Retraction_from_start_gcode[active_extruder] = 0.0;
-  }*/
+
       last_e_gcode[active_extruder] = e;
-        
+  }
     #endif
 
     #if ENABLED(AUTO_BED_LEVELING_UBL)

@@ -7786,7 +7786,7 @@ inline void gcode_M82() { axis_relative_modes[E_AXIS] = false; }
  */
 inline void gcode_M83() { 
   axis_relative_modes[E_AXIS] = true;
-  Planner::use_e_fade = false;
+  //Planner::use_e_fade = false;
   }
 
 /**
@@ -10588,13 +10588,13 @@ void process_next_command() {
       case 90: // G90
         relative_mode = false;
         #ifdef E_FADE
-        Planner::use_e_fade = true;
+          Planner::relative_mode = false;
         #endif
         break;
       case 91: // G91
         relative_mode = true;
-        #ifdef E_FADE
-        Planner::use_e_fade = false;
+         #ifdef E_FADE
+          Planner::relative_mode = true;
         #endif
         break;
 
@@ -10729,8 +10729,10 @@ void process_next_command() {
         break;
         #ifdef E_FADE
       case 60:
+      if(planner.z_fade_height != 0.0){
         Planner::use_e_fade = true;
-          SERIAL_ECHOLN("E Fade enabled");
+        SERIAL_ECHOLN("E Fade enabled");
+      }
           Planner::dz_gcode = 0.0;
           Planner::de_real = 0.0;
           Planner::de_gcode = 0.0;
@@ -10743,13 +10745,20 @@ void process_next_command() {
           Planner::Retraction_from_start_gcode[yy] = 0.0;
           Planner::e_real[yy] = 0.0;
       }  
-      Planner::nLayer = 0;        
+      Planner::nLayer = 0; 
         break;
       case 59:
+
         Planner::use_e_fade = false;
+         for(byte tt = 0 ; tt < EXTRUDERS; tt++){
+          Planner::Retraction_from_start_gcode[tt] = 0.0;
+        }
           SERIAL_ECHOLN("E Fade disabled");
         break;
       case 58:
+        for(byte tt = 0 ; tt < EXTRUDERS; tt++){
+          Planner::Retraction_from_start_gcode[tt] = 0.0;
+        }
         SERIAL_ECHOLN("Saving Retracts after start gcode:");
         for(byte yy = 0; yy < EXTRUDERS; yy++){
         SERIAL_ECHO("E");
@@ -10778,7 +10787,6 @@ void process_next_command() {
       #endif
 
       #if ENABLED(FILAMENT_JAM_SENSOR)
-
       case 66:
         if(Planner::filament_sensor_type == 0){
           SERIAL_ECHOLN("USING BINARY FILAMENT SENSOR");
@@ -10795,6 +10803,17 @@ void process_next_command() {
         gcode_M500();
       break;
       case 64:
+      if(Planner::filament_sensor_type == 0){
+        if(filament_binary_sensor_E0_on && filament_binary_sensor_E1_on){
+          SERIAL_ECHO("L: ");
+          SERIAL_ECHO(filament_runout_E0*1);
+          SERIAL_ECHO(" R: ");
+          SERIAL_ECHOLN(filament_runout_E1*1);
+        }else{
+          SERIAL_ECHOLN("Filament sensor off");
+        }
+
+      }else{
         SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
         SERIAL_ECHOLN("ERROR LEVEL:");
         SERIAL_ECHOLN(Stepper::filament_error_level);
@@ -10802,6 +10821,7 @@ void process_next_command() {
         SERIAL_ECHOLN(Stepper::filament_alarm_level);
         SERIAL_ECHOLN("RETRACT BUFFOR LEVEL:");
         SERIAL_ECHOLN(Stepper::filament_retract_buffor);
+      }
       break;
       case 69:    
           Stepper::extruder_counts = 0;

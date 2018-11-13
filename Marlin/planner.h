@@ -188,6 +188,7 @@ class Planner {
         static float E_fade_extrusion_difference[EXTRUDERS];
         static bool E_fade_applied[EXTRUDERS];
         static int nLayer;
+        static bool relative_mode;
       #ifdef START_GCODE_EXTRUSION_CORRECTION
         static float Retraction_from_start_gcode[EXTRUDERS];
       #endif
