@@ -598,9 +598,19 @@ void Planner::check_axes_activity() {
         if(relative_mode) de_real = de_gcode;
         e_real[active_extruder] += de_real;
   }
+        last_e_gcode[active_extruder] = e;
+  }else if(z_fade_height == 0.0){
 
-
-      last_e_gcode[active_extruder] = e;
+        de_gcode = e-last_e_gcode[active_extruder];
+    if(de_gcode > 0){
+      if(Retracted_filament[active_extruder] > 0.0){
+        Retracted_filament[active_extruder] -= de_gcode;
+      }
+      if(Retracted_filament[active_extruder] < 0.0)Retracted_filament[active_extruder] = 0.0;
+    }else if(de_gcode < 0){
+        Retracted_filament[active_extruder] -= de_gcode;
+    }
+    last_e_gcode[active_extruder] = e;
   }
     #endif
 
@@ -630,10 +640,12 @@ void Planner::check_axes_activity() {
               SERIAL_ECHOLN(e);
               SERIAL_ECHO("E_R: ");
             #endif 
-            if(E_fade_applied[active_extruder]){
-                e = e_real[active_extruder];
-            }else{                      
-                  e+=E_fade_extrusion_difference[active_extruder];
+            if(use_e_fade){
+              if(E_fade_applied[active_extruder]){
+                  e = e_real[active_extruder];
+              }else{                      
+                    e+=E_fade_extrusion_difference[active_extruder];
+              }
             }
             #ifdef DEBUG_E_FADE
               SERIAL_ECHOLN(e);

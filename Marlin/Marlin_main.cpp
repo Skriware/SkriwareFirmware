@@ -10748,7 +10748,6 @@ void process_next_command() {
       Planner::nLayer = 0; 
         break;
       case 59:
-
         Planner::use_e_fade = false;
          for(byte tt = 0 ; tt < EXTRUDERS; tt++){
           Planner::Retraction_from_start_gcode[tt] = 0.0;
