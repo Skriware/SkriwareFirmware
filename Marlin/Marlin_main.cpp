@@ -10804,14 +10804,21 @@ void process_next_command() {
       case 64:
       if(Planner::filament_sensor_type == 0){
         if(filament_binary_sensor_E0_on && filament_binary_sensor_E1_on){
-          SERIAL_ECHO("L: ");
-          SERIAL_ECHO(filament_runout_E0*1);
-          SERIAL_ECHO(" R: ");
-          SERIAL_ECHOLN(filament_runout_E1*1);
+            SERIAL_ECHO("L: ");
+            if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){ 
+              SERIAL_ECHO("0");
+             }else{
+              SERIAL_ECHO("1");
+             } 
+            SERIAL_ECHO(" R: ");
+            if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){ 
+              SERIAL_ECHOLN("0");
+             }else{
+              SERIAL_ECHOLN("1");
+             } 
         }else{
-          SERIAL_ECHOLN("Filament sensor off");
+          SERIAL_ECHO("FILAMENT SENSORS OFF");
         }
-
       }else{
         SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
         SERIAL_ECHOLN("ERROR LEVEL:");
