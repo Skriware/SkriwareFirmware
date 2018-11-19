@@ -574,11 +574,13 @@ void Planner::check_axes_activity() {
         if(Retracted_filament[active_extruder] > 0.0){        
                 de_real = de_gcode;
                 Retracted_filament[active_extruder] -= de_gcode;
+                if(Retracted_filament[active_extruder] <= 0.0){
                 if(nLayer > 1){
                     de_real -= Retracted_filament[active_extruder];
                     de_real += (1-bilinear_z_offset(tmp)/z_fade_height)*Retracted_filament[active_extruder];
                 }
-                Retracted_filament[active_extruder] = 0.0;
+                  Retracted_filament[active_extruder] = 0.0;
+                }
         }else if(Retracted_filament[active_extruder] == 0.0){
              if(lz > last_new_layer_z && e > 0.0){
                   last_new_layer_z = lz;
