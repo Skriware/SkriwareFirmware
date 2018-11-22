@@ -869,6 +869,8 @@
   // The height can be set with M420 Z<height>
   #define ENABLE_LEVELING_FADE_HEIGHT
   #define E_FADE
+  #define E_FADE_MAX_LAYER_HIGH 0.25
+
   #define START_GCODE_EXTRUSION_CORRECTION
 #endif
 

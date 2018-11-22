@@ -5701,7 +5701,7 @@ inline void gcode_G92() {
 
 
     #ifdef ENABLE_LEVELING_FADE_HEIGHT
-    Planner::last_z_gcode = 0.0;
+    //Planner::last_z_gcode = 0.0;
     #ifdef E_FADE
       if(didE){                 //ukikoza
       Planner::dz_gcode = 0.0;

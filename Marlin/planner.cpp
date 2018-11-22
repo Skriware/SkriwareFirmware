@@ -578,11 +578,13 @@ void Planner::check_axes_activity() {
                 if(nLayer > 1){
                     de_real -= Retracted_filament[active_extruder];
                     de_real += (1-bilinear_z_offset(tmp)/z_fade_height)*Retracted_filament[active_extruder];
+                    if((1-bilinear_z_offset(tmp)/z_fade_height)*dz_gcode > E_FADE_MAX_LAYER_HIGH && dz_gcode < E_FADE_MAX_LAYER_HIGH) de_real += E_FADE_MAX_LAYER_HIGH/dz_gcode*Retracted_filament[active_extruder];
                 }
                   Retracted_filament[active_extruder] = 0.0;
                 }
         }else if(Retracted_filament[active_extruder] == 0.0){
              if(lz > last_new_layer_z && e > 0.0){
+                  dz_gcode = lz - last_new_layer_z;
                   last_new_layer_z = lz;
                   nLayer++;
                   #ifdef DEBUG_E_FADE
@@ -591,7 +593,11 @@ void Planner::check_axes_activity() {
                   #endif
               } 
               if(nLayer > 1 && e > 0.0){
+
                 de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
+
+                if((1-bilinear_z_offset(tmp)/z_fade_height)*dz_gcode > E_FADE_MAX_LAYER_HIGH && dz_gcode < E_FADE_MAX_LAYER_HIGH)de_real = E_FADE_MAX_LAYER_HIGH/dz_gcode*de_gcode;
+              
               }else{
                 de_real = de_gcode;
               }
