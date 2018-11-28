@@ -566,7 +566,7 @@ void Planner::check_axes_activity() {
           SERIAL_ECHOLN("END O E_FADE");
         }
 
-    if(E_fade_applied[active_extruder]){
+    //if(E_fade_applied[active_extruder]){
     if(de_gcode < 0){
       Retracted_filament[active_extruder] -= de_gcode;    //Retract monitoring
       de_real = de_gcode;
@@ -587,10 +587,12 @@ void Planner::check_axes_activity() {
                   dz_gcode = lz - last_new_layer_z;
                   last_new_layer_z = lz;
                   nLayer++;
-                  #ifdef DEBUG_E_FADE
+                 #ifdef DEBUG_E_FADE
                   SERIAL_ECHO("Printing on layer ");
                   SERIAL_ECHOLN(nLayer);
-                  #endif
+                  SERIAL_ECHO("Z: ");
+                  SERIAL_ECHOLN(last_new_layer_z);
+                 #endif
               } 
               if(nLayer > 1 && e > 0.0){
 
@@ -604,15 +606,26 @@ void Planner::check_axes_activity() {
         }
     }
         if(relative_mode) de_real = de_gcode;
-        e_real[active_extruder] += de_real;
-  }
+        if(E_fade_applied[active_extruder])e_real[active_extruder] += de_real;
+  //}
         last_e_gcode[active_extruder] = e;
-  }else if(z_fade_height == 0.0){
-
+  }else if(z_fade_height == 0.0 || E_fade_applied[active_extruder] == false){
         de_gcode = e-last_e_gcode[active_extruder];
     if(de_gcode > 0){
       if(Retracted_filament[active_extruder] > 0.0){
         Retracted_filament[active_extruder] -= de_gcode;
+      }else if (Retracted_filament[active_extruder] == 0.0){
+        if(lz > last_new_layer_z && e > 0.0){
+          dz_gcode = lz - last_new_layer_z;
+          last_new_layer_z = lz;
+          nLayer++;
+          #ifdef DEBUG_E_FADE
+          SERIAL_ECHO("Printing on layer ");
+          SERIAL_ECHOLN(nLayer);
+          SERIAL_ECHO("Z: ");
+          SERIAL_ECHOLN(last_new_layer_z);
+          #endif
+          } 
       }
       if(Retracted_filament[active_extruder] < 0.0)Retracted_filament[active_extruder] = 0.0;
     }else if(de_gcode < 0){

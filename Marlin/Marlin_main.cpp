@@ -3245,9 +3245,16 @@ void gcode_get_destination() {
 /**
  * G0, G1: Coordinated movement of X Y Z E axes
  */
+
+void set_to_print_Z(){    //ukikoza
+  //SERIAL_ECHOLN(Planner::last_new_layer_z);
+  destination[Z_AXIS] = Planner::last_new_layer_z;
+  prepare_move_to_destination();
+}
+
 inline void gcode_G0_G1(
   #if IS_SCARA
-    bool fast_move=false
+    bool fast_move=false;
   #endif
 ) {
   if (IsRunning()) {
@@ -10772,7 +10779,9 @@ void process_next_command() {
         #endif
       #endif
         break;
-
+        case 57:
+        set_to_print_Z();
+        break;
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
            case 68:
         Planner::filament_sensor_type = 0;
