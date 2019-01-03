@@ -534,7 +534,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 250, 250, 50, 1500 }
+#define DEFAULT_MAX_ACCELERATION      { 250, 250, 50, 1500}
 
 /**
  * Default Acceleration (change/s) change = mm/s
@@ -869,7 +869,7 @@
   // The height can be set with M420 Z<height>
   #define ENABLE_LEVELING_FADE_HEIGHT
   #define E_FADE
-  #define E_FADE_MAX_LAYER_HIGH 0.25
+  #define E_FADE_MAX_LAYER_HIGH 0.4
 
   #define START_GCODE_EXTRUSION_CORRECTION
 #endif

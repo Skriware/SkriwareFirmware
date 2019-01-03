@@ -565,7 +565,6 @@ void Planner::check_axes_activity() {
           E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
           SERIAL_ECHOLN("END O E_FADE");
         }
-
     //if(E_fade_applied[active_extruder]){
     if(de_gcode < 0){
       Retracted_filament[active_extruder] -= de_gcode;    //Retract monitoring
@@ -697,7 +696,6 @@ void Planner::check_axes_activity() {
             , z_fade_factor
           #endif
           );
-
     #elif ABL_PLANAR
 
       float dx = RAW_X_POSITION(lx) - (X_TILT_FULCRUM),
@@ -717,6 +715,7 @@ void Planner::check_axes_activity() {
         #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
           * z_fade_factor   
       ;
+
       #ifdef E_FADE  //ukikoza
       if(use_e_fade && E_fade_applied[active_extruder]){
            

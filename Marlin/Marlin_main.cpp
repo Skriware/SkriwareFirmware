@@ -11893,10 +11893,12 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
     NOMORE(cx2, GRID_MAX_POINTS_X - 2);
     NOMORE(cy2, GRID_MAX_POINTS_Y - 2);
 
+
+
     if (cx1 == cx2 && cy1 == cy2) {
       // Start and end on same mesh square
       line_to_destination(fr_mm_s);
-      set_current_to_destination();
+
       return;
     }
 
@@ -11946,59 +11948,122 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
    * Prepare a bilinear-leveled linear move on Cartesian,
    * splitting the move where it crosses grid borders.
    */
-  void bilinear_line_to_destination(float fr_mm_s, uint16_t x_splits = 0xFFFF, uint16_t y_splits = 0xFFFF) {
-    int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
+
+  void bilinear_line_to_destination(float fr_mm_s){
+     int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
         cy1 = CELL_INDEX(Y, current_position[Y_AXIS]),
         cx2 = CELL_INDEX(X, destination[X_AXIS]),
         cy2 = CELL_INDEX(Y, destination[Y_AXIS]);
-    cx1 = constrain(cx1, 0, ABL_BG_POINTS_X - 2);
-    cy1 = constrain(cy1, 0, ABL_BG_POINTS_Y - 2);
-    cx2 = constrain(cx2, 0, ABL_BG_POINTS_X - 2);
-    cy2 = constrain(cy2, 0, ABL_BG_POINTS_Y - 2);
+        cx1 = constrain(cx1, 0, ABL_BG_POINTS_X - 2);
+        cy1 = constrain(cy1, 0, ABL_BG_POINTS_Y - 2);
+        cx2 = constrain(cx2, 0, ABL_BG_POINTS_X - 2);
+        cy2 = constrain(cy2, 0, ABL_BG_POINTS_Y - 2);
 
-    if (cx1 == cx2 && cy1 == cy2) {
+   #define LINE_SEGMENT_END(A) (current_position[A ##_AXIS] + (destination[A ##_AXIS] - current_position[A ##_AXIS]) * normalized_dist)
+
+
+      if (cx1 == cx2 && cy1 == cy2) {
       // Start and end on same mesh square
-      line_to_destination(fr_mm_s);
-      set_current_to_destination();
-      return;
-    }
+        line_to_destination(fr_mm_s);
+        set_current_to_destination();
+        return;
+      }else{
+        #ifdef DEBUG_SPLIT
+      SERIAL_ECHO("NEW GCODE: ");
+      SERIAL_ECHO(" X: ");
+      SERIAL_ECHO(destination[X_AXIS]);
+      SERIAL_ECHO(" Y: ");
+      SERIAL_ECHO(destination[Y_AXIS]);
+      SERIAL_ECHO(" Z: ");
+      SERIAL_ECHO(destination[Z_AXIS]);
+      SERIAL_ECHO(" E: ");
+      SERIAL_ECHOLN(destination[E_AXIS]);
+      #endif
+        int X_grid = cx2-cx1;    
+        int Y_grid = cy2-cy1;      //calculate how many gid sections line corsses.
 
-    #define LINE_SEGMENT_END(A) (current_position[A ##_AXIS] + (destination[A ##_AXIS] - current_position[A ##_AXIS]) * normalized_dist)
+        int X_dir = (cx1 != cx2)? (cx2-cx1)/abs(cx2-cx1) : 0;
+        int Y_dir = (cy1 != cy2)? (cy2-cy1)/abs(cy2-cy1) : 0;
 
-    float normalized_dist, end[XYZE];
+        float final_X_destination = destination[X_AXIS];
+        float final_Y_destination = destination[Y_AXIS];
+        float start_position_X = current_position[X_AXIS];
+        float start_position_Y = current_position[Y_AXIS];
+        float E_movement = destination[E_AXIS] - current_position[E_AXIS];
+        float Z_movement = destination[Z_AXIS] - current_position[Z_AXIS];
+        #ifdef DEBUG_SPLIT
+        SERIAL_ECHO("Extrusion: ");
+        SERIAL_ECHOLN(E_movement);
+        #endif
+        float normalized_dist_X,normalized_dist_Y,normalized_dist;
+        normalized_dist = 0.0;
+        float gcode_distance = sqrt((destination[X_AXIS] - current_position[X_AXIS])*(destination[X_AXIS] - current_position[X_AXIS]) + (destination[Y_AXIS] - current_position[Y_AXIS])*(destination[Y_AXIS] - current_position[Y_AXIS]));
+        normalized_dist_Y = (final_Y_destination != start_position_Y) ? (final_X_destination - start_position_X)/(final_Y_destination - start_position_Y) : 0;
+        normalized_dist_X = (final_X_destination != start_position_X) ? (final_Y_destination - start_position_Y)/(final_X_destination - start_position_X) : 0;
+        for(int yy = 0; yy < abs(X_grid)+abs(Y_grid)+1; yy++){ //for loop containing line spliting algorithm
 
-    // Split at the left/front border of the right/top square
-    const int8_t gcx = max(cx1, cx2), gcy = max(cy1, cy2);
-    if (cx2 != cx1 && TEST(x_splits, gcx)) {
-      COPY(end, destination);
-      destination[X_AXIS] = LOGICAL_X_POSITION(bilinear_start[X_AXIS] + ABL_BG_SPACING(X_AXIS) * gcx);
-      normalized_dist = (destination[X_AXIS] - current_position[X_AXIS]) / (end[X_AXIS] - current_position[X_AXIS]);
-      destination[Y_AXIS] = LINE_SEGMENT_END(Y);
-      CBI(x_splits, gcx);
-    }
-    else if (cy2 != cy1 && TEST(y_splits, gcy)) {
-      COPY(end, destination);
-      destination[Y_AXIS] = LOGICAL_Y_POSITION(bilinear_start[Y_AXIS] + ABL_BG_SPACING(Y_AXIS) * gcy);
-      normalized_dist = (destination[Y_AXIS] - current_position[Y_AXIS]) / (end[Y_AXIS] - current_position[Y_AXIS]);
-      destination[X_AXIS] = LINE_SEGMENT_END(X);
-      CBI(y_splits, gcy);
-    }
-    else {
-      // Already split on a border
-      line_to_destination(fr_mm_s);
-      set_current_to_destination();
-      return;
-    }
+          float destination_X[XYZE],destination_Y[XYZE],distance_to_point[XYZE];
+          destination_Y[X_AXIS] = destination_Y[Y_AXIS] = 0.0;
+          destination_X[X_AXIS] = destination_X[Y_AXIS] = 0.0;
+          distance_to_point[X_AXIS] = 2*Y_MAX_POS;
+          distance_to_point[Y_AXIS] = 2*Y_MAX_POS;
+         #ifdef DEBUG_SPLIT
+          SERIAL_ECHO("CX1: ");
+          SERIAL_ECHO(cx1);
+          SERIAL_ECHO("CY1: ");
+          SERIAL_ECHO(cy1);
+        #endif
+          if(yy == 0 && X_dir == -1) cx1++; //mange starting edge of the negative direction
+          if(yy == 0 && Y_dir == -1) cy1++;
+          int gcx = (cx1 != cx2)?cx1 + X_dir: cx1;
+          int gcy = (cy1 != cy2)?cy1 + Y_dir: cy1;
+         
+        // calculating destinations to nearest points with grid crossing:
+          if(cx2 != cx1){
+            destination_X[X_AXIS] = LOGICAL_X_POSITION(bilinear_start[X_AXIS] + ABL_BG_SPACING(X_AXIS) * gcx);
+            destination_X[Y_AXIS] = current_position[Y_AXIS] + normalized_dist_X*(destination_X[X_AXIS]-current_position[X_AXIS]);
+            distance_to_point[X_AXIS] = sqrt((destination_X[X_AXIS] - current_position[X_AXIS])*(destination_X[X_AXIS] - current_position[X_AXIS]) + (destination_X[Y_AXIS] - current_position[Y_AXIS])*(destination_X[Y_AXIS] - current_position[Y_AXIS]));
+          }
+          if(cy2 != cy1){
+            destination_Y[Y_AXIS] = LOGICAL_Y_POSITION(bilinear_start[Y_AXIS] + ABL_BG_SPACING(Y_AXIS) * gcy);
+            destination_Y[X_AXIS] = current_position[X_AXIS] + normalized_dist_Y*(destination_Y[Y_AXIS] - current_position[Y_AXIS]);
+            distance_to_point[Y_AXIS] = sqrt((destination_Y[X_AXIS] - current_position[X_AXIS])*(destination_Y[X_AXIS] - current_position[X_AXIS]) + (destination_Y[Y_AXIS] - current_position[Y_AXIS])*(destination_Y[Y_AXIS] - current_position[Y_AXIS]));
+          }
+          
+          if(cx1 == cx2 && cy1 == cy2){
+            destination[X_AXIS] = final_X_destination;
+            destination[Y_AXIS] = final_Y_destination;
+            normalized_dist = distance_to_point[Y_AXIS] = sqrt((destination[X_AXIS] - current_position[X_AXIS])*(destination[X_AXIS] - current_position[X_AXIS]) + (destination[Y_AXIS] - current_position[Y_AXIS])*(destination[Y_AXIS] - current_position[Y_AXIS]))/gcode_distance;
+          }else{
+            if(distance_to_point[X_AXIS] >= distance_to_point[Y_AXIS]){
+              destination[X_AXIS] = destination_Y[X_AXIS];
+              destination[Y_AXIS] = destination_Y[Y_AXIS];
+              cy1 += Y_dir;
+              if(cy1-cy2 == 1 && Y_dir == -1) cy1--; 
+              normalized_dist = distance_to_point[Y_AXIS]/gcode_distance;  //set for Z and E scaling
+            }else if(distance_to_point[X_AXIS] < distance_to_point[Y_AXIS]){
+              destination[X_AXIS] = destination_X[X_AXIS];
+              destination[Y_AXIS] = destination_X[Y_AXIS];
+              cx1 += X_dir;
+              if(cx1-cx2 == 1 && X_dir == -1) cx1--;
+              normalized_dist = distance_to_point[X_AXIS]/gcode_distance;  //set for Z and E scaling
+            }
 
-    destination[Z_AXIS] = LINE_SEGMENT_END(Z);
-    destination[E_AXIS] = LINE_SEGMENT_END(E);
+          }
+          destination[Z_AXIS] = current_position[Z_AXIS] + Z_movement*normalized_dist;
+          destination[E_AXIS] = current_position[E_AXIS] + E_movement*normalized_dist;
+          #ifdef DEBUG_SPLIT
+          SERIAL_ECHO("SPLIT ");
+          SERIAL_ECHO(yy);
+          SERIAL_ECHOLN(":  ");
+          #endif
+          line_to_destination(fr_mm_s);
+          set_current_to_destination();
+        }
 
-    // Do the split and look for more borders
-    bilinear_line_to_destination(fr_mm_s, x_splits, y_splits);
 
-    // Restore destination from stack
-    COPY(destination, end);
-    bilinear_line_to_destination(fr_mm_s, x_splits, y_splits);
+      }
+
   }
 
 #endif // AUTO_BED_LEVELING_BILINEAR
