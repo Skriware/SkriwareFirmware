@@ -3252,6 +3252,48 @@ void set_to_print_Z(){    //ukikoza
   prepare_move_to_destination();
 }
 
+
+bool checkTestPin(int pin){
+  for(int ii = 0; ii < 10000; ii++){
+    if(digitalRead(pin) == HIGH){
+      return(false);
+    }
+  }
+  return(true);
+}
+
+void Z_distance_Test(){   //Test for moving extruder pozition 
+  for(int c = 0; c < 500; c++){
+  pinMode(2,INPUT);
+  pinMode(14,OUTPUT);
+  digitalWrite(14,LOW);
+  pinMode(15,INPUT);
+  float Z_dist = 8.0;
+    destination[X_AXIS] = Z_dist;
+    prepare_move_to_destination();
+    stepper.synchronize();
+  while(!checkTestPin(2)){
+    destination[X_AXIS] = Z_dist;
+    prepare_move_to_destination();
+    stepper.synchronize();
+    Z_dist += 0.0025;
+  }
+  SERIAL_ECHO(c);
+  SERIAL_ECHO(" [mm*100]: ");
+  SERIAL_ECHOLN(Z_dist*1000);
+  digitalWrite(14,HIGH);
+  delay(100);
+  digitalWrite(14,LOW);
+  delay(100);
+  destination[X_AXIS] = 8.0;
+  prepare_move_to_destination();
+  stepper.synchronize();
+  refresh_cmd_timeout();
+   while (PENDING(millis(), 5000 + previous_cmd_ms)) idle();
+  
+}
+}
+
 inline void gcode_G0_G1(
   #if IS_SCARA
     bool fast_move=false;
@@ -10781,6 +10823,7 @@ void process_next_command() {
         break;
         case 57:
         set_to_print_Z();
+        //Z_distance_Test();
         break;
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
            case 68:
@@ -11949,7 +11992,7 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
    * splitting the move where it crosses grid borders.
    */
 
-  void bilinear_line_to_destination(float fr_mm_s){
+  void bilinear_line_to_destination(float fr_mm_s){       //ukikoza
      int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
         cy1 = CELL_INDEX(Y, current_position[Y_AXIS]),
         cx2 = CELL_INDEX(X, destination[X_AXIS]),
