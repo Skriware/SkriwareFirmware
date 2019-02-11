@@ -840,6 +840,21 @@ void MarlinSettings::postprocess() {
           EEPROM_READ(bilinear_grid_spacing);        // 2 ints
           EEPROM_READ(bilinear_start);               // 2 ints
           EEPROM_READ(z_values);                     // 9 to 256 floats
+
+          bool nanTest = true;                                      //ukikoza
+          for(byte yy = 0 ; yy < GRID_MAX_POINTS_Y; yy++){
+            for(byte xx = 0; xx < GRID_MAX_POINTS_X; xx++){
+              if(isnan(z_values[xx][yy])){
+                nanTest = false;
+                break;
+              }
+            }
+          }
+          if(!nanTest){
+            SERIAL_ECHOLN("ERROR: Calibration data corrupted!");
+          }else{
+            SERIAL_ECHOLN("Bed matrix loaded, with no errors.");
+          }
         }
         else // EEPROM data is stale
       #endif // AUTO_BED_LEVELING_BILINEAR
@@ -1754,11 +1769,20 @@ void MarlinSettings::reset() {
         // !forReplay || HOTENDS == 1
         {
           CONFIG_ECHO_START;
-          SERIAL_ECHOPAIR("  M301 P", PID_PARAM(Kp, 0)); // for compatibility with hosts, only echo values for E0
+          SERIAL_ECHOPAIR("  M301 E0 P", PID_PARAM(Kp, 0)); // for compatibility with hosts, only echo values for E0
           SERIAL_ECHOPAIR(" I", unscalePID_i(PID_PARAM(Ki, 0)));
           SERIAL_ECHOPAIR(" D", unscalePID_d(PID_PARAM(Kd, 0)));
           #if ENABLED(PID_EXTRUSION_SCALING)
             SERIAL_ECHOPAIR(" C", PID_PARAM(Kc, 0));
+            SERIAL_ECHOPAIR(" L", lpq_len);
+          #endif
+          SERIAL_EOL();
+          CONFIG_ECHO_START;
+          SERIAL_ECHOPAIR("  M301 E1 P", PID_PARAM(Kp, 1)); // for compatibility with hosts, only echo values for E0
+          SERIAL_ECHOPAIR(" I", unscalePID_i(PID_PARAM(Ki, 1)));
+          SERIAL_ECHOPAIR(" D", unscalePID_d(PID_PARAM(Kd, 1)));
+          #if ENABLED(PID_EXTRUSION_SCALING)
+            SERIAL_ECHOPAIR(" C", PID_PARAM(Kc, 1));
             SERIAL_ECHOPAIR(" L", lpq_len);
           #endif
           SERIAL_EOL();

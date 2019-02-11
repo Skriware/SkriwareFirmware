@@ -696,6 +696,7 @@ void Planner::check_axes_activity() {
             , z_fade_factor
           #endif
           );
+
     #elif ABL_PLANAR
 
       float dx = RAW_X_POSITION(lx) - (X_TILT_FULCRUM),
@@ -709,12 +710,14 @@ void Planner::check_axes_activity() {
       lz = LOGICAL_Z_POSITION(dz);
 
     #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
-
       
       lz += bilinear_z_offset(tmp)
         #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-          * z_fade_factor   
+          * z_fade_factor
+        #endif   
       ;
+    
+
 
       #ifdef E_FADE  //ukikoza
       if(use_e_fade && E_fade_applied[active_extruder]){
@@ -733,7 +736,6 @@ void Planner::check_axes_activity() {
       }
       de_gcode = 0.0;
       de_real = 0.0;
-      #endif
       #endif
     #endif
   }

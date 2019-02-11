@@ -174,7 +174,7 @@
  * M261 - i2c Request Data (Requires EXPERIMENTAL_I2CBUS)
  * M280 - Set servo position absolute: "M280 P<index> S<angle|µs>". (Requires servos)
  * M300 - Play beep sound S<frequency Hz> P<duration ms>
- * M301 - Set PID parameters P I and D. (Requires PIDTEMP)
+ *M301 - Set PID parameters P I and D. (Requires PIDTEMP)
  * M302 - Allow cold extrudes, or set the minimum extrude S<temperature>. (Requires PREVENT_COLD_EXTRUSION)
  * M303 - PID relay autotune S<temperature> sets the target temperature. Default 150C. (Requires PIDTEMP)
  * M304 - Set bed PID parameters P I and D. (Requires PIDTEMPBED)
@@ -651,6 +651,11 @@ static bool filament_jam = false;
 static bool filament_alarm = false;
 static bool filament_sensor_on = true;
 #endif
+        int type = 0;                   //checkstation
+        float Z_start = 0.0;
+        float Z_up = 0.0;
+        float Z_down = 0.0;
+        int C_time = 0.0;
 
 #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
 static bool filament_binary_sensor_E0_on = true;
@@ -1123,7 +1128,11 @@ inline void get_serial_commands() {
         }
 
         gcode_LastN = gcode_N;
-        // if no errors, continue parsing
+       /*
+        SERIAL_ECHO("Line ");
+        SERIAL_ECHO(gcode_N);
+        SERIAL_ECHOLN("accepted");//ukikoza
+        */// if no errors, continue parsing
       }
       else if (apos) { // No '*' without 'N'
         gcode_line_error(PSTR(MSG_ERR_NO_LINENUMBER_WITH_CHECKSUM), false);
@@ -3262,35 +3271,53 @@ bool checkTestPin(int pin){
   return(true);
 }
 
-void Z_distance_Test(){   //Test for moving extruder pozition 
+void Z_distance_Test(int type,float Z_start,float Z_down,float Z_up,int Cycle_time){   //Test for moving extruder pozition 
+  //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3 
   for(int c = 0; c < 500; c++){
+  if(type == 1 || type == 2){
   pinMode(2,INPUT);
   pinMode(14,OUTPUT);
   digitalWrite(14,LOW);
-  pinMode(15,INPUT);
-  float Z_dist = 8.0;
-    destination[X_AXIS] = Z_dist;
-    prepare_move_to_destination();
-    stepper.synchronize();
-  while(!checkTestPin(2)){
-    destination[X_AXIS] = Z_dist;
-    prepare_move_to_destination();
-    stepper.synchronize();
-    Z_dist += 0.0025;
   }
+  
+  
+    destination[X_AXIS] = Z_start;
+    prepare_move_to_destination();
+    stepper.synchronize();
+    float Z_dist = Z_start;
+  while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
+    destination[X_AXIS] = Z_dist;
+    prepare_move_to_destination();
+    stepper.synchronize();
+    Z_dist += 0.001;
+  }                               
   SERIAL_ECHO(c);
   SERIAL_ECHO(" [mm*100]: ");
-  SERIAL_ECHOLN(Z_dist*1000);
-  digitalWrite(14,HIGH);
-  delay(100);
-  digitalWrite(14,LOW);
-  delay(100);
-  destination[X_AXIS] = 8.0;
+  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC
+ 
+  if(type == 1 || type == 2){
+      digitalWrite(14,HIGH);
+      delay(100);
+      digitalWrite(14,LOW);
+      delay(100);
+  }                             // Send Rotor or servo signal to start the cycle
+  destination[X_AXIS] = Z_start;
   prepare_move_to_destination();
   stepper.synchronize();
-  refresh_cmd_timeout();
-   while (PENDING(millis(), 5000 + previous_cmd_ms)) idle();
-  
+  if(type == 1 || type == 2){
+      refresh_cmd_timeout();
+      while (PENDING(millis(), Cycle_time + previous_cmd_ms)) idle();     //Version for Servo and Rotor, wait for the ccycle to end;
+  }
+
+  if(type == 3){                          // Move the extruder
+    destination[Z_AXIS] = Z_up;
+    prepare_move_to_destination();
+    stepper.synchronize();
+    delay(100);
+    destination[Z_AXIS] = Z_down;
+    prepare_move_to_destination();
+    stepper.synchronize();
+  }
 }
 }
 
@@ -10488,7 +10515,7 @@ inline void gcode_T(uint8_t tmp_extruder) {
  */
 void process_next_command() {
   char * const current_command = command_queue[cmd_queue_index_r];
-
+  
   if (DEBUGGING(ECHO)) {
     SERIAL_ECHO_START();
     SERIAL_ECHOLN(current_command);
@@ -10822,8 +10849,12 @@ void process_next_command() {
       #endif
         break;
         case 57:
-        set_to_print_Z();
-        //Z_distance_Test();
+        if (parser.seen('F')) type = parser.value_linear_units();
+        if (parser.seen('S')) Z_start = parser.value_float();
+        if (parser.seen('U')) Z_up = parser.value_float();
+        if (parser.seen('D')) Z_down = parser.value_float();
+        if (parser.seen('T')) C_time = parser.value_linear_units();
+        Z_distance_Test(type,Z_start,Z_down,Z_up,C_time);
         break;
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
            case 68:
