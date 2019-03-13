@@ -237,9 +237,9 @@ void handle_message(byte frame[5]) {
       centerLightDown();
       break;
     default: 
-      #ifdef DEGUB
+     #ifdef DEGUB
       Serial.println("I2C error");
-      #endif
+     #endif
       break;
   }
 

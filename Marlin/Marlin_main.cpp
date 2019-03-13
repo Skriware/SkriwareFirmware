@@ -11693,7 +11693,7 @@ void ok_to_send() {
     }
     last_offset = offset;
     //*/
-
+    if(isnan(offset))SERIAL_ECHO("Corrupted point!");
     return offset;
   }
 

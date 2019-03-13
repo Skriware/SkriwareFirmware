@@ -526,7 +526,7 @@
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 5, 100 }
+#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 50, 100 }
 //#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 1000, 100 } // checkstation
 
 /**
@@ -535,7 +535,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 250, 250, 50, 1500}
+#define DEFAULT_MAX_ACCELERATION      { 500, 500, 50, 1500}
 
 /**
  * Default Acceleration (change/s) change = mm/s
@@ -668,7 +668,7 @@
  *      O-- FRONT --+
  *    (0,0)
  */
-#define X_PROBE_OFFSET_FROM_EXTRUDER 18  // X offset: -left  +right  [of the nozzle]
+#define X_PROBE_OFFSET_FROM_EXTRUDER 20  // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 32  // Y offset: -front +behind [the nozzle]
 #define Z_PROBE_OFFSET_FROM_EXTRUDER 0   // Z offset: -below +above  [the nozzle]
 
@@ -885,7 +885,7 @@
   #define GRID_MAX_POINTS_Y 5//GRID_MAX_POINTS_X
 
   // Set the boundaries for probing (where the probe can reach).
-  #define LEFT_PROBE_BED_POSITION 18
+  #define LEFT_PROBE_BED_POSITION 20
   #define RIGHT_PROBE_BED_POSITION 180
   #define FRONT_PROBE_BED_POSITION 32
   #define BACK_PROBE_BED_POSITION 255
