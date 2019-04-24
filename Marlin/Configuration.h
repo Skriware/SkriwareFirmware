@@ -520,7 +520,7 @@
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 800, 204} // x,y steps = 80 for 1/16 microstepping, 160 for 1/32 microstepping
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 2070, 80, 800, 204}     //checkstation
+//#define DEFAULT_AXIS_STEPS_PER_UNIT   { 2070, 80, 800, 204}     //checkstation
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
@@ -873,7 +873,7 @@
   // The height can be set with M420 Z<height>
   #define ENABLE_LEVELING_FADE_HEIGHT
   #define E_FADE
-  #define E_FADE_MAX_LAYER_HIGH 0.4
+  #define E_FADE_MAX_LAYER_HIGH 0.25
 
   #define START_GCODE_EXTRUSION_CORRECTION
 #endif

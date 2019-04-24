@@ -345,6 +345,8 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS],
                 Tu = ((float)(t_low + t_high) * 0.001);
                 SERIAL_PROTOCOLPAIR(MSG_KU, Ku);
                 SERIAL_PROTOCOLPAIR(MSG_TU, Tu);
+                SERIAL_PROTOCOLPAIR("A: ",(max - min));
+                SERIAL_PROTOCOLPAIR("T: ",t_low+t_high*0.001);
                 workKp = 0.6 * Ku;
                 workKi = 2 * workKp / Tu;
                 workKd = workKp * Tu * 0.125;

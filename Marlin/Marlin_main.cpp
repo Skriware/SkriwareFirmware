@@ -10849,12 +10849,7 @@ void process_next_command() {
       #endif
         break;
         case 57:
-        if (parser.seen('F')) type = parser.value_linear_units();
-        if (parser.seen('S')) Z_start = parser.value_float();
-        if (parser.seen('U')) Z_up = parser.value_float();
-        if (parser.seen('D')) Z_down = parser.value_float();
-        if (parser.seen('T')) C_time = parser.value_linear_units();
-        Z_distance_Test(type,Z_start,Z_down,Z_up,C_time);
+        set_to_print_Z();
         break;
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
            case 68:
