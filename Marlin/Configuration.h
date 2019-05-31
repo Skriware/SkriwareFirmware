@@ -38,7 +38,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 #define CONFIGURATION_H_VERSION 010100
-
+//#define EXT_CHECKSTATION
 //===========================================================================
 //============================= Getting Started =============================
 //===========================================================================
@@ -411,7 +411,9 @@
 // *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
 #define PREVENT_COLD_EXTRUSION
 #define EXTRUDE_MINTEMP 170
-//#define EXTRUDE_MINTEMP -30   //checkstation
+#ifdef EXT_CHECKSTATION
+#define EXTRUDE_MINTEMP -30 
+#endif
 // This option prevents a single extrusion longer than EXTRUDE_MAXLENGTH.
 // Note that for Bowden Extruders a too-small value here may prevent loading.
 #define PREVENT_LENGTHY_EXTRUDE
@@ -465,8 +467,9 @@
 #define USE_ZMIN_PLUG
 //#define USE_XMAX_PLUG
 //#define USE_YMAX_PLUG
-//#define USE_ZMAX_PLUG   //checkstation
-
+#ifdef EXT_CHECKSTATION
+#define USE_ZMAX_PLUG 
+#endif
 // coarse Endstop Settings
 //#define ENDSTOPPULLUPS // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
 
@@ -519,16 +522,21 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
+#ifndef EXT_CHECKSTATION
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 800, 204} // x,y steps = 80 for 1/16 microstepping, 160 for 1/32 microstepping
-//#define DEFAULT_AXIS_STEPS_PER_UNIT   { 2070, 80, 800, 204}     //checkstation
+#else
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 2070, 80, 800, 204}     
+#endif
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
+#ifndef EXT_CHECKSTATION
 #define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 50, 100 }
-//#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 1000, 100 } // checkstation
-
+#else
+#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 1000, 100 } 
+#endif
 /**
  * Default Max Acceleration (change/s) change = mm/s
  * (Maximum start speed for accelerated moves)
@@ -757,15 +765,18 @@
 #define X_HOME_DIR -1
 #define Y_HOME_DIR -1
 #define Z_HOME_DIR -1
-//#define Z_HOME_DIR 1  //checkstation
-
+#ifdef EXT_CHECKSTATION
+#define Z_HOME_DIR 1  
+#endif
 // @section machine
 
 // Travel limits after homing (units are in mm)
 #define X_MIN_POS 0
 #define Y_MIN_POS 0
 #define Z_MIN_POS -3
-//#define Z_MIN_POS -200    //checkstation
+#ifdef EXT_CHECKSTATION
+#define Z_MIN_POS -200    
+#endif
 
 #define X_MAX_POS 230
 #define Y_MAX_POS 275
@@ -809,6 +820,11 @@
 //#define FILAMENT_JAM_SENSOR_DEBUG
 #endif
 
+//Moving extruder variables:
+#define SERVO_POS_DOWN 80
+#define SERVO_POS_UP   33
+#define MOTOR_UP_TIME 2000
+#define EXT_CHANGE_TIME_OFFSET 500
 
 
 //===========================================================================
@@ -1609,7 +1625,7 @@
 // leaving it undefined or defining as 0 will disable the servo subsystem
 // If unsure, leave commented / disabled
 //
-//#define NUM_SERVOS 3 // Servo index starts with 0 for M280 command
+#define NUM_SERVOS 1 // Servo index starts with 0 for M280 command
 
 // Delay (in milliseconds) before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.

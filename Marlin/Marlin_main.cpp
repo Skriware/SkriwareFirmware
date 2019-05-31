@@ -242,7 +242,7 @@
  */
 
 #include "Marlin.h"
-
+#include "Arduino.h"
 #include "ultralcd.h"
 #include "planner.h"
 #include "stepper.h"
@@ -257,6 +257,9 @@
 #include "duration_t.h"
 #include "types.h"
 #include "gcode.h"
+//ukikoza
+#include "OneWire.h"
+
 
 #if HAS_ABL
   #include "vector_3.h"
@@ -447,6 +450,13 @@ float filament_size[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(DEFAULT_NOMINAL_FILAMENT_DI
     // This offset is added to the configured home position.
     // Set by M206, M428, or menu item. Saved to EEPROM.
     float home_offset[XYZ] = { 0 };
+    float home_offset_E1 = 0.0;     //ukikoza
+    float home_offset_E0 = 0.0;
+    byte servo_up_pos = SERVO_POS_UP;
+    byte servo_down_pos = SERVO_POS_DOWN;
+    int extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
+    int up_delay = MOTOR_UP_TIME;
+    byte extruder_type = 0;
   #endif
   #if HAS_HOME_OFFSET && HAS_POSITION_SHIFT
     // The above two are combined to save on computes
@@ -651,11 +661,14 @@ static bool filament_jam = false;
 static bool filament_alarm = false;
 static bool filament_sensor_on = true;
 #endif
-        int type = 0;                   //checkstation
+
+                         //checkstation
         float Z_start = 0.0;
         float Z_up = 0.0;
         float Z_down = 0.0;
         int C_time = 0.0;
+        int NM =0;
+        byte tmp;
 
 #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
 static bool filament_binary_sensor_E0_on = true;
@@ -666,6 +679,10 @@ static long Last_runout_Signal_E0 = 0;
 static long Last_runout_Signal_E1 = 0;
 
 #endif
+OneWire  ds(21);
+bool servo_extruder = false;
+
+
 
 #if ENABLED(MIXING_EXTRUDER)
   float mixing_factor[MIXING_STEPPERS]; // Reciprocal of mix proportion. 0.0 = off, otherwise >= 1.0.
@@ -1432,7 +1449,6 @@ bool get_target_extruder_from_command(const uint16_t code) {
   static void set_home_offset(const AxisEnum axis, const float v) {
     current_position[axis] += v - home_offset[axis];
     home_offset[axis] = v;
-    update_software_endstops(axis);
   }
 #endif // HAS_M206_COMMAND
 
@@ -3261,7 +3277,6 @@ void set_to_print_Z(){    //ukikoza
   prepare_move_to_destination();
 }
 
-
 bool checkTestPin(int pin){
   for(int ii = 0; ii < 10000; ii++){
     if(digitalRead(pin) == HIGH){
@@ -3271,16 +3286,126 @@ bool checkTestPin(int pin){
   return(true);
 }
 
-void Z_distance_Test(int type,float Z_start,float Z_down,float Z_up,int Cycle_time){   //Test for moving extruder pozition 
-  //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3 
-  for(int c = 0; c < 500; c++){
-  if(type == 1 || type == 2){
-  pinMode(2,INPUT);
-  pinMode(14,OUTPUT);
-  digitalWrite(14,LOW);
+void Extruder_Up(){
+      if(extruder_type == 3){
+        servo[0].write(servo_up_pos);
+      }else if(extruder_type != 0){
+        bool done = false;
+      while(!done){
+      byte addr[8];
+      if ( !ds.search(addr)) {
+        ds.reset_search();
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+        refresh_cmd_timeout();
+        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+      }
+      if(addr[0] == 0x68){
+        ds.reset();
+        ds.select(addr);
+        ds.write(0xCC);
+        ds.reset_search();
+        done = true;
+      }else{
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+         refresh_cmd_timeout();
+        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+      }
+    }
+    }
+}
+
+void Extruder_Down(){
+     if(extruder_type == 3){
+      servo[0].write(servo_down_pos);
+     }else if(extruder_type != 0){
+       bool done = false;
+    while(!done){
+     byte addr[8];
+      if ( !ds.search(addr)) {
+        ds.reset_search();
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+         refresh_cmd_timeout();
+        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+      }
+      if(addr[0] == 0x68){
+        ds.reset();
+        ds.select(addr);
+        ds.write(0xBB);
+        ds.reset_search();
+        done = true;
+      }else{
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+         refresh_cmd_timeout();
+        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+      }
+    }
+    }
+}
+
+
+void Set_Extruder_Type(byte TYPE){
+      if(TYPE == 3){
+        servo[0].detach();
+        servo[0].attach(4);
+        servo_extruder = true;
+        Extruder_Up();
+      }else if(TYPE != 0){
+        servo_extruder = false;
+      byte addr[8];
+      if ( !ds.search(addr)) {
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+        ds.reset_search();
+      return;
+      }
+      if(addr[0] == 0x68){
+        ds.reset();
+        ds.select(addr);
+        ds.write(0xAA);
+        ds.write(TYPE);
+        ds.reset_search();
+      }else{
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+      }
+    }
+    extruder_type = TYPE;
+}
+
+void Set_up_Time(int time){
+     if(extruder_type != 0){
+      byte addr[8];
+      if ( !ds.search(addr)) {
+        ds.reset_search();
+      return;
+      }
+      if(addr[0] == 0x68){
+        ds.reset();
+        ds.select(addr);
+        ds.write(0xDC);
+        ds.write(uint8_t(time));
+        ds.write(uint8_t(time>>8));
+        ds.reset_search();
+      }else{
+        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
+      }
+    }
+
+}
+
+
+void Z_distance_Test(int type,float Z_start,float Z_down,float Z_up,int Cycle_time,int N_Cycles){   //Test for moving extruder pozition 
+  //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3,
+   if(type == 1 || type == 2){
+    pinMode(2,INPUT);
+    pinMode(14,OUTPUT);
+    digitalWrite(14,LOW);
+  }else if(type == 4){
+    pinMode(2,INPUT);
+    pinMode(14,INPUT);
   }
-  
-  
+
+
+  for(int c = 0; c < N_Cycles; c++){
+ 
     destination[X_AXIS] = Z_start;
     prepare_move_to_destination();
     stepper.synchronize();
@@ -3837,7 +3962,7 @@ inline void gcode_G4() {
  *
  */
 inline void gcode_G28(const bool always_home_all) {
-
+    Extruder_Up();                                        //ukikoza
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) {
       SERIAL_ECHOLNPGM(">>> gcode_G28");
@@ -8391,6 +8516,8 @@ inline void gcode_M205() {
    * ***              In the next 1.2 release, it will simply be disabled by default.
    */
   inline void gcode_M206() {
+    if (parser.seen('E')) home_offset_E1 = parser.value_linear_units();
+    if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units();
     LOOP_XYZ(i)
       if (parser.seen(axis_codes[i]))
         set_home_offset((AxisEnum)i, parser.value_linear_units());
@@ -8399,7 +8526,6 @@ inline void gcode_M205() {
       if (parser.seen('T')) set_home_offset(A_AXIS, parser.value_linear_units()); // Theta
       if (parser.seen('P')) set_home_offset(B_AXIS, parser.value_linear_units()); // Psi
     #endif
-
     SYNC_PLAN_POSITION_KINEMATIC();
     report_current_position();
   }
@@ -10507,6 +10633,37 @@ inline void gcode_T(uint8_t tmp_extruder) {
       SERIAL_ECHOLNPGM("<<< gcode_T");
     }
   #endif
+    
+}
+
+void extruder_swap(uint8_t tmp_extruder,uint8_t active){
+   bool extruder_change = tmp_extruder != active;        //ukikoza
+      float tmp_Z = current_position[Z_AXIS];
+   if(extruder_type != 0 && tmp_extruder == 1 && extruder_change){
+        stepper.synchronize();
+        destination[Z_AXIS] = tmp_Z+2.0;
+        prepare_move_to_destination();
+        stepper.synchronize();
+        Extruder_Down();
+        refresh_cmd_timeout();
+        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+        set_home_offset(Z_AXIS,home_offset_E1);
+        SYNC_PLAN_POSITION_KINEMATIC();
+        report_current_position();
+        destination[Z_AXIS] = tmp_Z;
+        prepare_move_to_destination();
+        stepper.synchronize();  
+    }
+    if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
+       stepper.synchronize();
+       Extruder_Up();
+       refresh_cmd_timeout();
+        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+       delay(extruder_change_time_offset);
+       set_home_offset(Z_AXIS,home_offset_E0);
+       SYNC_PLAN_POSITION_KINEMATIC();
+       report_current_position();
+    }
 }
 
 /**
@@ -10849,10 +11006,21 @@ void process_next_command() {
       #endif
         break;
         case 57:
-        set_to_print_Z();
+        //
+        #ifdef EXT_CHECKSTATION
+        if (parser.seen('F')) type = parser.value_linear_units();
+        if (parser.seen('S')) Z_start = parser.value_float();
+        if (parser.seen('U')) Z_up = parser.value_float();
+        if (parser.seen('D')) Z_down = parser.value_float();
+        if (parser.seen('T')) C_time = parser.value_linear_units();
+        if (parser.seen('N')) NM = parser.value_linear_units();
+        Z_distance_Test(type,Z_start,Z_down,Z_up,C_time,NM);
         break;
+        #else
+        set_to_print_Z();
+        #endif
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-           case 68:
+        case 68:
         Planner::filament_sensor_type = 0;
         gcode_M500();
       break;
@@ -10923,6 +11091,24 @@ void process_next_command() {
       case 72:
         Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
       break;
+       case 80:
+        if (parser.seen('U'))Extruder_Up();
+        if (parser.seen('D'))Extruder_Down();
+        if (parser.seen('W'))servo_up_pos = parser.value_linear_units();
+        if (parser.seen('S'))servo_down_pos = parser.value_linear_units();
+        if (parser.seen('O'))extruder_change_time_offset = parser.value_linear_units();
+        if (parser.seen('A')){ 
+          up_delay = parser.value_linear_units();
+          Set_up_Time(up_delay);
+        }
+        if (parser.seen('T')){ extruder_type= parser.value_linear_units();
+          Set_Extruder_Type(extruder_type);
+        }
+          if (parser.seen('I')){ 
+          Set_Extruder_Type(extruder_type);
+          Set_up_Time(up_delay);
+        }
+       break;
       #endif
       case 75: // M75: Start print timer
         gcode_M75(); break;
@@ -11497,7 +11683,9 @@ void process_next_command() {
     break;
 
     case 'T':
+      tmp = active_extruder;
       gcode_T(parser.codenum);
+      extruder_swap(parser.codenum,tmp);
       break;
 
     default: parser.unknown_command_error();
@@ -13524,6 +13712,8 @@ void setup() {
   #if ENABLED(SWITCHING_NOZZLE)
     move_nozzle_servo(0);  // Initialize nozzle servo
   #endif
+    Set_Extruder_Type(extruder_type);         //ukikoza
+    Set_up_Time(up_delay);
 }
 
 /**

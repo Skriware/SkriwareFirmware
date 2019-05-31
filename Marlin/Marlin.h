@@ -51,6 +51,8 @@
   #include "stopwatch.h"
 #endif
 
+
+
 void idle(
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
     bool no_stepper_sleep = false  // pass true to keep steppers from disabling on timeout
@@ -235,6 +237,14 @@ extern float current_position[NUM_AXIS];
 #if HAS_WORKSPACE_OFFSET
   #if HAS_HOME_OFFSET
     extern float home_offset[XYZ];
+
+        extern float home_offset_E1;     //ukikoza
+        extern float home_offset_E0;
+        extern int extruder_change_time_offset;
+        extern byte servo_up_pos;
+        extern byte servo_down_pos;
+        extern int up_delay;
+        extern byte extruder_type;
   #endif
   #if HAS_POSITION_SHIFT
     extern float position_shift[XYZ];
@@ -479,5 +489,7 @@ FORCE_INLINE bool position_is_reachable_by_probe_xy(const float &lx, const float
 FORCE_INLINE bool position_is_reachable_xy(const float &lx, const float &ly) {
   return position_is_reachable_raw_xy(RAW_X_POSITION(lx), RAW_Y_POSITION(ly));
 }
+
+
 
 #endif // MARLIN_H

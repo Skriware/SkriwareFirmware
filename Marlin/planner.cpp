@@ -718,7 +718,6 @@ void Planner::check_axes_activity() {
       ;
     
 
-
       #ifdef E_FADE  //ukikoza
       if(use_e_fade && E_fade_applied[active_extruder]){
            

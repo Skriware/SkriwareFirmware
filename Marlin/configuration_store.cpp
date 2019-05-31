@@ -342,6 +342,14 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(stepper.filament_retract_buffor); 
     #endif 
 
+    EEPROM_WRITE(home_offset_E1);
+    EEPROM_WRITE(home_offset_E0);
+    EEPROM_WRITE(extruder_change_time_offset);
+    EEPROM_WRITE(servo_up_pos);
+    EEPROM_WRITE(servo_down_pos);
+    EEPROM_WRITE(up_delay);
+    EEPROM_WRITE(extruder_type);
+
     #endif
     #if !HAS_HOME_OFFSET
       const float home_offset[XYZ] = { 0 };
@@ -754,7 +762,14 @@ void MarlinSettings::postprocess() {
 
       #endif
 
-
+      EEPROM_READ(home_offset_E1);
+      EEPROM_READ(home_offset_E0);
+      EEPROM_READ(extruder_change_time_offset);
+      EEPROM_READ(servo_up_pos);
+      EEPROM_READ(servo_down_pos);
+      EEPROM_READ(up_delay);
+      EEPROM_READ(extruder_type);
+      
         //ukikoza
 
       #if !HAS_HOME_OFFSET
@@ -1247,6 +1262,13 @@ void MarlinSettings::reset() {
   #endif
   #endif
 
+    home_offset_E1 = 0.0;
+    home_offset_E0 = 0.0;
+    servo_up_pos = SERVO_POS_UP;
+    servo_down_pos = SERVO_POS_DOWN;
+    extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
+    up_delay = MOTOR_UP_TIME;
+    extruder_type = 0;
 
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
     planner.z_fade_height = 0.0;
