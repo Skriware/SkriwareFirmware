@@ -457,6 +457,7 @@ float filament_size[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(DEFAULT_NOMINAL_FILAMENT_DI
     int extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
     int up_delay = MOTOR_UP_TIME;
     byte extruder_type = 0;
+    Filament_Sensor *fil_sens;
   #endif
   #if HAS_HOME_OFFSET && HAS_POSITION_SHIFT
     // The above two are combined to save on computes
@@ -669,6 +670,7 @@ static bool filament_sensor_on = true;
         int C_time = 0.0;
         int NM =0;
         byte tmp;
+        long Fil_sens_check_time = 0.0;
 
 #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
 static bool filament_binary_sensor_E0_on = true;
@@ -679,9 +681,11 @@ static long Last_runout_Signal_E0 = 0;
 static long Last_runout_Signal_E1 = 0;
 
 #endif
+
+#ifdef MOVING_EXTRUDER
 OneWire  ds(21);
 bool servo_extruder = false;
-
+#endif
 
 
 #if ENABLED(MIXING_EXTRUDER)
@@ -3286,6 +3290,7 @@ bool checkTestPin(int pin){
   return(true);
 }
 
+#ifdef MOVING_EXTRUDER
 void Extruder_Up(){
       if(extruder_type == 3){
         servo[0].write(servo_up_pos);
@@ -3390,7 +3395,7 @@ void Set_up_Time(int time){
     }
 
 }
-
+#endif
 
 void Z_distance_Test(int type,float Z_start,float Z_down,float Z_up,int Cycle_time,int N_Cycles){   //Test for moving extruder pozition 
   //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3,
@@ -3962,7 +3967,9 @@ inline void gcode_G4() {
  *
  */
 inline void gcode_G28(const bool always_home_all) {
-    Extruder_Up();                                        //ukikoza
+  #ifdef MOVING_EXTRUDER
+    Extruder_Up();      
+    #endif                                  //ukikoza
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) {
       SERIAL_ECHOLNPGM(">>> gcode_G28");
@@ -10635,7 +10642,7 @@ inline void gcode_T(uint8_t tmp_extruder) {
   #endif
     
 }
-
+#ifdef MOVING_EXTRUDER
 void extruder_swap(uint8_t tmp_extruder,uint8_t active){
    bool extruder_change = tmp_extruder != active;        //ukikoza
       float tmp_Z = current_position[Z_AXIS];
@@ -10665,6 +10672,7 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
        report_current_position();
     }
 }
+#endif
 
 /**
  * Process a single command and dispatch it to its handler
@@ -11048,6 +11056,7 @@ void process_next_command() {
         gcode_M500();
       break;
       case 64:
+      #ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR
       if(Planner::filament_sensor_type == 0){
         if(filament_binary_sensor_E0_on && filament_binary_sensor_E1_on){
             SERIAL_ECHO("L: ");
@@ -11065,6 +11074,7 @@ void process_next_command() {
         }else{
           SERIAL_ECHO("FILAMENT SENSORS OFF");
         }
+
       }else{
         SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
         SERIAL_ECHOLN("ERROR LEVEL:");
@@ -11074,6 +11084,7 @@ void process_next_command() {
         SERIAL_ECHOLN("RETRACT BUFFOR LEVEL:");
         SERIAL_ECHOLN(Stepper::filament_retract_buffor);
       }
+      #endif
       break;
       case 69:    
           Stepper::extruder_counts = 0;
@@ -11092,6 +11103,7 @@ void process_next_command() {
         Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
       break;
        case 80:
+       #ifdef MOVING_EXTRUDER
         if (parser.seen('U'))Extruder_Up();
         if (parser.seen('D'))Extruder_Down();
         if (parser.seen('W'))servo_up_pos = parser.value_linear_units();
@@ -11108,6 +11120,7 @@ void process_next_command() {
           Set_Extruder_Type(extruder_type);
           Set_up_Time(up_delay);
         }
+        #endif
        break;
       #endif
       case 75: // M75: Start print timer
@@ -11685,7 +11698,9 @@ void process_next_command() {
     case 'T':
       tmp = active_extruder;
       gcode_T(parser.codenum);
+      #ifdef MOVING_EXTRUDER
       extruder_swap(parser.codenum,tmp);
+      #endif
       break;
 
     default: parser.unknown_command_error();
@@ -13189,6 +13204,21 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
      handle_filament_jam();                           //ukikoza
    }
    #endif
+
+   if(millis()-Fil_sens_check_time > 1000){
+    
+    Fil_sens_check_time = millis();
+    fil_sens->readData();
+    float r_speed = fil_sens->readSpeed_X();
+    SERIAL_ECHO(millis());
+    SERIAL_ECHO(":");
+    SERIAL_ECHO(Stepper::current_extruder_speed);
+    SERIAL_ECHO(":");
+    SERIAL_ECHOLN(r_speed);
+
+    if(abs(Stepper::current_extruder_speed) > 0.0001 && r_speed < 0.0001)SERIAL_ECHOLN("FILMENT JAM!");
+  }
+
    #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
    if(Planner::filament_sensor_type == 0 || Planner::filament_sensor_type == 2){
     if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
@@ -13712,8 +13742,22 @@ void setup() {
   #if ENABLED(SWITCHING_NOZZLE)
     move_nozzle_servo(0);  // Initialize nozzle servo
   #endif
+    #ifdef MOVING_EXTRUDER
     Set_Extruder_Type(extruder_type);         //ukikoza
     Set_up_Time(up_delay);
+    #endif
+    fil_sens = new Filament_Sensor(15);
+     fil_sens->Init();
+   // put your setup code here, to run once:
+     fil_sens->set_measurement_time(200);
+     fil_sens->set_integration_time(1000);
+     fil_sens->set_readout_to_mean(20);
+     fil_sens->set_resolution(0xFF,0xFF);
+       if( fil_sens->upload_config()){
+      SERIAL_ECHOLN("SENSOR OK!");
+     }else{
+      SERIAL_ECHOLN("SENSOR_FAIL!");
+     }
 }
 
 /**

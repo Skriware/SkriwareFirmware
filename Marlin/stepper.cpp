@@ -100,6 +100,8 @@ bool Stepper::filament_sensor_state = false;
 long Stepper::filament_error_level = FILAMENT_JAM_ERROR;
 long Stepper::filament_alarm_level = FILAMENT_JAM_ALARM;
 long Stepper::filament_retract_buffor = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR; //ukikoza
+float Stepper::current_extruder_speed = 0.0;
+float Stepper::last_extruder_speed = 0.0;
 #endif
 
 
@@ -439,6 +441,7 @@ void Stepper::isr() {
   if (!current_block) {
     // Anything in the buffer?
     current_block = planner.get_current_block();
+    current_extruder_speed = current_block->extruder_speed;                                         //ukikoza
     if (current_block) {
       trapezoid_generator_reset();
 

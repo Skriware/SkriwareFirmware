@@ -94,6 +94,8 @@ class Stepper {
     static long filament_alarm_level;
     static long filament_retract_buffor; //ukikoza
     static int extruder_id;
+    static float current_extruder_speed;
+    static float last_extruder_speed;
 
     #endif
 

@@ -553,7 +553,7 @@ void Planner::check_axes_activity() {
   /**
    * lx, ly, lz - logical (cartesian, not delta) positions in mm
    */
-      //#define DEBUG_E_FADE
+//#define DEBUG_E_FADE
   void Planner::apply_leveling(float &lx, float &ly, float &lz,float &e) {
     #ifdef E_FADE
     float tmp[XYZ] = { lx, ly, 0 };
@@ -1572,6 +1572,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   #endif // ADVANCE or LIN_ADVANCE
 
+  block->extruder_speed = current_speed[E_AXIS];
   calculate_trapezoid_for_block(block, block->entry_speed / block->nominal_speed, safe_speed / block->nominal_speed);
 
   // Move buffer head
@@ -1588,6 +1589,9 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   recalculate();
 
+ // SERIAL_ECHO(millis());              //ukikoza
+ // SERIAL_ECHO(":");
+ // SERIAL_ECHOLN(current_speed[E_AXIS]);
   stepper.wake_up();
 
 } // buffer_line()

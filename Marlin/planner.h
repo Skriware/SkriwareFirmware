@@ -126,6 +126,8 @@ typedef struct {
 
   uint32_t segment_time;
 
+  float extruder_speed;         //ukikoza
+
 } block_t;
 
 #define BLOCK_MOD(n) ((n)&(BLOCK_BUFFER_SIZE-1))
