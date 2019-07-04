@@ -671,6 +671,8 @@ static bool filament_sensor_on = true;
         int NM =0;
         byte tmp;
         long Fil_sens_check_time = 0.0;
+        byte fil_alarm_counter = 0;
+        byte fil_alarm_counter_error_level = 4;
 
 #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
 static bool filament_binary_sensor_E0_on = true;
@@ -3386,8 +3388,8 @@ void Set_up_Time(int time){
         ds.reset();
         ds.select(addr);
         ds.write(0xDC);
-        ds.write(uint8_t(time));
         ds.write(uint8_t(time>>8));
+        ds.write(uint8_t(time));
         ds.reset_search();
       }else{
         SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
@@ -11053,6 +11055,7 @@ void process_next_command() {
         if (parser.seen('E')) Stepper::filament_error_level = parser.value_linear_units();
         if (parser.seen('A')) Stepper::filament_alarm_level = parser.value_linear_units();
         if (parser.seen('R')) Stepper::filament_retract_buffor = parser.value_linear_units();
+        if (parser.seen('T')) fil_alarm_counter_error_level = parser.value_linear_units();
         gcode_M500();
       break;
       case 64:
@@ -13210,13 +13213,21 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
     Fil_sens_check_time = millis();
     fil_sens->readData();
     float r_speed = fil_sens->readSpeed_X();
-    SERIAL_ECHO(millis());
+   /* SERIAL_ECHO(millis());
     SERIAL_ECHO(":");
     SERIAL_ECHO(Stepper::current_extruder_speed);
     SERIAL_ECHO(":");
     SERIAL_ECHOLN(r_speed);
-
-    if(abs(Stepper::current_extruder_speed) > 0.0001 && r_speed < 0.0001)SERIAL_ECHOLN("FILMENT JAM!");
+*/
+    if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 0.0001){
+      fil_alarm_counter++;
+      if(fil_alarm_counter == fil_alarm_counter_error_level){
+      SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+      fil_alarm_counter = 0;
+      }
+    }else{
+      fil_alarm_counter = 0;
+    }
   }
 
    #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
