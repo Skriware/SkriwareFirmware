@@ -350,6 +350,12 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(up_delay);
     EEPROM_WRITE(extruder_type);
 
+    EEPROM_WRITE(X_up_pos);
+    EEPROM_WRITE(X_down_pos);
+    EEPROM_WRITE(Y_change);
+    EEPROM_WRITE(dY_change);
+    EEPROM_WRITE(dX_change);
+
     #endif
     #if !HAS_HOME_OFFSET
       const float home_offset[XYZ] = { 0 };
@@ -769,6 +775,12 @@ void MarlinSettings::postprocess() {
       EEPROM_READ(servo_down_pos);
       EEPROM_READ(up_delay);
       EEPROM_READ(extruder_type);
+
+    EEPROM_READ(X_up_pos);
+    EEPROM_READ(X_down_pos);
+    EEPROM_READ(Y_change);
+    EEPROM_READ(dY_change);
+    EEPROM_READ(dX_change);
       
         //ukikoza
 
@@ -1269,6 +1281,11 @@ void MarlinSettings::reset() {
     extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
     up_delay = MOTOR_UP_TIME;
     extruder_type = 0;
+    X_up_pos = 0.0;
+    X_down_pos = 0.0;
+    Y_change = 0.0;
+    dY_change = 0.0;
+    dX_change = 0.0;
 
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
     planner.z_fade_height = 0.0;

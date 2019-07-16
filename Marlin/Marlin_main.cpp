@@ -457,7 +457,15 @@ float filament_size[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(DEFAULT_NOMINAL_FILAMENT_DI
     int extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
     int up_delay = MOTOR_UP_TIME;
     byte extruder_type = 0;
+    float X_up_pos  =  0.0;
+    float X_down_pos  =  0.0;
+    float Y_change  =  0.0;
+    float dY_change =  0.0;
+    float dX_change =  0.0;
+    bool extruder_up = true;
+
     Filament_Sensor *fil_sens;
+
   #endif
   #if HAS_HOME_OFFSET && HAS_POSITION_SHIFT
     // The above two are combined to save on computes
@@ -3296,7 +3304,32 @@ bool checkTestPin(int pin){
 void Extruder_Up(){
       if(extruder_type == 3){
         servo[0].write(servo_up_pos);
-      }else if(extruder_type != 0){
+      }else if(extruder_type == 4 && !extruder_up){
+        float tmp_X = current_position[X_AXIS];
+        float tmp_Y = current_position[Y_AXIS];
+         destination[Y_AXIS] = Y_change;
+         if(active_extruder == 0){
+          destination[X_AXIS] = X_up_pos;
+         }else{
+          destination[X_AXIS] = X_up_pos + hotend_offset[X_AXIS][active_extruder];
+         }
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[X_AXIS] = current_position[X_AXIS] + dX_change;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[X_AXIS] = tmp_X;
+         destination[Y_AXIS] = tmp_Y;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         extruder_up = true;
+      }else if(extruder_type != 0 && extruder_type != 4){
         bool done = false;
       while(!done){
       byte addr[8];
@@ -3324,7 +3357,32 @@ void Extruder_Up(){
 void Extruder_Down(){
      if(extruder_type == 3){
       servo[0].write(servo_down_pos);
-     }else if(extruder_type != 0){
+     }else if(extruder_type == 4 && extruder_up){
+         float tmp_X = current_position[X_AXIS];
+         float tmp_Y = current_position[Y_AXIS];
+         destination[Y_AXIS] = Y_change;
+         if(active_extruder == 0){
+          destination[X_AXIS] = X_down_pos;
+         }else{
+          destination[X_AXIS] = X_down_pos + hotend_offset[X_AXIS][active_extruder];
+         }
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[X_AXIS] = current_position[X_AXIS] - dX_change;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
+         prepare_move_to_destination();
+         stepper.synchronize();
+         destination[X_AXIS] = tmp_X;
+         destination[Y_AXIS] = tmp_Y;
+         prepare_move_to_destination();
+         stepper.synchronize();
+          extruder_up = false;
+     }else if(extruder_type != 0 && extruder_type != 4){
        bool done = false;
     while(!done){
      byte addr[8];
@@ -3356,7 +3414,7 @@ void Set_Extruder_Type(byte TYPE){
         servo[0].attach(4);
         servo_extruder = true;
         Extruder_Up();
-      }else if(TYPE != 0){
+      }else if(TYPE != 0 && TYPE != 4){
         servo_extruder = false;
       byte addr[8];
       if ( !ds.search(addr)) {
@@ -10970,6 +11028,7 @@ void process_next_command() {
           filament_binary_sensor_E1_on = true;
         }
         break;
+      #endif
         #ifdef E_FADE
       case 60:
       if(planner.z_fade_height != 0.0){
@@ -11012,11 +11071,9 @@ void process_next_command() {
         }  
         Planner::nLayer = 0;
         Planner::last_new_layer_z = 0.0;
+         break;
         #endif
-      #endif
-        break;
         case 57:
-        //
         #ifdef EXT_CHECKSTATION
         if (parser.seen('F')) type = parser.value_linear_units();
         if (parser.seen('S')) Z_start = parser.value_float();
@@ -11112,6 +11169,13 @@ void process_next_command() {
         if (parser.seen('W'))servo_up_pos = parser.value_linear_units();
         if (parser.seen('S'))servo_down_pos = parser.value_linear_units();
         if (parser.seen('O'))extruder_change_time_offset = parser.value_linear_units();
+
+          if (parser.seen('N'))X_up_pos = parser.value_float();
+          if (parser.seen('M'))Y_change = parser.value_float();
+          if (parser.seen('Y'))dY_change = parser.value_float();
+          if (parser.seen('X'))dX_change = parser.value_float();
+          if (parser.seen('B'))X_down_pos = parser.value_float();
+
         if (parser.seen('A')){ 
           up_delay = parser.value_linear_units();
           Set_up_Time(up_delay);
@@ -13208,6 +13272,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
    }
    #endif
 
+#ifdef FILAMENT_JAM_SENSOR
    if(millis()-Fil_sens_check_time > 1000){
     
     Fil_sens_check_time = millis();
@@ -13229,6 +13294,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
       fil_alarm_counter = 0;
     }
   }
+  #endif
 
    #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
    if(Planner::filament_sensor_type == 0 || Planner::filament_sensor_type == 2){

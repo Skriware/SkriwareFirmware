@@ -248,6 +248,11 @@ extern float current_position[NUM_AXIS];
         extern byte servo_down_pos;
         extern int up_delay;
         extern byte extruder_type;
+        extern float X_up_pos;
+        extern float X_down_pos;
+        extern float Y_change;
+        extern float dY_change;
+        extern float dX_change;
   #endif
   #if HAS_POSITION_SHIFT
     extern float position_shift[XYZ];
