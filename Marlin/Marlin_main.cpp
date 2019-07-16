@@ -3305,8 +3305,10 @@ void Extruder_Up(){
       if(extruder_type == 3){
         servo[0].write(servo_up_pos);
       }else if(extruder_type == 4 && !extruder_up){
+        float tmp_f = feedrate_mm_s;
         float tmp_X = current_position[X_AXIS];
         float tmp_Y = current_position[Y_AXIS];
+        feedrate_mm_s = 4200;
          destination[Y_AXIS] = Y_change;
          if(active_extruder == 0){
           destination[X_AXIS] = X_up_pos;
@@ -3315,6 +3317,7 @@ void Extruder_Up(){
          }
          prepare_move_to_destination();
          stepper.synchronize();
+         feedrate_mm_s = 1200;
          destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
          prepare_move_to_destination();
          stepper.synchronize();
@@ -3324,10 +3327,12 @@ void Extruder_Up(){
          destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
          prepare_move_to_destination();
          stepper.synchronize();
+         feedrate_mm_s = 4200;
          destination[X_AXIS] = tmp_X;
          destination[Y_AXIS] = tmp_Y;
          prepare_move_to_destination();
          stepper.synchronize();
+         feedrate_mm_s = tmp_f;
          extruder_up = true;
       }else if(extruder_type != 0 && extruder_type != 4){
         bool done = false;
@@ -3358,8 +3363,10 @@ void Extruder_Down(){
      if(extruder_type == 3){
       servo[0].write(servo_down_pos);
      }else if(extruder_type == 4 && extruder_up){
-         float tmp_X = current_position[X_AXIS];
-         float tmp_Y = current_position[Y_AXIS];
+         float tmp_f = feedrate_mm_s;
+        float tmp_X = current_position[X_AXIS];
+        float tmp_Y = current_position[Y_AXIS];
+        feedrate_mm_s = 4200;
          destination[Y_AXIS] = Y_change;
          if(active_extruder == 0){
           destination[X_AXIS] = X_down_pos;
@@ -3368,6 +3375,7 @@ void Extruder_Down(){
          }
          prepare_move_to_destination();
          stepper.synchronize();
+         feedrate_mm_s = 1200;
          destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
          prepare_move_to_destination();
          stepper.synchronize();
@@ -3377,10 +3385,12 @@ void Extruder_Down(){
          destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
          prepare_move_to_destination();
          stepper.synchronize();
+         feedrate_mm_s = 4200;
          destination[X_AXIS] = tmp_X;
          destination[Y_AXIS] = tmp_Y;
          prepare_move_to_destination();
          stepper.synchronize();
+         feedrate_mm_s = tmp_f;
           extruder_up = false;
      }else if(extruder_type != 0 && extruder_type != 4){
        bool done = false;

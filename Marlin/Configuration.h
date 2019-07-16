@@ -772,7 +772,7 @@
 
 // Travel limits after homing (units are in mm)
 #define X_MIN_POS 0
-#define Y_MIN_POS -10
+#define Y_MIN_POS -15
 #define Z_MIN_POS -3
 #ifdef EXT_CHECKSTATION
 #define Z_MIN_POS -200    
