@@ -97,7 +97,7 @@ long LeftRead;
 long RightRead;  
 
 HX711 LeftScale;
-HX711 RightScale;
+//HX711 RightScale;
 char out_buffer[32];
 byte frame[6];
 
@@ -123,7 +123,7 @@ void setup() {
   Wire.onReceive(receiveEvent); // register event
   Wire.onRequest(requestEvent);
   LeftScale.begin(SCALE1_DT, SCALE1_SCK, 64);
-  RightScale.begin(SCALE2_DT, SCALE2_SCK, 64);
+  //RightScale.begin(SCALE2_DT, SCALE2_SCK, 64);
   
   #ifdef DEBUG
   Serial.begin(9600);           // start serial for output
@@ -303,6 +303,7 @@ long measure_weight1() {
   while(true){
     if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
     if(LeftScale.is_ready()) {
+       LeftScale.set_gain(64);
       weightLT[i] = LeftScale.read_average(2);
       i++;
     }
@@ -339,8 +340,13 @@ long measure_weight2() {
   int i = 0;
   while(true){
     if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
-    if(RightScale.is_ready()) {
+    /*if(RightScale.is_ready()) {
       weightRT[i] = RightScale.read_average(2);
+      i++;
+    }*/
+    if(LeftScale.is_ready()) {
+       LeftScale.set_gain(32);
+      weightRT[i] = LeftScale.read_average(2);
       i++;
     }
     if(i == 5)break;
