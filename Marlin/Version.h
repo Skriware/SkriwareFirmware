@@ -36,7 +36,7 @@
    * Marlin release version identifier
    */
   #define SHORT_BUILD_VERSION "1.1.4.6.3"
-
+  
   /**
    * Verbose version identifier which should contain a reference to the location
    * from where the binary was downloaded or the source code was compiled.

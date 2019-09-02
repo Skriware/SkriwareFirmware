@@ -778,7 +778,7 @@
 #define Z_MIN_POS -200    
 #endif
 
-#define X_MAX_POS 230
+#define X_MAX_POS 210
 #define Y_MAX_POS 275
 #define Z_MAX_POS 210
 
@@ -802,7 +802,7 @@
   #define FILAMENT_RUNOUT_SCRIPT "M600"
 #endif
 
-//#define SKRIWARE_FILAMENT_RUNOUT_SENSOR
+#define SKRIWARE_FILAMENT_RUNOUT_SENSOR
 #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
   #define SKRIWARE_FILAMENT_RUNOUT_INVERTING
   #define SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0 15
@@ -819,12 +819,18 @@
 #define FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR 800
 //#define FILAMENT_JAM_SENSOR_DEBUG
 #endif
-#define MOVING_EXTRUDER
+//#define MOVING_EXTRUDER
 //Moving extruder variables:
 #define SERVO_POS_DOWN 80
 #define SERVO_POS_UP   33
 #define MOTOR_UP_TIME 2000
 #define EXT_CHANGE_TIME_OFFSET 500
+
+//#define OPTICAL_SENSOR
+#define OPTICAL_SENSOR_INT_TIME 500
+#define OPTICAL_SENSOR_MEASUREMENT_TIME 100
+#define OPTICAL_SENSOR_N_TO_MEAN 20
+
 
 
 //===========================================================================

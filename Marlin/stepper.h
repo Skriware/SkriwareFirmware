@@ -81,6 +81,7 @@ class Stepper {
   public:
 
     static block_t* current_block;  // A pointer to the block currently being traced
+    static bool E0_inverted;
 
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
       static bool abort_on_endstop_hit;
@@ -198,6 +199,7 @@ class Stepper {
     // Block until all buffered steps are executed
     //
     static void synchronize();
+    static void Update_dir();
 
     //
     // Set the current position in steps

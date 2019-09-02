@@ -693,7 +693,7 @@ static long Last_runout_Signal_E1 = 0;
 #endif
 bool optical_sensor_on  = true;
 
-#ifdef MOVING_EXTRUDER
+#ifdef MOVING_EXTRUDER      //ukikoza
 OneWire  ds(21);
 bool servo_extruder = false;
 #endif
@@ -3301,6 +3301,15 @@ bool checkTestPin(int pin){
   return(true);
 }
 
+  void invert_E0(){
+          Stepper::E0_inverted = !Stepper::E0_inverted;
+          stepper.set_directions();
+          if(Stepper::E0_inverted){SERIAL_ECHOLN("E1 INVERTED!");
+          }else{
+            SERIAL_ECHOLN("E1 AS IN CONFIG FILE!");
+          }
+  }
+
 #ifdef MOVING_EXTRUDER
 void Extruder_Up(){
       if(extruder_type == 3){
@@ -3420,6 +3429,46 @@ void Extruder_Down(){
     }
 }
 
+void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder pozition 
+  //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3,
+  pinMode(2,INPUT);
+  pinMode(15,INPUT);
+   Extruder_Down(); 
+  for(int c = 0; c < N_Cycles; c++){
+     
+    destination[X_AXIS] = Z_start;
+    prepare_move_to_destination();
+    stepper.synchronize();
+     Extruder_Up();
+    float Z_dist = Z_start;
+  while(!checkTestPin(15)){        ///going up with the table, till it touches the nozzle
+    destination[X_AXIS] = Z_dist;
+    prepare_move_to_destination();
+    stepper.synchronize();
+    Z_dist += 0.001;
+  }
+  SERIAL_ECHO(c);
+  SERIAL_ECHO("1 [mm*1000]: ");
+  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC   
+     
+    destination[X_AXIS] = Z_start;
+    prepare_move_to_destination();
+    stepper.synchronize();
+     Extruder_Down();
+     Z_dist = Z_start;
+  while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
+    destination[X_AXIS] = Z_dist;
+    prepare_move_to_destination();
+    stepper.synchronize();
+    Z_dist += 0.001;
+  }                               
+  SERIAL_ECHO(c);
+  SERIAL_ECHO("2 [mm*1000]: ");
+  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC
+ }
+ 
+}
+
 
 void Set_Extruder_Type(byte TYPE){
       if(TYPE == 3){
@@ -3470,45 +3519,6 @@ void Set_up_Time(int time){
 }
 #endif
 
-void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder pozition 
-  //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3,
-  pinMode(2,INPUT);
-  pinMode(15,INPUT);
-   Extruder_Down(); 
-  for(int c = 0; c < N_Cycles; c++){
-     
-    destination[X_AXIS] = Z_start;
-    prepare_move_to_destination();
-    stepper.synchronize();
-     Extruder_Up();
-    float Z_dist = Z_start;
-  while(!checkTestPin(15)){        ///going up with the table, till it touches the nozzle
-    destination[X_AXIS] = Z_dist;
-    prepare_move_to_destination();
-    stepper.synchronize();
-    Z_dist += 0.001;
-  }
-  SERIAL_ECHO(c);
-  SERIAL_ECHO("1 [mm*1000]: ");
-  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC   
-     
-    destination[X_AXIS] = Z_start;
-    prepare_move_to_destination();
-    stepper.synchronize();
-     Extruder_Down();
-     Z_dist = Z_start;
-  while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
-    destination[X_AXIS] = Z_dist;
-    prepare_move_to_destination();
-    stepper.synchronize();
-    Z_dist += 0.001;
-  }                               
-  SERIAL_ECHO(c);
-  SERIAL_ECHO("2 [mm*1000]: ");
-  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC
- }
- 
-}
 
 inline void gcode_G0_G1(
   #if IS_SCARA
@@ -10713,12 +10723,12 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
         Extruder_Down();
         refresh_cmd_timeout();
         while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-        set_home_offset(Z_AXIS,home_offset_E1);
-        SYNC_PLAN_POSITION_KINEMATIC();
-        report_current_position();
         destination[Z_AXIS] = tmp_Z;
         prepare_move_to_destination();
         stepper.synchronize();  
+        set_home_offset(Z_AXIS,home_offset_E1);
+        SYNC_PLAN_POSITION_KINEMATIC();
+        report_current_position();
     }
     if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
        stepper.synchronize();
@@ -11032,10 +11042,12 @@ void process_next_command() {
           optical_sensor_on = false;
           SERIAL_ECHOLN("OPTICAL SENSOR OFF");
         break;
-
         case 61:
           optical_sensor_on = true;
           SERIAL_ECHOLN("OPTICAL SENSOR ON");
+        break;
+        case 63:
+        optical_sensor_on = true;
         break;
       #endif
         #ifdef E_FADE
@@ -11089,7 +11101,12 @@ void process_next_command() {
         Z_distance_Test(Z_start,NM);
         break;
         #else
+         if (parser.seen('E')){
+        invert_E0();
+        }else{
         set_to_print_Z();
+        }
+        break;
         #endif
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
         case 68:
@@ -11114,11 +11131,18 @@ void process_next_command() {
         }
       break;
       case 65:
+        #ifndef OPTICAL_SENSOR 
         if (parser.seen('E')) Stepper::filament_error_level = parser.value_linear_units();
         if (parser.seen('A')) Stepper::filament_alarm_level = parser.value_linear_units();
         if (parser.seen('R')) Stepper::filament_retract_buffor = parser.value_linear_units();
-        if (parser.seen('T')) fil_alarm_counter_error_level = parser.value_linear_units();
         gcode_M500();
+        #else
+        if (parser.seen('N')) fil_sens->set_readout_to_mean(parser.value_linear_units());
+        if (parser.seen('I'))  fil_sens->set_integration_time(parser.value_linear_units());
+        if (parser.seen('M')) fil_sens->set_measurement_time(parser.value_linear_units());
+        if (parser.seen('T')) fil_alarm_counter_error_level = parser.value_linear_units();
+        #endif
+
       break;
       case 64:
       #ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR
@@ -11771,7 +11795,7 @@ void process_next_command() {
       tmp = active_extruder;
       gcode_T(parser.codenum);
       #ifdef MOVING_EXTRUDER
-      extruder_swap(parser.codenum,tmp);
+      extruder_swap(parser.codenum,tmp);      //ukikoza
       #endif
       break;
 
@@ -13276,8 +13300,8 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
      handle_filament_jam();                           //ukikoza
    }
    #endif
-#ifdef FILAMENT_JAM_SENSOR
-   if(optical_sensor_on && millis()-Fil_sens_check_time > 1000){
+#ifdef OPTICAL_SENSOR
+   if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
     
     Fil_sens_check_time = millis();
     fil_sens->readData();
@@ -13825,14 +13849,17 @@ void setup() {
     fil_sens = new Filament_Sensor(15);
      fil_sens->Init();
    // put your setup code here, to run once:
-     fil_sens->set_measurement_time(200);
-     fil_sens->set_integration_time(1000);
-     fil_sens->set_readout_to_mean(20);
+     fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
+     fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
+     fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);
      fil_sens->set_resolution(0xFF,0xFF);
        if( fil_sens->upload_config()){
       SERIAL_ECHOLN("SENSOR OK!");
      }else{
       SERIAL_ECHOLN("SENSOR_FAIL!");
+     }
+     if(!checkTestPin(29)){
+      invert_E0();
      }
 }
 

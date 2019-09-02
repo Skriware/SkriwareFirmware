@@ -300,10 +300,16 @@ long measure_weight1() {
   long WL = 0;
   long weightLT[5];
   int i = 0;
+
+  while(!LeftScale.is_ready()){
+
+  }
+    LeftScale.set_gain(64);
+
+
   while(true){
     if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
     if(LeftScale.is_ready()) {
-       LeftScale.set_gain(64);
       weightLT[i] = LeftScale.read_average(2);
       i++;
     }
@@ -325,8 +331,6 @@ long measure_weight1() {
     minid = jj;
    }
   }
-
-
   for(byte kk = 0; kk <5 ; kk++){
     if(kk != maxid && kk != minid) WL += weightLT[kk];
   }
@@ -338,6 +342,10 @@ long measure_weight2() {
   long WR = 0;
   long weightRT[5];
   int i = 0;
+  while(!LeftScale.is_ready()){
+
+  }
+    LeftScale.set_gain(32);
   while(true){
     if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
     /*if(RightScale.is_ready()) {
@@ -345,7 +353,6 @@ long measure_weight2() {
       i++;
     }*/
     if(LeftScale.is_ready()) {
-       LeftScale.set_gain(32);
       weightRT[i] = LeftScale.read_average(2);
       i++;
     }
@@ -371,8 +378,6 @@ long measure_weight2() {
   for(byte kk = 0; kk <5 ; kk++){
     if(kk != maxid && kk != minid) WR += weightRT[kk];
   }
-  
-
   return(WR/3);
 }
 

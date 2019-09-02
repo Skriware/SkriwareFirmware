@@ -63,6 +63,7 @@ Stepper stepper; // Singleton
 // public:
 
 block_t* Stepper::current_block = NULL;  // A pointer to the block currently being traced
+bool Stepper::E0_inverted = false;
 
 #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
   bool Stepper::abort_on_endstop_hit = false;
@@ -315,8 +316,15 @@ void Stepper::wake_up() {
  *   COREXZ: X_AXIS=A_AXIS and Z_AXIS=C_AXIS
  *   COREYZ: Y_AXIS=B_AXIS and Z_AXIS=C_AXIS
  */
-void Stepper::set_directions() {
+void Stepper::Update_dir(){
+      //ukikoza
+      REV_E_DIR();  
+      NORM_E_DIR();
 
+}
+
+
+void Stepper::set_directions() {
   #define SET_STEP_DIR(AXIS) \
     if (motor_direction(AXIS ##_AXIS)) { \
       AXIS ##_APPLY_DIR(INVERT_## AXIS ##_DIR, false); \
@@ -336,6 +344,7 @@ void Stepper::set_directions() {
   #if HAS_Z_DIR
     SET_STEP_DIR(Z); // C
   #endif
+
 
   #if DISABLED(ADVANCE) && DISABLED(LIN_ADVANCE)
     if (motor_direction(E_AXIS)) {
