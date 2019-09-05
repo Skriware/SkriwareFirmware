@@ -175,7 +175,7 @@ class Planner {
       #endif
     #endif
 
-    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
+    #ifdef ENABLE_LEVELING_FADE_HEIGHT
       static float z_fade_height, inverse_z_fade_height;
       static float last_z_gcode;
       #ifdef E_FADE        //ukikoza

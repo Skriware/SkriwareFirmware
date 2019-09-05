@@ -183,6 +183,7 @@ MarlinSettings settings;
 #include "temperature.h"
 #include "ultralcd.h"
 #include "stepper.h"
+#include "Skriware_Variables.h"
 
 #if ENABLED(INCH_MODE_SUPPORT) || (ENABLED(ULTIPANEL) && ENABLED(TEMPERATURE_UNITS_SUPPORT))
   #include "gcode.h"

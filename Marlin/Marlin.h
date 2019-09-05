@@ -51,10 +51,6 @@
   #include "stopwatch.h"
 #endif
 
-#include "Filament_Sensor.h"
-
-
-
 
 void idle(
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
@@ -240,19 +236,6 @@ extern float current_position[NUM_AXIS];
 #if HAS_WORKSPACE_OFFSET
   #if HAS_HOME_OFFSET
     extern float home_offset[XYZ];
-
-        extern float home_offset_E1;     //ukikoza
-        extern float home_offset_E0;
-        extern int extruder_change_time_offset;
-        extern byte servo_up_pos;
-        extern byte servo_down_pos;
-        extern int up_delay;
-        extern byte extruder_type;
-        extern float X_up_pos;
-        extern float X_down_pos;
-        extern float Y_change;
-        extern float dY_change;
-        extern float dX_change;
   #endif
   #if HAS_POSITION_SHIFT
     extern float position_shift[XYZ];
