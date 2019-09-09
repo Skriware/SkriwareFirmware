@@ -334,30 +334,7 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(planner.min_segment_time);
     EEPROM_WRITE(planner.max_jerk);
 
-    #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR) 
-    EEPROM_WRITE(planner.filament_sensor_type);           //ukikoza
-    
-    #if ENABLED(FILAMENT_JAM_SENSOR)
-    EEPROM_WRITE(stepper.filament_error_level); 
-    EEPROM_WRITE(stepper.filament_alarm_level); 
-    EEPROM_WRITE(stepper.filament_retract_buffor); 
-    #endif 
-
-    EEPROM_WRITE(home_offset_E1);
-    EEPROM_WRITE(home_offset_E0);
-    EEPROM_WRITE(extruder_change_time_offset);
-    EEPROM_WRITE(servo_up_pos);
-    EEPROM_WRITE(servo_down_pos);
-    EEPROM_WRITE(up_delay);
-    EEPROM_WRITE(extruder_type);
-
-    EEPROM_WRITE(X_up_pos);
-    EEPROM_WRITE(X_down_pos);
-    EEPROM_WRITE(Y_change);
-    EEPROM_WRITE(dY_change);
-    EEPROM_WRITE(dX_change);
-
-    #endif
+    save_eeprom_sk2(working_crc,eeprom_index);        //Skriware
     #if !HAS_HOME_OFFSET
       const float home_offset[XYZ] = { 0 };
     #endif
@@ -757,33 +734,8 @@ void MarlinSettings::postprocess() {
       EEPROM_READ(planner.min_segment_time);
       EEPROM_READ(planner.max_jerk);
 
-      #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-      EEPROM_READ(planner.filament_sensor_type);    
       
-      #if ENABLED(FILAMENT_JAM_SENSOR)
-      EEPROM_READ(stepper.filament_error_level); 
-      EEPROM_READ(stepper.filament_alarm_level); 
-      EEPROM_READ(stepper.filament_retract_buffor);  
-
-      #endif
-
-      #endif
-
-      EEPROM_READ(home_offset_E1);
-      EEPROM_READ(home_offset_E0);
-      EEPROM_READ(extruder_change_time_offset);
-      EEPROM_READ(servo_up_pos);
-      EEPROM_READ(servo_down_pos);
-      EEPROM_READ(up_delay);
-      EEPROM_READ(extruder_type);
-
-    EEPROM_READ(X_up_pos);
-    EEPROM_READ(X_down_pos);
-    EEPROM_READ(Y_change);
-    EEPROM_READ(dY_change);
-    EEPROM_READ(dX_change);
-      
-        //ukikoza
+      load_eeprom_sk2(working_crc,eeprom_index);      //Skriware
 
       #if !HAS_HOME_OFFSET
         float home_offset[XYZ];
@@ -868,21 +820,7 @@ void MarlinSettings::postprocess() {
           EEPROM_READ(bilinear_grid_spacing);        // 2 ints
           EEPROM_READ(bilinear_start);               // 2 ints
           EEPROM_READ(z_values);                     // 9 to 256 floats
-
-          bool nanTest = true;                                      //ukikoza
-          for(byte yy = 0 ; yy < GRID_MAX_POINTS_Y; yy++){
-            for(byte xx = 0; xx < GRID_MAX_POINTS_X; xx++){
-              if(isnan(z_values[xx][yy])){
-                nanTest = false;
-                break;
-              }
-            }
-          }
-          if(!nanTest){
-            SERIAL_ECHOLN("ERROR: Calibration data corrupted!");
-          }else{
-            SERIAL_ECHOLN("Bed matrix loaded, with no errors.");
-          }
+          nan_Matrix_Test(z_values);                  //Skriware
         }
         else // EEPROM data is stale
       #endif // AUTO_BED_LEVELING_BILINEAR
@@ -1264,30 +1202,6 @@ void MarlinSettings::reset() {
   planner.max_jerk[E_AXIS] = DEFAULT_EJERK;
 
 
-  #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-  planner.filament_sensor_type = 0;
-
-  #if ENABLED(FILAMENT_JAM_SENSOR)
-
-  stepper.filament_error_level = FILAMENT_JAM_ERROR;
-  stepper.filament_alarm_level = FILAMENT_JAM_ALARM;
-  stepper.filament_retract_buffor = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;        //ukikoza
-  #endif
-  #endif
-
-    home_offset_E1 = 0.0;
-    home_offset_E0 = 0.0;
-    servo_up_pos = SERVO_POS_UP;
-    servo_down_pos = SERVO_POS_DOWN;
-    extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
-    up_delay = MOTOR_UP_TIME;
-    extruder_type = 0;
-    X_up_pos = 0.0;
-    X_down_pos = 0.0;
-    Y_change = 0.0;
-    dY_change = 0.0;
-    dX_change = 0.0;
-
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
     planner.z_fade_height = 0.0;
   #endif
@@ -1464,6 +1378,8 @@ void MarlinSettings::reset() {
   #endif
 
   postprocess();
+
+  reset_eeprom_sk2();     //Skriware
 
   #if ENABLED(EEPROM_CHITCHAT)
     SERIAL_ECHO_START();

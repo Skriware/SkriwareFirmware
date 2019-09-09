@@ -14,16 +14,22 @@
      float dY_change =  0.0;
      float dX_change =  0.0;
      bool extruder_up = true;
+
+    #ifdef MOVING_EXTRUDER      				
+	OneWire  *ds;
+	bool servo_extruder = false;
+	#endif
     #endif
 
     #ifdef OPTICAL_SENSOR
-    Filament_Sensor *fil_sens;					//Filament sensor
+    Filament_Sensor *fil_sens;					// Optical Filament sensor
     int C_time = 0.0;
     int NM =0;
     byte tmp;
     long Fil_sens_check_time = 0.0;
     byte fil_alarm_counter = 0;
     byte fil_alarm_counter_error_level = 4;
+    bool optical_sensor_on  = true;
     #endif
 
      #ifdef EXT_CHEACKSTATION
@@ -31,3 +37,19 @@
         float Z_up = 0.0;
         float Z_down = 0.0;
      #endif
+
+
+	#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR		//Mechanical runout sensor
+ 		bool filament_binary_sensor_E0_on = true;
+ 		bool filament_binary_sensor_E1_on = true;
+ 		bool filament_runout_E0 = false;
+ 		bool filament_runout_E1 = false;
+ 		long Last_runout_Signal_E0 = 0;
+ 		long Last_runout_Signal_E1 = 0;
+
+	#endif
+
+
+
+
+

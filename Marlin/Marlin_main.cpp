@@ -182,7 +182,7 @@
  * M351 - Toggle MS1 MS2 pins directly. (Requires digital microstepping pins.)
  * M355 - Set Case Light on/off and set brightness. (Requires CASE_LIGHT_PIN)
  * M380 - Activate solenoid on active extruder. (Requires EXT_SOLENOID)
- * M381 - Disable all solenoids. (Requires EXT_SOLENOID)
+ * M381 - Disable all solenoids-> (Requires EXT_SOLENOID)
  * M400 - Finish all moves.
  * M401 - Lower Z probe. (Requires a probe)
  * M402 - Raise Z probe. (Requires a probe)
@@ -258,6 +258,8 @@
 #include "types.h"
 #include "gcode.h"
 #include "Skriware_Variables.h"
+#include "Skriware_Functions.h"
+#include "Skriware_Gcodes.h"
 
 
 #if HAS_ABL
@@ -402,7 +404,7 @@ static char command_queue[BUFSIZE][MAX_CMD_SIZE];
 /**
  * Next Injected Command pointer. NULL if no commands are being injected.
  * Used by Marlin internally to ensure that commands initiated from within
- * are enqueued ahead of any pending serial or sd card commands.
+ * are enqueued ahead of any pending serial or sd card commands->
  */
 static const char *injected_commands_P = NULL;
 
@@ -653,22 +655,6 @@ float cartes[XYZ] = { 0 };
 static bool filament_jam = false;
 static bool filament_alarm = false;
 static bool filament_sensor_on = true;
-#endif
-
-#if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-static bool filament_binary_sensor_E0_on = true;
-static bool filament_binary_sensor_E1_on = true;
-static bool filament_runout_E0 = false;
-static bool filament_runout_E1 = false;
-static long Last_runout_Signal_E0 = 0;
-static long Last_runout_Signal_E1 = 0;
-
-#endif
-bool optical_sensor_on  = true;
-
-#ifdef MOVING_EXTRUDER      //ukikoza
-OneWire  ds(21);
-bool servo_extruder = false;
 #endif
 
 
@@ -1134,9 +1120,7 @@ inline void get_serial_commands() {
 
         gcode_LastN = gcode_N;
        /*
-        SERIAL_ECHO("Line ");
-        SERIAL_ECHO(gcode_N);
-        SERIAL_ECHOLN("accepted");//ukikoza
+       
         */// if no errors, continue parsing
       }
       else if (apos) { // No '*' without 'N'
@@ -3221,7 +3205,7 @@ void gcode_get_destination() {
 
   /**
    * Output a "busy" message at regular intervals
-   * while the machine is not accepting commands.
+   * while the machine is not accepting commands->
    */
   void host_keepalive() {
     const millis_t ms = millis();
@@ -3259,238 +3243,7 @@ void gcode_get_destination() {
  * G0, G1: Coordinated movement of X Y Z E axes
  */
 
-void set_to_print_Z(){    //ukikoza
-  //SERIAL_ECHOLN(Planner::last_new_layer_z);
-  destination[Z_AXIS] = Planner::last_new_layer_z;
-  prepare_move_to_destination();
-}
 
-bool checkTestPin(int pin){
-  for(int ii = 0; ii < 10000; ii++){
-    if(digitalRead(pin) == HIGH){
-      return(false);
-    }
-  }
-  return(true);
-}
-
-  void invert_E0(){
-          Stepper::E0_inverted = !Stepper::E0_inverted;
-          stepper.set_directions();
-          if(Stepper::E0_inverted){SERIAL_ECHOLN("E1 INVERTED!");
-          }else{
-            SERIAL_ECHOLN("E1 AS IN CONFIG FILE!");
-          }
-  }
-
-#ifdef MOVING_EXTRUDER
-void Extruder_Up(){
-      if(extruder_type == 3){
-        servo[0].write(servo_up_pos);
-      }else if(extruder_type == 4 && !extruder_up){
-        float tmp_f = feedrate_mm_s;
-        float tmp_X = current_position[X_AXIS];
-        float tmp_Y = current_position[Y_AXIS];
-        feedrate_mm_s = 4200;
-         destination[Y_AXIS] = Y_change;
-         if(active_extruder == 0){
-          destination[X_AXIS] = X_up_pos;
-         }else{
-          destination[X_AXIS] = X_up_pos + hotend_offset[X_AXIS][active_extruder];
-         }
-         prepare_move_to_destination();
-         stepper.synchronize();
-         feedrate_mm_s = 1200;
-         destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         destination[X_AXIS] = current_position[X_AXIS] + dX_change;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         feedrate_mm_s = 4200;
-         destination[X_AXIS] = tmp_X;
-         destination[Y_AXIS] = tmp_Y;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         feedrate_mm_s = tmp_f;
-         extruder_up = true;
-      }else if(extruder_type != 0 && extruder_type != 4){
-        bool done = false;
-      while(!done){
-      byte addr[8];
-      if ( !ds.search(addr)) {
-        ds.reset_search();
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-        refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-      }
-      if(addr[0] == 0x68){
-        ds.reset();
-        ds.select(addr);
-        ds.write(0xCC);
-        ds.reset_search();
-        done = true;
-      }else{
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-         refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-      }
-    }
-     while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-    }
-}
-
-void Extruder_Down(){
-     if(extruder_type == 3){
-      servo[0].write(servo_down_pos);
-     }else if(extruder_type == 4 && extruder_up){
-         float tmp_f = feedrate_mm_s;
-        float tmp_X = current_position[X_AXIS];
-        float tmp_Y = current_position[Y_AXIS];
-        feedrate_mm_s = 4200;
-         destination[Y_AXIS] = Y_change;
-         if(active_extruder == 0){
-          destination[X_AXIS] = X_down_pos;
-         }else{
-          destination[X_AXIS] = X_down_pos + hotend_offset[X_AXIS][active_extruder];
-         }
-         prepare_move_to_destination();
-         stepper.synchronize();
-         feedrate_mm_s = 1200;
-         destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         destination[X_AXIS] = current_position[X_AXIS] - dX_change;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         feedrate_mm_s = 4200;
-         destination[X_AXIS] = tmp_X;
-         destination[Y_AXIS] = tmp_Y;
-         prepare_move_to_destination();
-         stepper.synchronize();
-         feedrate_mm_s = tmp_f;
-          extruder_up = false;
-     }else if(extruder_type != 0 && extruder_type != 4){
-       bool done = false;
-    while(!done){
-     byte addr[8];
-      if ( !ds.search(addr)) {
-        ds.reset_search();
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-         refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-      }
-      if(addr[0] == 0x68){
-        ds.reset();
-        ds.select(addr);
-        ds.write(0xBB);
-        ds.reset_search();
-        done = true;
-      }else{
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-         refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-      }
-    }
-     while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-    }
-}
-
-void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder pozition 
-  //type - SERVO = 1, ROTOR = 2, MECHANICAL = 3,
-  pinMode(2,INPUT);
-  pinMode(15,INPUT);
-   Extruder_Down(); 
-  for(int c = 0; c < N_Cycles; c++){
-     
-    destination[X_AXIS] = Z_start;
-    prepare_move_to_destination();
-    stepper.synchronize();
-     Extruder_Up();
-    float Z_dist = Z_start;
-  while(!checkTestPin(15)){        ///going up with the table, till it touches the nozzle
-    destination[X_AXIS] = Z_dist;
-    prepare_move_to_destination();
-    stepper.synchronize();
-    Z_dist += 0.001;
-  }
-  SERIAL_ECHO(c);
-  SERIAL_ECHO("1 [mm*1000]: ");
-  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC   
-     
-    destination[X_AXIS] = Z_start;
-    prepare_move_to_destination();
-    stepper.synchronize();
-     Extruder_Down();
-     Z_dist = Z_start;
-  while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
-    destination[X_AXIS] = Z_dist;
-    prepare_move_to_destination();
-    stepper.synchronize();
-    Z_dist += 0.001;
-  }                               
-  SERIAL_ECHO(c);
-  SERIAL_ECHO("2 [mm*1000]: ");
-  SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC
- }
- 
-}
-
-
-void Set_Extruder_Type(byte TYPE){
-      if(TYPE == 3){
-        servo[0].detach();
-        servo[0].attach(4);
-        servo_extruder = true;
-        Extruder_Up();
-      }else if(TYPE != 0 && TYPE != 4){
-        servo_extruder = false;
-      byte addr[8];
-      if ( !ds.search(addr)) {
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-        ds.reset_search();
-      return;
-      }
-      if(addr[0] == 0x68){
-        ds.reset();
-        ds.select(addr);
-        ds.write(0xAA);
-        ds.write(TYPE);
-        ds.reset_search();
-      }else{
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-      }
-    }
-    extruder_type = TYPE;
-}
-
-void Set_up_Time(int time){
-     if(extruder_type != 0){
-      byte addr[8];
-      if ( !ds.search(addr)) {
-        ds.reset_search();
-      return;
-      }
-      if(addr[0] == 0x68){
-        ds.reset();
-        ds.select(addr);
-        ds.write(0xDC);
-        ds.write(uint8_t(time>>8));
-        ds.write(uint8_t(time));
-        ds.reset_search();
-      }else{
-        SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-      }
-    }
-
-}
-#endif
 
 
 inline void gcode_G0_G1(
@@ -4010,8 +3763,8 @@ inline void gcode_G4() {
  */
 inline void gcode_G28(const bool always_home_all) {
   #ifdef MOVING_EXTRUDER
-    Extruder_Up();      
-    #endif                                  //ukikoza
+    Extruder_Up();      //Skriware
+    #endif                                 
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) {
       SERIAL_ECHOLNPGM(">>> gcode_G28");
@@ -8939,7 +8692,7 @@ inline void gcode_M226() {
     uint16_t const frequency = parser.ushortval('S', 260);
     uint16_t duration = parser.ushortval('P', 1000);
 
-    // Limits the tone duration to 0-5 seconds.
+    // Limits the tone duration to 0-5 seconds->
     NOMORE(duration, 5000);
 
     BUZZ(duration, frequency);
@@ -10684,37 +10437,7 @@ inline void gcode_T(uint8_t tmp_extruder) {
   #endif
     
 }
-#ifdef MOVING_EXTRUDER
-void extruder_swap(uint8_t tmp_extruder,uint8_t active){
-   bool extruder_change = tmp_extruder != active;        //ukikoza
-      float tmp_Z = current_position[Z_AXIS];
-   if(extruder_type != 0 && tmp_extruder == 1 && extruder_change){
-        stepper.synchronize();
-        destination[Z_AXIS] = tmp_Z+2.0;
-        prepare_move_to_destination();
-        stepper.synchronize();
-        Extruder_Down();
-        refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-        destination[Z_AXIS] = tmp_Z;
-        prepare_move_to_destination();
-        stepper.synchronize();  
-        set_home_offset(Z_AXIS,home_offset_E1);
-        SYNC_PLAN_POSITION_KINEMATIC();
-        report_current_position();
-    }
-    if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
-       stepper.synchronize();
-       Extruder_Up();
-       refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-       delay(extruder_change_time_offset);
-       set_home_offset(Z_AXIS,home_offset_E0);
-       SYNC_PLAN_POSITION_KINEMATIC();
-       report_current_position();
-    }
-}
-#endif
+
 
 /**
  * Process a single command and dispatch it to its handler
@@ -10984,45 +10707,15 @@ void process_next_command() {
           break;
       #endif // AUTO_BED_LEVELING_UBL && UBL_G26_MESH_VALIDATION
       //ukikoza
-     
-      #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-      case 63:
-        if (parser.seen('L')) filament_runout_E0 = false; 
-        if (parser.seen('R')) filament_runout_E1 = false;
-        if (parser.seen('A')){
-          filament_runout_E1 = false;
-          filament_runout_E0 = false;
-        }
-      break;
-      case 62:
-        if (parser.seen('L')) filament_binary_sensor_E0_on = false;
-        if (parser.seen('R')) filament_binary_sensor_E1_on = false;
-        if (parser.seen('A')){
-          filament_binary_sensor_E0_on = false;
-          filament_binary_sensor_E1_on = false;
-        }
+       case 61:
+          gcode_M61();
         break;
-      case 61:
-        if (parser.seen('L')) filament_binary_sensor_E0_on = true;
-        if (parser.seen('R')) filament_binary_sensor_E1_on = true;
-        if (parser.seen('A')){
-          filament_binary_sensor_E0_on = true;
-          filament_binary_sensor_E1_on = true;
-        }
-        break;
-      #else
         case 62:
-          optical_sensor_on = false;
-          SERIAL_ECHOLN("OPTICAL SENSOR OFF");
-        break;
-        case 61:
-          optical_sensor_on = true;
-          SERIAL_ECHOLN("OPTICAL SENSOR ON");
+          gcode_M62();
         break;
         case 63:
-        optical_sensor_on = true;
+          gcode_M63();
         break;
-      #endif
         #ifdef E_FADE
       case 60:
       if(planner.z_fade_height != 0.0){
@@ -11090,9 +10783,7 @@ void process_next_command() {
         Planner::filament_sensor_type = 1;
         gcode_M500();
       break;
-
       #endif
-
       #if ENABLED(FILAMENT_JAM_SENSOR)
       case 66:
         if(Planner::filament_sensor_type == 0){
@@ -11871,7 +11562,7 @@ void ok_to_send() {
     static float z1, d2, z3, d4, L, D, ratio_x, ratio_y,
                  last_x = -999.999, last_y = -999.999;
 
-    // Whole units for the grid line indices. Constrained within bounds.
+    // Whole units for the grid line indices. Constrained within bounds->
     static int8_t gridx, gridy, nextx, nexty,
                   last_gridx = -99, last_gridy = -99;
 
