@@ -81,7 +81,8 @@ class Stepper {
   public:
 
     static block_t* current_block;  // A pointer to the block currently being traced
-    static bool E0_inverted;
+    static int E0_inverted;
+    static int Software_Invert;
 
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
       static bool abort_on_endstop_hit;

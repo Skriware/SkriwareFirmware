@@ -3302,7 +3302,11 @@ bool checkTestPin(int pin){
 }
 
   void invert_E0(){
-          Stepper::E0_inverted = !Stepper::E0_inverted;
+          if(Stepper::E0_inverted == 0){
+            Stepper::E0_inverted = 1;
+          }else if(Stepper::E0_inverted == 1){
+            Stepper::E0_inverted = 0;
+          }
           stepper.set_directions();
           if(Stepper::E0_inverted){SERIAL_ECHOLN("E1 INVERTED!");
           }else{
@@ -11101,11 +11105,13 @@ void process_next_command() {
         Z_distance_Test(Z_start,NM);
         break;
         #else
-         if (parser.seen('E')){
-        invert_E0();
-        }else{
-        set_to_print_Z();
-        }
+         if(parser.seen('E')){
+            invert_E0();
+         }else{
+          set_to_print_Z();
+         }
+         if(parser.seen('S')) stepper.Software_Invert = 1;
+         if(parser.seen('R')) stepper.Software_Invert = 0;
         break;
         #endif
       #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
@@ -13858,9 +13864,17 @@ void setup() {
      }else{
       SERIAL_ECHOLN("SENSOR_FAIL!");
      }
-     if(!checkTestPin(29)){
-      invert_E0();
-     }
+     pinMode(27,INPUT_PULLUP);
+  if(!Stepper::Software_Invert){
+    if(checkTestPin(27)){
+        Stepper::E0_inverted = 1;
+    }else{
+        Stepper::E0_inverted = 0;
+    }
+  }
+  SERIAL_ECHO("E0 INVERT options:");
+  SERIAL_ECHO(stepper.E0_inverted);
+  SERIAL_ECHOLN(stepper.Software_Invert);
 }
 
 /**

@@ -333,15 +333,8 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(planner.min_segment_time);
     EEPROM_WRITE(planner.max_jerk);
 
-    #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR) 
-    EEPROM_WRITE(planner.filament_sensor_type);           //ukikoza
-    
-    #if ENABLED(FILAMENT_JAM_SENSOR)
-    EEPROM_WRITE(stepper.filament_error_level); 
-    EEPROM_WRITE(stepper.filament_alarm_level); 
-    EEPROM_WRITE(stepper.filament_retract_buffor); 
-    #endif 
-
+    EEPROM_WRITE(stepper.E0_inverted);
+    EEPROM_WRITE(stepper.Software_Invert);
     EEPROM_WRITE(home_offset_E1);
     EEPROM_WRITE(home_offset_E0);
     EEPROM_WRITE(extruder_change_time_offset);
@@ -356,7 +349,6 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(dY_change);
     EEPROM_WRITE(dX_change);
 
-    #endif
     #if !HAS_HOME_OFFSET
       const float home_offset[XYZ] = { 0 };
     #endif
@@ -756,18 +748,8 @@ void MarlinSettings::postprocess() {
       EEPROM_READ(planner.min_segment_time);
       EEPROM_READ(planner.max_jerk);
 
-      #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-      EEPROM_READ(planner.filament_sensor_type);    
-      
-      #if ENABLED(FILAMENT_JAM_SENSOR)
-      EEPROM_READ(stepper.filament_error_level); 
-      EEPROM_READ(stepper.filament_alarm_level); 
-      EEPROM_READ(stepper.filament_retract_buffor);  
-
-      #endif
-
-      #endif
-
+      EEPROM_READ(stepper.E0_inverted); 
+      EEPROM_READ(stepper.Software_Invert);
       EEPROM_READ(home_offset_E1);
       EEPROM_READ(home_offset_E0);
       EEPROM_READ(extruder_change_time_offset);
@@ -776,11 +758,11 @@ void MarlinSettings::postprocess() {
       EEPROM_READ(up_delay);
       EEPROM_READ(extruder_type);
 
-    EEPROM_READ(X_up_pos);
-    EEPROM_READ(X_down_pos);
-    EEPROM_READ(Y_change);
-    EEPROM_READ(dY_change);
-    EEPROM_READ(dX_change);
+      EEPROM_READ(X_up_pos);
+      EEPROM_READ(X_down_pos);
+      EEPROM_READ(Y_change);
+      EEPROM_READ(dY_change);
+      EEPROM_READ(dX_change);
       
         //ukikoza
 
@@ -1286,6 +1268,8 @@ void MarlinSettings::reset() {
     Y_change = 0.0;
     dY_change = 0.0;
     dX_change = 0.0;
+    stepper.E0_inverted = 0;
+    stepper.Software_Invert = 0;
 
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
     planner.z_fade_height = 0.0;

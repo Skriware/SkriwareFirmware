@@ -63,7 +63,8 @@ Stepper stepper; // Singleton
 // public:
 
 block_t* Stepper::current_block = NULL;  // A pointer to the block currently being traced
-bool Stepper::E0_inverted = false;
+int Stepper::E0_inverted = 0;      //ukikoza
+int Stepper::Software_Invert = 0;
 
 #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
   bool Stepper::abort_on_endstop_hit = false;
