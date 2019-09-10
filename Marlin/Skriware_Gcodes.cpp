@@ -1,5 +1,16 @@
 #include "Skriware_Gcodes.h"
+void gcode_M57(){
 
+}
+void gcode_M58(){
+
+}
+void gcode_M59(){
+
+}
+void gcode_M60(){
+
+}
 void gcode_M61(){
 		#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR	
 		if (parser.seen('L')) filament_binary_sensor_E0_on = true;
@@ -29,6 +40,7 @@ void gcode_M62(){
          SERIAL_ECHOLN("OPTICAL SENSOR OFF");
         #endif
 }
+
 void gcode_M63(){
 	#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR
 	  	if (parser.seen('L')) filament_runout_E0 = false; 

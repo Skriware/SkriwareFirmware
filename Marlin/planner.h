@@ -126,7 +126,7 @@ typedef struct {
 
   uint32_t segment_time;
 
-  float extruder_speed;         //ukikoza
+  float extruder_speed;         // Skriware modification for Optical sensor speed tracking
 
 } block_t;
 
@@ -179,6 +179,11 @@ class Planner {
       static float z_fade_height, inverse_z_fade_height;
       static float last_z_gcode;
       #ifdef E_FADE        //ukikoza
+
+        void efade_and_retract_control_calculation(float &lz, float &e);
+        void apply_efade_above_fade_high(float &e);
+        void apply_efade_below_fade_high(float &e);
+
         static bool use_e_fade;
         static float dz_gcode;
         static float last_e_gcode[EXTRUDERS];

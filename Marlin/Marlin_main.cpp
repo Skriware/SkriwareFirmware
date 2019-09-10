@@ -10716,7 +10716,7 @@ void process_next_command() {
         case 63:
           gcode_M63();
         break;
-        #ifdef E_FADE
+    #ifdef E_FADE
       case 60:
       if(planner.z_fade_height != 0.0){
         Planner::use_e_fade = true;
