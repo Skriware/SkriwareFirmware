@@ -538,7 +538,7 @@ void Planner::check_axes_activity() {
    */
   void Planner::apply_leveling(float &lx, float &ly, float &lz,float &e) {
     float tmp[XYZ] = { lx, ly, 0 };
-    efade_and_retract_control_calculation(lz,e);
+    efade_and_retract_control_calculation(lz,e,lx,ly);
 
     #if ENABLED(AUTO_BED_LEVELING_UBL)
       if (!ubl.state.active) return;
@@ -556,7 +556,7 @@ void Planner::check_axes_activity() {
     #endif
     #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT) && DISABLED(AUTO_BED_LEVELING_UBL)      
       static float z_fade_factor = 1.0;
-      const float raw_lz = lz; //ukikoza (wczesnije RAW_VALUE())
+      const float raw_lz = lz; //SKRIWARE!!!! IMPORTANT FOR HOME OFFSET
       if (z_fade_height) {
         if (raw_lz > z_fade_height){
          apply_efade_above_fade_high(e);
@@ -602,24 +602,7 @@ void Planner::check_axes_activity() {
       ;
     
 
-      #ifdef E_FADE  //ukikoza
-      if(use_e_fade && E_fade_applied[active_extruder]){
-           
-           #ifdef DEBUG_E_FADE
-           SERIAL_ECHO("E_G: ");
-           SERIAL_ECHOLN(e);
-           SERIAL_ECHO("E_R: "); 
-           #endif
-            e = e_real[active_extruder];
-           #ifdef DEBUG_E_FADE
-           SERIAL_ECHOLN(e);
-           SERIAL_ECHO("Retraction:");
-           SERIAL_ECHOLN(Retracted_filament[active_extruder]);
-           #endif
-      }
-      de_gcode = 0.0;
-      de_real = 0.0;
-      #endif
+     apply_efade_below_fade_high(e);
     #endif
   }
 

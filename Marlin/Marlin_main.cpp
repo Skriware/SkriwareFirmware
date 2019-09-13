@@ -651,12 +651,6 @@ float cartes[XYZ] = { 0 };
   AdvancedPauseMenuResponse advanced_pause_menu_response;
 #endif
 
-#if ENABLED(FILAMENT_JAM_SENSOR)        //ukikoza
-static bool filament_jam = false;
-static bool filament_alarm = false;
-static bool filament_sensor_on = true;
-#endif
-
 
 #if ENABLED(MIXING_EXTRUDER)
   float mixing_factor[MIXING_STEPPERS]; // Reciprocal of mix proportion. 0.0 = off, otherwise >= 1.0.
@@ -5704,19 +5698,8 @@ inline void gcode_G92() {
 
 
     #ifdef ENABLE_LEVELING_FADE_HEIGHT
-    //Planner::last_z_gcode = 0.0;
-    #ifdef E_FADE
-      if(didE){                 //ukikoza
-      Planner::dz_gcode = 0.0;
-      Planner::de_real = 0.0;
-      Planner::de_gcode = 0.0;
-      for(byte yy = 0; yy < EXTRUDERS; yy++){
-      Planner::last_e_gcode[yy] = 0.0;
-      Planner::e_real[yy] = 0.0;
-      Planner::E_fade_extrusion_difference[yy] = 0.0;
-      }  
-    }
-    #endif
+    g92_efade(didE);        //Skriware
+
 
     #endif
 
@@ -5731,12 +5714,7 @@ inline void gcode_G92() {
         #endif
         float v = parser.value_axis_units((AxisEnum)i);
 
-          if(i == E_AXIS && Planner::Retraction_from_start_gcode[active_extruder] != 0.0 ){
-            v = -Planner::Retraction_from_start_gcode[active_extruder];
-            Planner::last_e_gcode[active_extruder] = v;
-            Planner::e_real[active_extruder] = v;
-            Planner::Retraction_from_start_gcode[active_extruder] = 0.0;
-          }
+            if(i == E_AXIS)g92_retraction_controll(&v);    //Skriware
             current_position[i] = v;
           
         if (i != E_AXIS) {
@@ -5744,7 +5722,6 @@ inline void gcode_G92() {
           #if HAS_POSITION_SHIFT
             position_shift[i] += v - p; // Offset the coordinate space
             update_software_endstops((AxisEnum)i);
-
             #if ENABLED(I2C_POSITION_ENCODERS)
               I2CPEM.encoders[I2CPEM.idx_from_axis((AxisEnum)i)].set_axis_offset(position_shift[i]);
             #endif
@@ -5754,9 +5731,6 @@ inline void gcode_G92() {
       #endif
     }
   }
-
-   
-
   if (didXYZ)
     SYNC_PLAN_POSITION_KINEMATIC();
   else if (didE)
@@ -10706,7 +10680,7 @@ void process_next_command() {
           gcode_M49();
           break;
       #endif // AUTO_BED_LEVELING_UBL && UBL_G26_MESH_VALIDATION
-      //ukikoza
+      //Skriware
        case 61:
           gcode_M61();
         break;
@@ -10716,173 +10690,27 @@ void process_next_command() {
         case 63:
           gcode_M63();
         break;
-    #ifdef E_FADE
       case 60:
-      if(planner.z_fade_height != 0.0){
-        Planner::use_e_fade = true;
-        SERIAL_ECHOLN("E Fade enabled");
-      }
-          Planner::dz_gcode = 0.0;
-          Planner::de_real = 0.0;
-          Planner::de_gcode = 0.0;
-          Planner::last_new_layer_z = 0.0;
-      for(byte yy = 0; yy < EXTRUDERS; yy++){
-          Planner::last_e_gcode[yy] = 0.0;
-          Planner::E_fade_applied[yy] = true;
-          Planner::Retracted_filament[yy] = 0.0;
-          Planner::E_fade_extrusion_difference[yy] = 0.0;
-          Planner::Retraction_from_start_gcode[yy] = 0.0;
-          Planner::e_real[yy] = 0.0;
-      }  
-      Planner::nLayer = 0; 
+          gcode_M60();
         break;
       case 59:
-        Planner::use_e_fade = false;
-         for(byte tt = 0 ; tt < EXTRUDERS; tt++){
-          Planner::Retraction_from_start_gcode[tt] = 0.0;
-        }
-          SERIAL_ECHOLN("E Fade disabled");
+          gcode_M59();
         break;
       case 58:
-        for(byte tt = 0 ; tt < EXTRUDERS; tt++){
-          Planner::Retraction_from_start_gcode[tt] = 0.0;
-        }
-        SERIAL_ECHOLN("Saving Retracts after start gcode:");
-        for(byte yy = 0; yy < EXTRUDERS; yy++){
-        SERIAL_ECHO("E");
-        SERIAL_ECHO(yy*1);
-        SERIAL_ECHO(":");
-        SERIAL_ECHOLN(Planner::Retracted_filament[yy]);
-        Planner::Retraction_from_start_gcode[yy] = Planner::Retracted_filament[yy];
-        Planner::Retracted_filament[yy] = 0.0;
-        }  
-        Planner::nLayer = 0;
-        Planner::last_new_layer_z = 0.0;
+          gcode_M58();
          break;
-        #endif
         case 57:
-        #ifdef EXT_CHECKSTATION
-        if (parser.seen('S')) Z_start = parser.value_float();
-        if (parser.seen('N')) NM = parser.value_linear_units();
-        Z_distance_Test(Z_start,NM);
+          gcode_M57();
         break;
-        #else
-         if (parser.seen('E')){
-        invert_E0();
-        }else{
-        set_to_print_Z();
-        }
-        break;
-        #endif
-      #if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-        case 68:
-        Planner::filament_sensor_type = 0;
-        gcode_M500();
-      break;
-      case 67:
-        Planner::filament_sensor_type = 1;
-        gcode_M500();
-      break;
-      #endif
-      #if ENABLED(FILAMENT_JAM_SENSOR)
-      case 66:
-        if(Planner::filament_sensor_type == 0){
-          SERIAL_ECHOLN("USING BINARY FILAMENT SENSOR");
-        }else if(Planner::filament_sensor_type == 1) {
-          SERIAL_ECHOLN("USING ROTATION FILAMET SENSOR");
-        }else{
-          SERIAL_ECHOLN("USING ROTATION FILAMET SENSOR AND BINARY FILAMENT SENSOR");
-        }
-      break;
       case 65:
-        #ifndef OPTICAL_SENSOR 
-        if (parser.seen('E')) Stepper::filament_error_level = parser.value_linear_units();
-        if (parser.seen('A')) Stepper::filament_alarm_level = parser.value_linear_units();
-        if (parser.seen('R')) Stepper::filament_retract_buffor = parser.value_linear_units();
-        gcode_M500();
-        #else
-        if (parser.seen('N')) fil_sens->set_readout_to_mean(parser.value_linear_units());
-        if (parser.seen('I'))  fil_sens->set_integration_time(parser.value_linear_units());
-        if (parser.seen('M')) fil_sens->set_measurement_time(parser.value_linear_units());
-        if (parser.seen('T')) fil_alarm_counter_error_level = parser.value_linear_units();
-        #endif
-
+          gcode_M65();
       break;
       case 64:
-      #ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR
-      if(Planner::filament_sensor_type == 0){
-        if(filament_binary_sensor_E0_on && filament_binary_sensor_E1_on){
-            SERIAL_ECHO("L: ");
-            if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){ 
-              SERIAL_ECHO("0");
-             }else{
-              SERIAL_ECHO("1");
-             } 
-            SERIAL_ECHO(" R: ");
-            if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){ 
-              SERIAL_ECHOLN("0");
-             }else{
-              SERIAL_ECHOLN("1");
-             } 
-        }else{
-          SERIAL_ECHO("FILAMENT SENSORS OFF");
-        }
-
-      }else{
-        SERIAL_ECHOLN("FILAMENT ROTATION SENSOR PARAMETERS:");
-        SERIAL_ECHOLN("ERROR LEVEL:");
-        SERIAL_ECHOLN(Stepper::filament_error_level);
-        SERIAL_ECHOLN("ALARM LEVEL:");
-        SERIAL_ECHOLN(Stepper::filament_alarm_level);
-        SERIAL_ECHOLN("RETRACT BUFFOR LEVEL:");
-        SERIAL_ECHOLN(Stepper::filament_retract_buffor);
-      }
-      #endif
-      break;
-      case 69:    
-          Stepper::extruder_counts = 0;
-          filament_jam = false;
-          filament_alarm = false;
-      break;
-      case 70:
-          filament_sensor_on = false;
-      break;
-      case 71:
-          filament_sensor_on = true;
-          Stepper::extruder_counts = 0;
-          Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
-      break;
-      case 72:
-        Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
+          gcode_M64();
       break;
        case 80:
-       #ifdef MOVING_EXTRUDER
-        if (parser.seen('U'))Extruder_Up();
-        if (parser.seen('D'))Extruder_Down();
-        if (parser.seen('W'))servo_up_pos = parser.value_linear_units();
-        if (parser.seen('S'))servo_down_pos = parser.value_linear_units();
-        if (parser.seen('O'))extruder_change_time_offset = parser.value_linear_units();
-
-          if (parser.seen('N'))X_up_pos = parser.value_float();
-          if (parser.seen('M'))Y_change = parser.value_float();
-          if (parser.seen('Y'))dY_change = parser.value_float();
-          if (parser.seen('X'))dX_change = parser.value_float();
-          if (parser.seen('B'))X_down_pos = parser.value_float();
-
-        if (parser.seen('A')){ 
-          up_delay = parser.value_linear_units();
-          Set_up_Time(up_delay);
-        }
-        if (parser.seen('T')){ extruder_type= parser.value_linear_units();
-          Set_Extruder_Type(extruder_type);
-        }
-          if (parser.seen('I')){ 
-          Set_Extruder_Type(extruder_type);
-          Set_up_Time(up_delay);
-        }
-        #endif
+          gcode_M80();
        break;
-      #endif
       case 75: // M75: Start print timer
         gcode_M75(); break;
       case 76: // M76: Pause print timer
@@ -11459,7 +11287,7 @@ void process_next_command() {
       tmp = active_extruder;
       gcode_T(parser.codenum);
       #ifdef MOVING_EXTRUDER
-      extruder_swap(parser.codenum,tmp);      //ukikoza
+      extruder_swap(parser.codenum,tmp);      //Skriwara
       #endif
       break;
 
@@ -11981,7 +11809,8 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
    * splitting the move where it crosses grid borders.
    */
 
-  void bilinear_line_to_destination(float fr_mm_s){       //ukikoza
+  //#define DEBUG_SPLIT
+  void bilinear_line_to_destination(float fr_mm_s){ //Skriware      
      int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
         cy1 = CELL_INDEX(Y, current_position[Y_AXIS]),
         cx2 = CELL_INDEX(X, destination[X_AXIS]),
@@ -12717,29 +12546,6 @@ void prepare_move_to_destination() {
 
 #endif
 
-  #if ENABLED(FILAMENT_JAM_SENSOR)      //ukikoza
-
-  void handle_filament_jam() {
-    if (!filament_jam) {
-      if(abs(Stepper::extruder_counts) > Stepper::filament_error_level){
-           filament_jam = true;
-           SERIAL_ECHO("FILAMENT_JAM_ERROR ");
-           SERIAL_ECHO("E");
-           SERIAL_ECHOLN(Stepper::extruder_id);
-
-    }else{
-      if(!filament_alarm){
-           SERIAL_ECHO("FILAMENT_JAM_ALARM ");
-           SERIAL_ECHO("E");
-           SERIAL_ECHOLN(Stepper::extruder_id);
-           filament_alarm = true; 
-      }
-  
-    }
-  }
-}
-#endif
-
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
 
   void handle_filament_runout() {
@@ -12959,60 +12765,10 @@ void disable_all_steppers() {
  */
 void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
 
-  #if ENABLED(FILAMENT_JAM_SENSOR)
-   if((Planner::filament_sensor_type == 1 || Planner::filament_sensor_type == 2) && filament_sensor_on && abs(Stepper::extruder_counts) > Stepper::filament_alarm_level){
-     handle_filament_jam();                           //ukikoza
-   }
-   #endif
-#ifdef OPTICAL_SENSOR
-   if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
-    
-    Fil_sens_check_time = millis();
-    fil_sens->readData();
-    float r_speed = fil_sens->readSpeed_X();
+  optical_sensor_chech();       //Skriware
+  binary_sensor_check();
 
-    if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 0.0001){
-      fil_alarm_counter++;
-      if(fil_alarm_counter == fil_alarm_counter_error_level){
-      SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
-      fil_alarm_counter = 0;
-      }
-    }else{
-      fil_alarm_counter = 0;
-    }
-  }
-  #endif
 
-   #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-   if(Planner::filament_sensor_type == 0 || Planner::filament_sensor_type == 2){
-    if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
-      if(millis() - Last_runout_Signal_E0 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E0 != 0){
-          SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
-          filament_runout_E0 = true;
-          Last_runout_Signal_E0 = 0;
-      }else{
-          if(Last_runout_Signal_E0 == 0){
-          Last_runout_Signal_E0 = millis();
-          }
-      }
-    }else if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == HIGH){
-          Last_runout_Signal_E0 = 0;
-    }
-    if(filament_binary_sensor_E1_on && !filament_runout_E1 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){
-      if(millis() - Last_runout_Signal_E1 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E1 != 0){
-          SERIAL_ECHOLN("FILAMENT_RUNOUT_E1");
-          filament_runout_E1 = true;
-          Last_runout_Signal_E1 = 0;
-      }else{
-          if(Last_runout_Signal_E1 == 0){
-          Last_runout_Signal_E1 = millis();
-          }
-      }
-    }else if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == HIGH){
-          Last_runout_Signal_E1 = 0;
-    }
-  }
-   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     if ((IS_SD_PRINTING || print_job_timer.isRunning()) && (READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_INVERTING))
       handle_filament_runout();
@@ -13506,25 +13262,8 @@ void setup() {
   #if ENABLED(SWITCHING_NOZZLE)
     move_nozzle_servo(0);  // Initialize nozzle servo
   #endif
-    #ifdef MOVING_EXTRUDER
-    Set_Extruder_Type(extruder_type);         //ukikoza
-    Set_up_Time(up_delay);
-    #endif
-    fil_sens = new Filament_Sensor(15);
-     fil_sens->Init();
-   // put your setup code here, to run once:
-     fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
-     fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
-     fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);
-     fil_sens->set_resolution(0xFF,0xFF);
-       if( fil_sens->upload_config()){
-      SERIAL_ECHOLN("SENSOR OK!");
-     }else{
-      SERIAL_ECHOLN("SENSOR_FAIL!");
-     }
-     if(!checkTestPin(29)){
-      invert_E0();
-     }
+
+  Skriware_Init();  //Skriware
 }
 
 /**

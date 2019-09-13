@@ -9,3 +9,8 @@ void Z_distance_Test(float Z_start,int N_Cycles);
 void Set_Extruder_Type(byte TYPE);
 void Set_up_Time(int time);
 void extruder_swap(uint8_t tmp_extruder,uint8_t active);
+void optical_sensor_chech();
+void binary_sensor_check();
+void g92_efade(bool didE);
+void g92_retraction_controll(float *v);
+void Skriware_Init();

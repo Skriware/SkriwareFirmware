@@ -29,6 +29,8 @@ void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
     EEPROM_WRITE(Y_change);
     EEPROM_WRITE(dY_change);
     EEPROM_WRITE(dX_change);
+    EEPROM_WRITE(Stepper::Software_Invert);
+    EEPROM_WRITE(Stepper::E0_inverted);
 
 }
 
@@ -50,6 +52,8 @@ void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index){
     EEPROM_READ(Y_change);
     EEPROM_READ(dY_change);
     EEPROM_READ(dX_change);
+    EEPROM_READ(Stepper::Software_Invert);
+    EEPROM_READ(Stepper::E0_inverted);
 }
 
 void MarlinSettings::reset_eeprom_sk2(){

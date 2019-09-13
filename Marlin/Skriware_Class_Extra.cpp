@@ -7,6 +7,9 @@
 #include "gcode.h"
 
 #include "Marlin.h"
+
+
+/********************* PLANNER *************************/
 //#define DEBUG_E_FADE
 /**** For planner.h 
 
@@ -49,13 +52,16 @@
       int   Planner::nLayer = 0; 
       bool  Planner::relative_mode = false;
        #ifdef START_GCODE_EXTRUSION_CORRECTION
-      float Planner::Retraction_from_start_gcode[] = {0.0};
+      bool  Planner::Retract_menagement = false;
       #endif
 #endif
 #endif
 
-void Planner::efade_and_retract_control_calculation(float &lz, float &e){
+
+
+void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &lx, float &ly){
 	#ifdef E_FADE
+   float tmp[XYZ] = { lx, ly, 0 };
 	if(use_e_fade){
               de_gcode = e-last_e_gcode[active_extruder];
               if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0 &&  e > 0.0){
@@ -180,4 +186,49 @@ void Planner::apply_efade_below_fade_high(float &e){
       de_gcode = 0.0;
       de_real = 0.0;
       #endif
+}
+
+// CHANGE for float raw_z = lz; in apply_leveling!!!!!!
+
+/**************************STEPPER **************************************/
+
+/**** for stepper.h
+
+  
+    #if ENABLED(FILAMENT_JAM_SENSOR)    
+    static bool filament_sensor_state;
+    static long extruder_counts; 
+    static long retract_counts;
+    static long filament_error_level;
+    static long filament_alarm_level;
+    static long filament_retract_buffor; 
+    static int extruder_id;
+    static float current_extruder_speed;
+    static float last_extruder_speed;
+    #endif
+
+//ADD current_extruder_speed filed to structure "block_t"
+
+******/
+     
+int Stepper::E0_inverted = 0;
+int Stepper::Software_Invert = 0;
+#if ENABLED(FILAMENT_JAM_SENSOR)
+long Stepper::extruder_counts = 0;
+long Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
+int  Stepper::extruder_id = 0;
+bool Stepper::filament_sensor_state = false; 
+
+long Stepper::filament_error_level = FILAMENT_JAM_ERROR;
+long Stepper::filament_alarm_level = FILAMENT_JAM_ALARM;
+long Stepper::filament_retract_buffor = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
+float Stepper::current_extruder_speed = 0.0;
+float Stepper::last_extruder_speed = 0.0;
+#endif
+
+void Stepper::Update_dir(){
+      //ukikoza
+      REV_E_DIR();  
+      NORM_E_DIR();
+
 }

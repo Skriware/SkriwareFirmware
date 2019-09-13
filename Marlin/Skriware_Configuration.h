@@ -228,7 +228,7 @@
 
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 800, 204} 
 #define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 50, 100 }
-#define DEFAULT_MAX_ACCELERATION      { 500, 500, 50, 1500}
+#define DEFAULT_MAX_ACCELERATION      { 1500, 1500, 50, 1500}
 
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
@@ -309,6 +309,7 @@
 	#define OPTICAL_SENSOR_INT_TIME 500
 	#define OPTICAL_SENSOR_MEASUREMENT_TIME 100
 	#define OPTICAL_SENSOR_N_TO_MEAN 20
+  #define OPTICAL_SENSOR_ERROR_LEVEL 8 
 #endif
 
 #define FILAMENT_JAM_SENSOR     //ukikoza

@@ -58,12 +58,13 @@
   #include <SPI.h>
 #endif
 
+#define JAM_SENSOR_PIN(VAL) FILAMENT_JAM_SENSOR_PIN_E## VAL //Skriware
 Stepper stepper; // Singleton
 
 // public:
 
 block_t* Stepper::current_block = NULL;  // A pointer to the block currently being traced
-bool Stepper::E0_inverted = false;
+
 
 #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
   bool Stepper::abort_on_endstop_hit = false;
@@ -92,18 +93,6 @@ long Stepper::counter_X = 0,
      Stepper::counter_Z = 0,
      Stepper::counter_E = 0;
 
-#if ENABLED(FILAMENT_JAM_SENSOR)
-long Stepper::extruder_counts = 0;
-long Stepper::retract_counts = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR;
-int Stepper::extruder_id = 0;
-bool Stepper::filament_sensor_state = false; 
-
-long Stepper::filament_error_level = FILAMENT_JAM_ERROR;
-long Stepper::filament_alarm_level = FILAMENT_JAM_ALARM;
-long Stepper::filament_retract_buffor = FILAMET_JAM_SENSOR_TURN_ON_RETRACT_BUFFOR; //ukikoza
-float Stepper::current_extruder_speed = 0.0;
-float Stepper::last_extruder_speed = 0.0;
-#endif
 
 
 volatile uint32_t Stepper::step_events_completed = 0; // The number of step events executed in the current block
@@ -161,7 +150,7 @@ unsigned short Stepper::OCR1A_nominal;
 
 volatile long Stepper::endstops_trigsteps[XYZ];
 
-#define JAM_SENSOR_PIN(VAL) FILAMENT_JAM_SENSOR_PIN_E## VAL     //ukikoza
+
 
 #if ENABLED(X_DUAL_STEPPER_DRIVERS)
   #define X_APPLY_DIR(v,Q) do{ X_DIR_WRITE(v); X2_DIR_WRITE((v) != INVERT_X2_VS_X_DIR); }while(0)
@@ -316,12 +305,6 @@ void Stepper::wake_up() {
  *   COREXZ: X_AXIS=A_AXIS and Z_AXIS=C_AXIS
  *   COREYZ: Y_AXIS=B_AXIS and Z_AXIS=C_AXIS
  */
-void Stepper::Update_dir(){
-      //ukikoza
-      REV_E_DIR();  
-      NORM_E_DIR();
-
-}
 
 
 void Stepper::set_directions() {
@@ -450,7 +433,7 @@ void Stepper::isr() {
   if (!current_block) {
     // Anything in the buffer?
     current_block = planner.get_current_block();
-    current_extruder_speed = current_block->extruder_speed;                                         //ukikoza
+    current_extruder_speed = current_block->extruder_speed; //Skriware
     if (current_block) {
       trapezoid_generator_reset();
 
@@ -662,22 +645,6 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_START(E);
-        #if ENABLED(FILAMENT_JAM_SENSOR)
-         if(_COUNTER(E) > 0){
-          if(motor_direction(E_AXIS)){
-            
-            retract_counts++;
-            
-         }else{
-          if(retract_counts == 0){
-            extruder_counts++;
-          }else{
-            retract_counts--;
-          } 
-          }
-         }
-         #endif
-         //ukikoza
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE
 
@@ -714,7 +681,7 @@ void Stepper::isr() {
         }
       #else // !MIXING_EXTRUDER
         PULSE_STOP(E);
-        #if ENABLED(FILAMENT_JAM_SENSOR) //ukikoza
+        /*#if ENABLED(FILAMENT_JAM_SENSOR) //ukikoza
         extruder_id = current_block->active_extruder;
         if(current_block->active_extruder == 1){
         if(digitalRead(JAM_SENSOR_PIN(1)) == LOW){
@@ -770,6 +737,7 @@ void Stepper::isr() {
          } //ukikoza
        }
         #endif
+        */
       #endif
     #endif // !ADVANCE && !LIN_ADVANCE
 

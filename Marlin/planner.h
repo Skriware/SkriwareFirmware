@@ -180,9 +180,9 @@ class Planner {
       static float last_z_gcode;
       #ifdef E_FADE        //ukikoza
 
-        void efade_and_retract_control_calculation(float &lz, float &e);
-        void apply_efade_above_fade_high(float &e);
-        void apply_efade_below_fade_high(float &e);
+        static void efade_and_retract_control_calculation(float &lz, float &e, float &lx,float &ly);
+        static void apply_efade_above_fade_high(float &e);
+        static void apply_efade_below_fade_high(float &e);
 
         static bool use_e_fade;
         static float dz_gcode;
@@ -197,7 +197,7 @@ class Planner {
         static int nLayer;
         static bool relative_mode;
       #ifdef START_GCODE_EXTRUSION_CORRECTION
-        static float Retraction_from_start_gcode[EXTRUDERS];
+        static bool Retract_menagement;
       #endif
       #endif
 

@@ -81,23 +81,23 @@ class Stepper {
   public:
 
     static block_t* current_block;  // A pointer to the block currently being traced
-    static bool E0_inverted;
+    static int E0_inverted;
+    static int Software_Invert;
 
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
       static bool abort_on_endstop_hit;
     #endif
 
-     #if ENABLED(FILAMENT_JAM_SENSOR)        //ukikoza
+     #if ENABLED(FILAMENT_JAM_SENSOR)    //Skriware
     static bool filament_sensor_state;
     static long extruder_counts; 
     static long retract_counts;
     static long filament_error_level;
     static long filament_alarm_level;
-    static long filament_retract_buffor; //ukikoza
+    static long filament_retract_buffor; 
     static int extruder_id;
     static float current_extruder_speed;
     static float last_extruder_speed;
-
     #endif
 
     #if ENABLED(Z_DUAL_ENDSTOPS)

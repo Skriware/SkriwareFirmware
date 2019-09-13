@@ -282,3 +282,228 @@ void Set_up_Time(int time){
 
 }
 #endif
+
+void optical_sensor_chech(){
+  #ifdef OPTICAL_SENSOR
+       if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
+        
+        Fil_sens_check_time = millis();
+        fil_sens->readData();
+        float r_speed = fil_sens->readSpeed_X();
+
+        if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 0.0001){
+          fil_alarm_counter++;
+          if(fil_alarm_counter == fil_alarm_counter_error_level){
+          SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+          fil_alarm_counter = 0;
+          }
+        }else{
+          fil_alarm_counter = 0;
+        }
+      }
+  #endif
+}
+void binary_sensor_check(){
+  #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+    if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
+      if(millis() - Last_runout_Signal_E0 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E0 != 0){
+          SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+          filament_runout_E0 = true;
+          Last_runout_Signal_E0 = 0;
+      }else{
+          if(Last_runout_Signal_E0 == 0){
+          Last_runout_Signal_E0 = millis();
+          }
+      }
+    }else if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == HIGH){
+          Last_runout_Signal_E0 = 0;
+    }
+    if(filament_binary_sensor_E1_on && !filament_runout_E1 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E1) == LOW){
+      if(millis() - Last_runout_Signal_E1 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E1 != 0){
+          SERIAL_ECHOLN("FILAMENT_RUNOUT_E1");
+          filament_runout_E1 = true;
+          Last_runout_Signal_E1 = 0;
+      }else{
+          if(Last_runout_Signal_E1 == 0){
+          Last_runout_Signal_E1 = millis();
+          }
+      }
+    }else if(digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == HIGH){
+          Last_runout_Signal_E1 = 0;
+    
+    }
+   #endif
+}
+
+void g92_efade(bool didE){
+      #ifdef E_FADE
+      if(didE){                 //ukikoza
+      Planner::dz_gcode = 0.0;
+      Planner::de_real = 0.0;
+      Planner::de_gcode = 0.0;
+      for(byte yy = 0; yy < EXTRUDERS; yy++){
+      Planner::last_e_gcode[yy] = 0.0;
+      Planner::e_real[yy] = 0.0;
+      Planner::E_fade_extrusion_difference[yy] = 0.0;
+      }  
+      }
+        #endif
+}
+
+void g92_retraction_controll(float *v){
+  if(Planner::Retract_menagement  && Planner::Retracted_filament[active_extruder] != 0.0 && *v == 0.0){       //ukikoza
+    *v = -Planner::Retracted_filament[active_extruder];
+    Planner::last_e_gcode[active_extruder] = *v;
+    Planner::e_real[active_extruder] = *v;
+  }
+}
+
+void Skriware_Init(){
+   #ifdef MOVING_EXTRUDER
+    Set_Extruder_Type(extruder_type);         //ukikoza
+    Set_up_Time(up_delay);
+    #endif
+    fil_sens = new Filament_Sensor(15);
+     fil_sens->Init();
+   // put your setup code here, to run once:
+     fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
+     fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
+     fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);
+     fil_sens->set_resolution(0xFF,0xFF);
+       if( fil_sens->upload_config()){
+      SERIAL_ECHOLN("SENSOR OK!");
+     }else{
+      SERIAL_ECHOLN("SENSOR_FAIL!");
+     }
+     pinMode(27,INPUT_PULLUP);
+  if(!Stepper::Software_Invert){
+    if(checkTestPin(27)){
+        Stepper::E0_inverted = 1;
+    }else{
+        Stepper::E0_inverted = 0;
+    }
+  }
+  SERIAL_ECHO("E0 INVERT options:");
+  SERIAL_ECHO(stepper.E0_inverted);
+  SERIAL_ECHOLN(stepper.Software_Invert);
+}
+
+
+/************* Correction for ABL *************************
+void bilinear_line_to_destination(float fr_mm_s){       
+     int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
+        cy1 = CELL_INDEX(Y, current_position[Y_AXIS]),
+        cx2 = CELL_INDEX(X, destination[X_AXIS]),
+        cy2 = CELL_INDEX(Y, destination[Y_AXIS]);
+        cx1 = constrain(cx1, 0, ABL_BG_POINTS_X - 2);
+        cy1 = constrain(cy1, 0, ABL_BG_POINTS_Y - 2);
+        cx2 = constrain(cx2, 0, ABL_BG_POINTS_X - 2);
+        cy2 = constrain(cy2, 0, ABL_BG_POINTS_Y - 2);
+
+   #define LINE_SEGMENT_END(A) (current_position[A ##_AXIS] + (destination[A ##_AXIS] - current_position[A ##_AXIS]) * normalized_dist)
+
+
+      if (cx1 == cx2 && cy1 == cy2) {
+      // Start and end on same mesh square
+        line_to_destination(fr_mm_s);
+        set_current_to_destination();
+        return;
+      }else{
+        #ifdef DEBUG_SPLIT
+      SERIAL_ECHO("NEW GCODE: ");
+      SERIAL_ECHO(" X: ");
+      SERIAL_ECHO(destination[X_AXIS]);
+      SERIAL_ECHO(" Y: ");
+      SERIAL_ECHO(destination[Y_AXIS]);
+      SERIAL_ECHO(" Z: ");
+      SERIAL_ECHO(destination[Z_AXIS]);
+      SERIAL_ECHO(" E: ");
+      SERIAL_ECHOLN(destination[E_AXIS]);
+      #endif
+        int X_grid = cx2-cx1;    
+        int Y_grid = cy2-cy1;      //calculate how many gid sections line corsses.
+
+        int X_dir = (cx1 != cx2)? (cx2-cx1)/abs(cx2-cx1) : 0;
+        int Y_dir = (cy1 != cy2)? (cy2-cy1)/abs(cy2-cy1) : 0;
+
+        float final_X_destination = destination[X_AXIS];
+        float final_Y_destination = destination[Y_AXIS];
+        float start_position_X = current_position[X_AXIS];
+        float start_position_Y = current_position[Y_AXIS];
+        float E_movement = destination[E_AXIS] - current_position[E_AXIS];
+        float Z_movement = destination[Z_AXIS] - current_position[Z_AXIS];
+        #ifdef DEBUG_SPLIT
+        SERIAL_ECHO("Extrusion: ");
+        SERIAL_ECHOLN(E_movement);
+        #endif
+        float normalized_dist_X,normalized_dist_Y,normalized_dist;
+        normalized_dist = 0.0;
+        float gcode_distance = sqrt((destination[X_AXIS] - current_position[X_AXIS])*(destination[X_AXIS] - current_position[X_AXIS]) + (destination[Y_AXIS] - current_position[Y_AXIS])*(destination[Y_AXIS] - current_position[Y_AXIS]));
+        normalized_dist_Y = (final_Y_destination != start_position_Y) ? (final_X_destination - start_position_X)/(final_Y_destination - start_position_Y) : 0;
+        normalized_dist_X = (final_X_destination != start_position_X) ? (final_Y_destination - start_position_Y)/(final_X_destination - start_position_X) : 0;
+        for(int yy = 0; yy < abs(X_grid)+abs(Y_grid)+1; yy++){ //for loop containing line spliting algorithm
+
+          float destination_X[XYZE],destination_Y[XYZE],distance_to_point[XYZE];
+          destination_Y[X_AXIS] = destination_Y[Y_AXIS] = 0.0;
+          destination_X[X_AXIS] = destination_X[Y_AXIS] = 0.0;
+          distance_to_point[X_AXIS] = 2*Y_MAX_POS;
+          distance_to_point[Y_AXIS] = 2*Y_MAX_POS;
+         #ifdef DEBUG_SPLIT
+          SERIAL_ECHO("CX1: ");
+          SERIAL_ECHO(cx1);
+          SERIAL_ECHO("CY1: ");
+          SERIAL_ECHO(cy1);
+        #endif
+          if(yy == 0 && X_dir == -1) cx1++; //mange starting edge of the negative direction
+          if(yy == 0 && Y_dir == -1) cy1++;
+          int gcx = (cx1 != cx2)?cx1 + X_dir: cx1;
+          int gcy = (cy1 != cy2)?cy1 + Y_dir: cy1;
+         
+        // calculating destinations to nearest points with grid crossing:
+          if(cx2 != cx1){
+            destination_X[X_AXIS] = LOGICAL_X_POSITION(bilinear_start[X_AXIS] + ABL_BG_SPACING(X_AXIS) * gcx);
+            destination_X[Y_AXIS] = current_position[Y_AXIS] + normalized_dist_X*(destination_X[X_AXIS]-current_position[X_AXIS]);
+            distance_to_point[X_AXIS] = sqrt((destination_X[X_AXIS] - current_position[X_AXIS])*(destination_X[X_AXIS] - current_position[X_AXIS]) + (destination_X[Y_AXIS] - current_position[Y_AXIS])*(destination_X[Y_AXIS] - current_position[Y_AXIS]));
+          }
+          if(cy2 != cy1){
+            destination_Y[Y_AXIS] = LOGICAL_Y_POSITION(bilinear_start[Y_AXIS] + ABL_BG_SPACING(Y_AXIS) * gcy);
+            destination_Y[X_AXIS] = current_position[X_AXIS] + normalized_dist_Y*(destination_Y[Y_AXIS] - current_position[Y_AXIS]);
+            distance_to_point[Y_AXIS] = sqrt((destination_Y[X_AXIS] - current_position[X_AXIS])*(destination_Y[X_AXIS] - current_position[X_AXIS]) + (destination_Y[Y_AXIS] - current_position[Y_AXIS])*(destination_Y[Y_AXIS] - current_position[Y_AXIS]));
+          }
+          
+          if(cx1 == cx2 && cy1 == cy2){
+            destination[X_AXIS] = final_X_destination;
+            destination[Y_AXIS] = final_Y_destination;
+            normalized_dist = distance_to_point[Y_AXIS] = sqrt((destination[X_AXIS] - current_position[X_AXIS])*(destination[X_AXIS] - current_position[X_AXIS]) + (destination[Y_AXIS] - current_position[Y_AXIS])*(destination[Y_AXIS] - current_position[Y_AXIS]))/gcode_distance;
+          }else{
+            if(distance_to_point[X_AXIS] >= distance_to_point[Y_AXIS]){
+              destination[X_AXIS] = destination_Y[X_AXIS];
+              destination[Y_AXIS] = destination_Y[Y_AXIS];
+              cy1 += Y_dir;
+              if(cy1-cy2 == 1 && Y_dir == -1) cy1--; 
+              normalized_dist = distance_to_point[Y_AXIS]/gcode_distance;  //set for Z and E scaling
+            }else if(distance_to_point[X_AXIS] < distance_to_point[Y_AXIS]){
+              destination[X_AXIS] = destination_X[X_AXIS];
+              destination[Y_AXIS] = destination_X[Y_AXIS];
+              cx1 += X_dir;
+              if(cx1-cx2 == 1 && X_dir == -1) cx1--;
+              normalized_dist = distance_to_point[X_AXIS]/gcode_distance;  //set for Z and E scaling
+            }
+
+          }
+          destination[Z_AXIS] = current_position[Z_AXIS] + Z_movement*normalized_dist;
+          destination[E_AXIS] = current_position[E_AXIS] + E_movement*normalized_dist;
+          #ifdef DEBUG_SPLIT
+          SERIAL_ECHO("SPLIT ");
+          SERIAL_ECHO(yy);
+          SERIAL_ECHOLN(":  ");
+          #endif
+          line_to_destination(fr_mm_s);
+          set_current_to_destination();
+        }
+
+
+      }
+
+  }
+  ******************/

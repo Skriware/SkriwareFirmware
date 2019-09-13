@@ -28,7 +28,7 @@
     byte tmp;
     long Fil_sens_check_time = 0.0;
     byte fil_alarm_counter = 0;
-    byte fil_alarm_counter_error_level = 4;
+    byte fil_alarm_counter_error_level = OPTICAL_SENSOR_ERROR_LEVEL;
     bool optical_sensor_on  = true;
     #endif
 
