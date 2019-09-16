@@ -14,7 +14,6 @@
      float dY_change =  0.0;
      float dX_change =  0.0;
      bool extruder_up = true;
-
     #ifdef MOVING_EXTRUDER      				
 	OneWire  *ds;
 	bool servo_extruder = false;

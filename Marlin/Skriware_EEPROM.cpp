@@ -14,7 +14,7 @@
 
 void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
 
-    EEPROM_WRITE(planner.filament_sensor_type);           //ukikoza
+    EEPROM_WRITE(planner.filament_sensor_type);           
     
     EEPROM_WRITE(home_offset_E1);
     EEPROM_WRITE(home_offset_E0);
@@ -35,9 +35,8 @@ void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
 }
 
 void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index){
-	#if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-      EEPROM_READ(planner.filament_sensor_type);    
-    #endif
+
+    EEPROM_READ(planner.filament_sensor_type);    
 
     EEPROM_READ(home_offset_E1);
     EEPROM_READ(home_offset_E0);
@@ -66,7 +65,7 @@ void MarlinSettings::reset_eeprom_sk2(){
     servo_down_pos = SERVO_POS_DOWN;
     extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
     up_delay = MOTOR_UP_TIME;
-    extruder_type = 0;
+    extruder_type = DEF_EXTRDER_TYPE;
     X_up_pos = 0.0;
     X_down_pos = 0.0;
     Y_change = 0.0;
@@ -75,7 +74,7 @@ void MarlinSettings::reset_eeprom_sk2(){
 }
 
  bool MarlinSettings::nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y]){
-    bool nanTest = true;                                      //ukikoza
+    bool nanTest = true;                                      
           for(byte yy = 0 ; yy < GRID_MAX_POINTS_Y; yy++){
             for(byte xx = 0; xx < GRID_MAX_POINTS_X; xx++){
               if(isnan(z_values[xx][yy])){

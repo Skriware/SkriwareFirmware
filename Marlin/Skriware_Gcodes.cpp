@@ -17,9 +17,10 @@ void gcode_M57(){
 }
 void gcode_M58(){
   #ifdef START_GCODE_EXTRUSION_CORRECTION
-        Planner::Retract_menagement = true;
         SERIAL_ECHOLN("Saving Retracts after start gcode:");
         for(byte yy = 0; yy < EXTRUDERS; yy++){
+        Planner::Retraction_from_start_gcode[yy] = Planner::Retracted_filament[yy];
+        Planner::Retract_menagement[yy] = 1;
         SERIAL_ECHO("E");
         SERIAL_ECHO(yy*1);
         SERIAL_ECHO(":");
@@ -32,7 +33,7 @@ void gcode_M58(){
 void gcode_M59(){
   #ifdef E_FADE
           Planner::use_e_fade = false;
-          Planner::Retract_menagement = false;
+          for(byte tt = 0; tt < EXTRUDERS; tt++)Planner::Retract_menagement[tt] = 0;
           SERIAL_ECHOLN("E Fade disabled");
   #endif
 }

@@ -197,7 +197,8 @@ class Planner {
         static int nLayer;
         static bool relative_mode;
       #ifdef START_GCODE_EXTRUSION_CORRECTION
-        static bool Retract_menagement;
+        static uint8_t Retract_menagement[EXTRUDERS];
+        static float Retraction_from_start_gcode[EXTRUDERS];
       #endif
       #endif
 

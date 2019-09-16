@@ -334,7 +334,6 @@ void MarlinSettings::postprocess() {
     EEPROM_WRITE(planner.min_segment_time);
     EEPROM_WRITE(planner.max_jerk);
 
-    save_eeprom_sk2(working_crc,eeprom_index);        //Skriware
     #if !HAS_HOME_OFFSET
       const float home_offset[XYZ] = { 0 };
     #endif
@@ -646,6 +645,7 @@ void MarlinSettings::postprocess() {
       for (uint8_t q = 3; q--;) EEPROM_WRITE(dummyui32);
     #endif
 
+    save_eeprom_sk2(working_crc,eeprom_index);   
     if (!eeprom_error) {
       const int eeprom_size = eeprom_index;
 
@@ -653,6 +653,7 @@ void MarlinSettings::postprocess() {
 
       // Write the EEPROM header
       eeprom_index = EEPROM_OFFSET;
+           //Skriware
 
       EEPROM_WRITE(version);
       EEPROM_WRITE(final_crc);
@@ -735,7 +736,6 @@ void MarlinSettings::postprocess() {
       EEPROM_READ(planner.max_jerk);
 
       
-      load_eeprom_sk2(working_crc,eeprom_index);      //Skriware
 
       #if !HAS_HOME_OFFSET
         float home_offset[XYZ];
@@ -1013,7 +1013,7 @@ void MarlinSettings::postprocess() {
         uint32_t dummyui32;
         for (uint8_t q = 3; q--;) EEPROM_READ(dummyui32);
       #endif
-
+      load_eeprom_sk2(working_crc,eeprom_index);      //Skriware
       if (working_crc == stored_crc) {
         postprocess();
         #if ENABLED(EEPROM_CHITCHAT)

@@ -351,8 +351,9 @@ void g92_efade(bool didE){
 }
 
 void g92_retraction_controll(float *v){
-  if(Planner::Retract_menagement  && Planner::Retracted_filament[active_extruder] != 0.0 && *v == 0.0){       //ukikoza
-    *v = -Planner::Retracted_filament[active_extruder];
+  if(Planner::Retract_menagement[active_extruder] == 2)Planner::Retraction_from_start_gcode[active_extruder] = 0.0;
+  if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retraction_from_start_gcode[active_extruder] != 0.0 && *v == 0.0){       //ukikoza
+    *v = -Planner::Retraction_from_start_gcode[active_extruder];
     Planner::last_e_gcode[active_extruder] = *v;
     Planner::e_real[active_extruder] = *v;
   }
@@ -364,12 +365,12 @@ void Skriware_Init(){
     Set_up_Time(up_delay);
     #endif
     fil_sens = new Filament_Sensor(15);
-     fil_sens->Init();
+    fil_sens->Init();
    // put your setup code here, to run once:
-     fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
-     fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
-     fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);
-     fil_sens->set_resolution(0xFF,0xFF);
+    fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
+    fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
+    fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);
+    fil_sens->set_resolution(0xFF,0xFF);
        if( fil_sens->upload_config()){
       SERIAL_ECHOLN("SENSOR OK!");
      }else{

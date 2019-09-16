@@ -602,7 +602,7 @@ void Planner::check_axes_activity() {
       ;
     
 
-     apply_efade_below_fade_high(e);
+     apply_efade_below_fade_high(e); //Skriware
     #endif
   }
 
