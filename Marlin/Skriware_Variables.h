@@ -24,7 +24,8 @@
 #if HAS_SERVOS
   #include "servo.h"
 #endif
-
+    
+    extern bool Matrix_calibration_corruption;
 
 	#if HAS_HOME_OFFSET
 	extern float home_offset_E1;    				//MOVING EXTRUDER HOME OFFSET CHANGE

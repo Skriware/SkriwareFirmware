@@ -163,17 +163,17 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
       float tmp_Z = current_position[Z_AXIS];
    if(extruder_type != 0 && tmp_extruder == 1 && extruder_change){
         stepper.synchronize();
-        destination[Z_AXIS] = tmp_Z+2.0;
+        destination[Z_AXIS] = tmp_Z+3.0;
         prepare_move_to_destination();
         stepper.synchronize();
         Extruder_Down();
         refresh_cmd_timeout();
         while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
-        destination[Z_AXIS] = tmp_Z;
-        prepare_move_to_destination();
-        stepper.synchronize();  
-        current_position[Z_AXIS] += home_offset_E1 - home_offset[Z_AXIS];
+        current_position[Z_AXIS] = tmp_Z+3.0 + home_offset_E1 - home_offset[Z_AXIS];
         home_offset[Z_AXIS] = home_offset_E1;
+        //prepare_move_to_destination();
+        //stepper.synchronize();  
+        //current_position[Z_AXIS] += home_offset_E1 - home_offset[Z_AXIS];
         SYNC_PLAN_POSITION_KINEMATIC();
         report_current_position();
     }
@@ -183,10 +183,8 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
        refresh_cmd_timeout();
         while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
        delay(extruder_change_time_offset);
-    
        current_position[Z_AXIS] += home_offset_E0 - home_offset[Z_AXIS];
        home_offset[Z_AXIS] = home_offset_E0;
-
        SYNC_PLAN_POSITION_KINEMATIC();
        report_current_position();
     }
@@ -286,11 +284,9 @@ void Set_up_Time(int time){
 void optical_sensor_chech(){
   #ifdef OPTICAL_SENSOR
        if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
-        
         Fil_sens_check_time = millis();
         fil_sens->readData();
         float r_speed = fil_sens->readSpeed_X();
-
         if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 0.0001){
           fil_alarm_counter++;
           if(fil_alarm_counter == fil_alarm_counter_error_level){

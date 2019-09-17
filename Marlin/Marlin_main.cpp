@@ -10523,6 +10523,7 @@ void process_next_command() {
         case 29: // G29 Detailed Z probe, probes the bed at 3 or more points,
                  // or provides access to the UBL System if enabled.
           gcode_G29();
+          Matrix_calibration_corruption = false;
           break;
       #endif // HAS_LEVELING
 
@@ -11479,7 +11480,11 @@ void ok_to_send() {
     }
     last_offset = offset;
     //*/
-    if(isnan(offset))SERIAL_ECHO("Corrupted point!");
+    if(isnan(offset)){//Skriware
+      if(!Matrix_calibration_corruption)SERIAL_ECHOLN("Corrupted matrix point! Recalibration Needed!");
+      Matrix_calibration_corruption = true;
+      return(0.0);
+    }
     return offset;
   }
 

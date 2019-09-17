@@ -1,6 +1,9 @@
 	#include "Skriware_Variables.h"
 	#include "MarlinConfig.h"
-	#if HAS_HOME_OFFSET
+	
+    bool Matrix_calibration_corruption = false; // bilinear_z_offset and g29- implementation
+
+    #if HAS_HOME_OFFSET
 	 float home_offset_E1 = 0.0;    				//MOVING EXTRUDER HOME OFFSET CHANGE
      float home_offset_E0 = 0.0;
      byte servo_up_pos = SERVO_POS_UP;

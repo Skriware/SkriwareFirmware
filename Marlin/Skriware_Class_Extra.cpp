@@ -57,9 +57,8 @@
       #endif
 #endif
 #endif
-
-
 //#define DEBUG_E_FADE
+//#define LAYER_DEBUG
 void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &lx, float &ly){
 	#ifdef E_FADE
    float tmp[XYZ] = { lx, ly, 0 };
@@ -89,13 +88,13 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
               }else if(Retracted_filament[active_extruder] == 0.0){
                    if((lz - last_new_layer_z) > 0.001 && e > 0.0){
                         nLayer++;
-                        #ifdef DEBUG_E_FADE
+                        #ifdef LAYER_DEBUG
                         SERIAL_ECHO("Printing on layer ");
                         SERIAL_ECHOLN(nLayer);
                         SERIAL_ECHO("Z: ");
-                        SERIAL_ECHOLN(lz*1000);
+                        SERIAL_ECHOLN(lz);
                         SERIAL_ECHO("last Z: ");
-                        SERIAL_ECHOLN(last_new_layer_z*1000);
+                        SERIAL_ECHOLN(last_new_layer_z);
                        #endif
                         dz_gcode = lz - last_new_layer_z;
                         last_new_layer_z = lz;

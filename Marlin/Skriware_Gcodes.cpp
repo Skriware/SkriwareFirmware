@@ -67,8 +67,8 @@ void gcode_M61(){
         }
         #endif
         #ifdef OPTICAL_SENSOR
-         optical_sensor_on = false;
-         SERIAL_ECHOLN("OPTICAL SENSOR OFF");
+         optical_sensor_on = true;
+         SERIAL_ECHOLN("OPTICAL SENSOR ON");
         #endif
 }
 

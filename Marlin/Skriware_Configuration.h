@@ -297,7 +297,7 @@
 #define SERVO_POS_UP   33
 #define MOTOR_UP_TIME 2000
 #define EXT_CHANGE_TIME_OFFSET 500
-#define DEF_EXTRDER_TYPE 3
+#define DEF_EXTRDER_TYPE 0
 #endif
 
 
