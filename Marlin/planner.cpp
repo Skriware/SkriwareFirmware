@@ -1354,7 +1354,7 @@ void Planner::check_axes_activity() {
    *              Leveled XYZ on completion
    */
   void Planner::apply_leveling(float &rx, float &ry, float &rz) {
-
+    SERIAL_ECHOLNPGM("using this function!!!");
     #if ENABLED(SKEW_CORRECTION)
       skew(rx, ry, rz);
     #endif

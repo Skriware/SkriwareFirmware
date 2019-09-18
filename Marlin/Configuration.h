@@ -1923,3 +1923,4 @@
 //#define DEACTIVATE_SERVOS_AFTER_MOVE
 
 #endif // CONFIGURATION_H
+#include "Skriware_Configuration.h"
