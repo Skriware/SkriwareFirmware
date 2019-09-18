@@ -1359,4 +1359,6 @@
 
 #endif // I2C_POSITION_ENCODERS
 
+#include "Skriware_Conf_Advanced.h"
 #endif // CONFIGURATION_ADV_H
+
