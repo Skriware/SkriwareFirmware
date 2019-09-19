@@ -1357,8 +1357,7 @@ void Planner::check_axes_activity() {
     #if ENABLED(SKEW_CORRECTION)
       skew(rx, ry, rz);
     #endif
-
-
+    efade_and_retract_control_calculation(rz,e,rx,ry);    //Skriware
     if (!leveling_active) return;
 
     #if ABL_PLANAR
@@ -1396,6 +1395,8 @@ void Planner::check_axes_activity() {
           fade_scaling_factor ? fade_scaling_factor * bilinear_z_offset(raw) : 0.0
         #endif
       );
+
+      fade_scaling_factor ? apply_efade_below_fade_high(e) : apply_efade_above_fade_high(e);    //Skriware
 
     #endif
   }
@@ -2698,7 +2699,7 @@ void Planner::_set_position_mm(const float &a, const float &b, const float &c
 
 void Planner::set_position_mm_kinematic(const float (&cart)[XYZE]) {
   #if PLANNER_LEVELING
-    float raw[XYZ] = { cart[X_AXIS], cart[Y_AXIS], cart[Z_AXIS] };
+    float raw[XYZE] = { cart[X_AXIS], cart[Y_AXIS], cart[Z_AXIS],cart[E_AXIS]};
     apply_leveling(raw);
   #elif ENABLED(HANGPRINTER)
     float raw[XYZ] = { cart[X_AXIS], cart[Y_AXIS], cart[Z_AXIS] };

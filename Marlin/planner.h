@@ -146,6 +146,8 @@ typedef struct {
 
   uint32_t segment_time_us;
 
+  uint8_t current_extruder_speed;
+
 } block_t;
 
 #define HAS_POSITION_FLOAT (ENABLED(LIN_ADVANCE) || HAS_FEEDRATE_SCALING)

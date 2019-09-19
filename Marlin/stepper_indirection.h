@@ -487,8 +487,8 @@ void reset_stepper_drivers();    // Called by settings.load / settings.reset
     #define    REV_E_DIR(E)   do{ if (extruder_duplication_enabled) { E0_DIR_WRITE( INVERT_E0_DIR); E1_DIR_WRITE( INVERT_E1_DIR); } else if (E == 0) { E0_DIR_WRITE( INVERT_E0_DIR); } else { E1_DIR_WRITE( INVERT_E1_DIR); } }while(0)
   #else
     #define E_STEP_WRITE(E,V) do{ if (E == 0) { E0_STEP_WRITE(V); } else { E1_STEP_WRITE(V); } }while(0)
-    #define   NORM_E_DIR(E)   do{ if (E == 0) { E0_DIR_WRITE(!INVERT_E0_DIR); } else { E1_DIR_WRITE(!INVERT_E1_DIR); } }while(0)
-    #define    REV_E_DIR(E)   do{ if (E == 0) { E0_DIR_WRITE( INVERT_E0_DIR); } else { E1_DIR_WRITE( INVERT_E1_DIR); } }while(0)
+    #define   NORM_E_DIR(E)   do{ if (E == 0) { if (E0_inverted == true){ E0_DIR_WRITE(INVERT_E1_DIR);  }  else { E0_DIR_WRITE(!INVERT_E1_DIR); } } else { E1_DIR_WRITE(!INVERT_E1_DIR); } }while(0)
+    #define    REV_E_DIR(E)   do{ if (E == 0) { if (E0_inverted == true){ E0_DIR_WRITE(!INVERT_E1_DIR);  }  else { E0_DIR_WRITE(INVERT_E1_DIR); } } else { E1_DIR_WRITE( INVERT_E1_DIR); } }while(0)
   #endif
 #else
   #define E_STEP_WRITE(E,V) E0_STEP_WRITE(V)

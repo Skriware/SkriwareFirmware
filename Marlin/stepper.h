@@ -226,6 +226,21 @@ class Stepper {
 
   public:
 
+    static int E0_inverted;             //Skriware
+    static int Software_Invert;
+    #if ENABLED(FILAMENT_JAM_SENSOR)    
+    static bool filament_sensor_state;
+    static long extruder_counts; 
+    static long retract_counts;
+    static long filament_error_level;
+    static long filament_alarm_level;
+    static long filament_retract_buffor; 
+    static int extruder_id;
+    static float current_extruder_speed;
+    static float last_extruder_speed;
+    #endif
+
+
     #if ENABLED(X_DUAL_ENDSTOPS) || ENABLED(Y_DUAL_ENDSTOPS) || ENABLED(Z_DUAL_ENDSTOPS)
       static bool homing_dual_axis;
     #endif

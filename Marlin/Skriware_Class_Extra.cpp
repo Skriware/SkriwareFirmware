@@ -190,13 +190,14 @@ void Planner::apply_efade_below_fade_high(float &e){
       #endif
 }
 
-// CHANGE for float raw_z = lz; in apply_leveling!!!!!!
+
 
 /**************************STEPPER **************************************/
 
 /**** for stepper.h
 
-  
+    static int E0_inverted;             //Skriware
+    static int Software_Invert;  
     #if ENABLED(FILAMENT_JAM_SENSOR)    
     static bool filament_sensor_state;
     static long extruder_counts; 
