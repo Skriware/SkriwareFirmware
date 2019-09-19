@@ -294,6 +294,7 @@
 #define MOVING_EXTRUDER
 //Moving extruder variables:
 #ifdef MOVING_EXTRUDER
+#define HAS_SERVO
 #define NUM_SERVOS 1
 #define SERVO_DELAY {300}
 #define SERVO_POS_DOWN 80

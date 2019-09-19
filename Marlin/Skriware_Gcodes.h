@@ -2,6 +2,7 @@
 #define SK_G
 #include "Skriware_Variables.h"
 #include "Skriware_Functions.h"
+#include "parser.h"
 
 void gcode_M57();
 void gcode_M58();

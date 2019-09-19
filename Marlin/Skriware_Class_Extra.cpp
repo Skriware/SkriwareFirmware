@@ -1,12 +1,8 @@
+
+#include "Skriware_Variables.h"
+#include "Skriware_Functions.h"
 #include "planner.h"
 #include "stepper.h"
-#include "temperature.h"
-#include "ultralcd.h"
-#include "language.h"
-#include "ubl.h"
-
-#include "Marlin.h"
-
 
 /********************* PLANNER *************************/
 //#define DEBUG_E_FADE
@@ -229,8 +225,7 @@ float Stepper::last_extruder_speed = 0.0;
 #endif
 
 void Stepper::Update_dir(){
-      //ukikoza
-      REV_E_DIR();  
-      NORM_E_DIR();
+      REV_E_DIR(0);  
+      NORM_E_DIR(0);
 
 }

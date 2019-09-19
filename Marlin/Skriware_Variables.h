@@ -1,11 +1,9 @@
 #ifndef SKRI_V
 #define SKRI_V
+#include "MarlinConfig.h"
 #include "OneWire.h"
 #include "Filament_Sensor.h"
-
-#if HAS_SERVOS
-  #include "servo.h"
-#endif
+#include "servo.h"
     
     extern bool Matrix_calibration_corruption;
 

@@ -1,6 +1,8 @@
 #ifndef SK_F
 #define SK_F
 #include "Skriware_Variables.h"
+#include "stepper.h"
+#include "planner.h"
 
 void set_to_print_Z();
 bool checkTestPin(int pin);

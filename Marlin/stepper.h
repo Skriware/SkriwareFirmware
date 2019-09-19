@@ -239,7 +239,7 @@ class Stepper {
     static float current_extruder_speed;
     static float last_extruder_speed;
     #endif
-
+    void Update_dir();
 
     #if ENABLED(X_DUAL_ENDSTOPS) || ENABLED(Y_DUAL_ENDSTOPS) || ENABLED(Z_DUAL_ENDSTOPS)
       static bool homing_dual_axis;
@@ -469,6 +469,7 @@ class Stepper {
       if (was_enabled) ENABLE_STEPPER_DRIVER_INTERRUPT();
     }
 
+      static void set_directions();
   private:
 
     // Set the current position in steps
@@ -480,7 +481,6 @@ class Stepper {
     );
 
     // Set direction bits for all steppers
-    static void set_directions();
 
     // Allow reset_stepper_drivers to access private set_directions
     friend void reset_stepper_drivers();

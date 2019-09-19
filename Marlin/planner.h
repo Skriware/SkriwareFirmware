@@ -175,6 +175,11 @@ class Planner {
         static bool relative_mode;
       #endif
 
+      #ifdef START_GCODE_EXTRUSION_CORRECTION
+        static uint8_t Retract_menagement[EXTRUDERS];
+        static float Retraction_from_start_gcode[EXTRUDERS];
+      #endif
+
         static void efade_and_retract_control_calculation(float &lz, float &e, float &lx,float &ly);
         static void apply_efade_above_fade_high(float &e);
         static void apply_efade_below_fade_high(float &e);

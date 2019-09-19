@@ -1,4 +1,5 @@
 #include "Skriware_Functions.h"
+#include "Skriware_Variables.h"
 
 #if IS_KINEMATIC
  #define SYNC_PLAN_POSITION_KINEMATIC() sync_plan_position_kinematic()
@@ -55,22 +56,22 @@ void Extruder_Up(){
           destination[X_AXIS] = X_up_pos + hotend_offset[X_AXIS][active_extruder];
          }
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          feedrate_mm_s = 1200;
          destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          destination[X_AXIS] = current_position[X_AXIS] + dX_change;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          feedrate_mm_s = 4200;
          destination[X_AXIS] = tmp_X;
          destination[Y_AXIS] = tmp_Y;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          feedrate_mm_s = tmp_f;
          extruder_up = true;
       }else if(extruder_type != 0 && extruder_type != 4){
@@ -80,8 +81,8 @@ void Extruder_Up(){
       if ( !ds->search(addr)) {
         ds->reset_search();
         SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-        refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+        
+        while (PENDING(millis(), extruder_change_time_offset )) idle();
       }
       if(addr[0] == 0x68){
         ds->reset();
@@ -91,11 +92,11 @@ void Extruder_Up(){
         done = true;
       }else{
         SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-         refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+         
+        while (PENDING(millis(), extruder_change_time_offset )) idle();
       }
     }
-     while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+     while (PENDING(millis(), extruder_change_time_offset )) idle();
     }
 }
 
@@ -114,22 +115,22 @@ void Extruder_Down(){
           destination[X_AXIS] = X_down_pos + hotend_offset[X_AXIS][active_extruder];
          }
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          feedrate_mm_s = 1200;
          destination[Y_AXIS] = current_position[Y_AXIS] - dY_change;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          destination[X_AXIS] = current_position[X_AXIS] - dX_change;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          destination[Y_AXIS] = current_position[Y_AXIS] + dY_change;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          feedrate_mm_s = 4200;
          destination[X_AXIS] = tmp_X;
          destination[Y_AXIS] = tmp_Y;
          prepare_move_to_destination();
-         stepper.synchronize();
+         planner.synchronize();
          feedrate_mm_s = tmp_f;
           extruder_up = false;
      }else if(extruder_type != 0 && extruder_type != 4){
@@ -139,8 +140,8 @@ void Extruder_Down(){
       if ( !ds->search(addr)) {
         ds->reset_search();
         SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-         refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+         
+        while (PENDING(millis(), extruder_change_time_offset )) idle();
       }
       if(addr[0] == 0x68){
         ds->reset();
@@ -150,11 +151,11 @@ void Extruder_Down(){
         done = true;
       }else{
         SERIAL_ECHOLN("EXTRUDER BOARD CONNECTION FAIL!");
-         refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+         
+        while (PENDING(millis(), extruder_change_time_offset )) idle();
       }
     }
-     while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+     while (PENDING(millis(), extruder_change_time_offset )) idle();
     }
 }
 
@@ -162,26 +163,26 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
    bool extruder_change = tmp_extruder != active;        
       float tmp_Z = current_position[Z_AXIS];
    if(extruder_type != 0 && tmp_extruder == 1 && extruder_change){
-        stepper.synchronize();
+        planner.synchronize();
         destination[Z_AXIS] = tmp_Z+3.0;
         prepare_move_to_destination();
-        stepper.synchronize();
+        planner.synchronize();
         Extruder_Down();
-        refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+        
+        while (PENDING(millis(), extruder_change_time_offset )) idle();
         current_position[Z_AXIS] = tmp_Z+3.0 + home_offset_E1 - home_offset[Z_AXIS];
         home_offset[Z_AXIS] = home_offset_E1;
         //prepare_move_to_destination();
-        //stepper.synchronize();  
+        //planner.synchronize();  
         //current_position[Z_AXIS] += home_offset_E1 - home_offset[Z_AXIS];
         SYNC_PLAN_POSITION_KINEMATIC();
         report_current_position();
     }
     if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
-       stepper.synchronize();
+       planner.synchronize();
        Extruder_Up();
-       refresh_cmd_timeout();
-        while (PENDING(millis(), extruder_change_time_offset + previous_cmd_ms)) idle();
+       
+        while (PENDING(millis(), extruder_change_time_offset )) idle();
        delay(extruder_change_time_offset);
        current_position[Z_AXIS] += home_offset_E0 - home_offset[Z_AXIS];
        home_offset[Z_AXIS] = home_offset_E0;
@@ -200,13 +201,13 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
      
     destination[X_AXIS] = Z_start;
     prepare_move_to_destination();
-    stepper.synchronize();
+    planner.synchronize();
      Extruder_Up();
     float Z_dist = Z_start;
   while(!checkTestPin(15)){        ///going up with the table, till it touches the nozzle
     destination[X_AXIS] = Z_dist;
     prepare_move_to_destination();
-    stepper.synchronize();
+    planner.synchronize();
     Z_dist += 0.001;
   }
   SERIAL_ECHO(c);
@@ -215,13 +216,13 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
      
     destination[X_AXIS] = Z_start;
     prepare_move_to_destination();
-    stepper.synchronize();
+    planner.synchronize();
      Extruder_Down();
      Z_dist = Z_start;
   while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
     destination[X_AXIS] = Z_dist;
     prepare_move_to_destination();
-    stepper.synchronize();
+    planner.synchronize();
     Z_dist += 0.001;
   }                               
   SERIAL_ECHO(c);
