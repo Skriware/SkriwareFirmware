@@ -155,6 +155,28 @@ typedef struct {
 class Planner {
   public:
 
+
+                                      //Skriware
+    static float last_z_gcode;
+      #ifdef E_FADE        
+        static bool use_e_fade;
+        static float dz_gcode;
+        static float last_e_gcode[EXTRUDERS];
+        static float de_real;
+        static float de_gcode;
+        static float e_real[EXTRUDERS];
+        static float last_new_layer_z;
+        static float Retracted_filament[EXTRUDERS];
+        static float E_fade_extrusion_difference[EXTRUDERS];
+        static bool E_fade_applied[EXTRUDERS];
+        static int nLayer;
+        static bool relative_mode;
+      #endif
+
+        static void efade_and_retract_control_calculation(float &lz, float &e, float &lx,float &ly);
+        static void apply_efade_above_fade_high(float &e);
+        static void apply_efade_below_fade_high(float &e);
+
     /**
      * The move buffer, calculated in stepper steps
      *
@@ -437,8 +459,8 @@ class Planner {
        * Apply leveling to transform a cartesian position
        * as it will be given to the planner and steppers.
        */
-      static void apply_leveling(float &rx, float &ry, float &rz);
-      FORCE_INLINE static void apply_leveling(float (&raw)[XYZ]) { apply_leveling(raw[X_AXIS], raw[Y_AXIS], raw[Z_AXIS]); }
+      static void apply_leveling(float &rx, float &ry, float &rz,float &e);
+      FORCE_INLINE static void apply_leveling(float (&raw)[XYZE]) { apply_leveling(raw[X_AXIS], raw[Y_AXIS], raw[Z_AXIS],raw[E_AXIS]); }
     #endif
 
     #if PLANNER_LEVELING

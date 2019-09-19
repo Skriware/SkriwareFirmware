@@ -44,5 +44,8 @@
 #include "language.h"
 #include "utility.h"
 #include "serial.h"
+#include "Skriware_Variables.h"
+#include "Skriware_Functions.h"
+#include "Skriware_Gcodes.h"
 
 #endif // MARLIN_CONFIG_H

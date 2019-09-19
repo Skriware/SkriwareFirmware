@@ -1709,5 +1709,5 @@
 
 // Enable Marlin dev mode which adds some special commands
 //#define MARLIN_DEV_MODE
-
+#include "Skriware_Conf_Advanced.h"
 #endif // CONFIGURATION_ADV_H

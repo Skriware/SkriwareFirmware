@@ -1353,11 +1353,11 @@ void Planner::check_axes_activity() {
    * rx, ry, rz - Cartesian positions in mm
    *              Leveled XYZ on completion
    */
-  void Planner::apply_leveling(float &rx, float &ry, float &rz) {
-    SERIAL_ECHOLNPGM("using this function!!!");
+  void Planner::apply_leveling(float &rx, float &ry, float &rz, float &e) {
     #if ENABLED(SKEW_CORRECTION)
       skew(rx, ry, rz);
     #endif
+
 
     if (!leveling_active) return;
 
