@@ -1,3 +1,5 @@
+#ifndef SK_F
+#define SK_F
 #include "Skriware_Variables.h"
 
 void set_to_print_Z();
@@ -14,3 +16,5 @@ void binary_sensor_check();
 void g92_efade(bool didE);
 void g92_retraction_controll(float *v);
 void Skriware_Init();
+
+#endif

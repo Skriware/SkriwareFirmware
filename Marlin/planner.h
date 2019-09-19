@@ -616,10 +616,10 @@ class Planner {
       #if ENABLED(HANGPRINTER)
         ARG_E1,
       #endif
-      const float &e, const float &fr_mm_s, const uint8_t extruder, const float millimeters = 0.0
+      float &e, const float &fr_mm_s, const uint8_t extruder, const float millimeters = 0.0
     ) {
       #if PLANNER_LEVELING && IS_CARTESIAN
-        apply_leveling(rx, ry, rz);
+        apply_leveling(rx,ry,rz,e);
       #endif
       return buffer_segment(rx, ry, rz,
         #if ENABLED(HANGPRINTER)
@@ -641,8 +641,9 @@ class Planner {
      */
     FORCE_INLINE static bool buffer_line_kinematic(const float (&cart)[XYZE], const float &fr_mm_s, const uint8_t extruder, const float millimeters = 0.0) {
       #if PLANNER_LEVELING
-        float raw[XYZ] = { cart[X_AXIS], cart[Y_AXIS], cart[Z_AXIS] };
-        apply_leveling(raw);
+        float raw[XYZ] = { cart[X_AXIS], cart[Y_AXIS], cart[Z_AXIS]};
+        float rawE[XYZE] = {cart[X_AXIS], cart[Y_AXIS], cart[Z_AXIS],cart[E_AXIS]};
+        apply_leveling(rawE);
       #else
         const float (&raw)[XYZE] = cart;
       #endif
@@ -674,10 +675,10 @@ class Planner {
       #if ENABLED(HANGPRINTER)
         ARG_E1,
       #endif
-      const float &e
+      float &e
     ) {
       #if PLANNER_LEVELING && IS_CARTESIAN
-        apply_leveling(rx, ry, rz);
+        apply_leveling(rx, ry, rz,e);
       #endif
       _set_position_mm(rx, ry, rz,
         #if ENABLED(HANGPRINTER)

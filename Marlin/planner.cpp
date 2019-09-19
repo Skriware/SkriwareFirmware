@@ -2476,7 +2476,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
       COPY(position_float, target_float);
     #endif
   }
-
+  block->extruder_speed = current_speed[E_AXIS];
   // Movement was accepted
   return true;
 } // _populate_block()

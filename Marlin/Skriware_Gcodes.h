@@ -1,3 +1,5 @@
+#ifndef SK_G
+#define SK_G
 #include "Skriware_Variables.h"
 #include "Skriware_Functions.h"
 
@@ -25,3 +27,5 @@ void gcode_M77();
 void gcode_M78();
 void gcode_M79();
 void gcode_M80();
+
+#endif

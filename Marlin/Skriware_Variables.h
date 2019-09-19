@@ -1,24 +1,6 @@
 #ifndef SKRI_V
 #define SKRI_V
 #include "OneWire.h"
-#include "Marlin.h"
-#include "Arduino.h"
-#include "ultralcd.h"
-#include "planner.h"
-#include "stepper.h"
-#include "endstops.h"
-#include "temperature.h"
-#include "cardreader.h"
-#include "configuration_store.h"
-#include "language.h"
-#include "pins_arduino.h"
-#include "math.h"
-#include "nozzle.h"
-#include "duration_t.h"
-#include "types.h"
-#include "gcode.h"
-#include "Skriware_Variables.h"
-#include "Skriware_Functions.h"
 #include "Filament_Sensor.h"
 
 #if HAS_SERVOS

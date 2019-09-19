@@ -4,7 +4,6 @@
 #include "ultralcd.h"
 #include "language.h"
 #include "ubl.h"
-#include "gcode.h"
 
 #include "Marlin.h"
 
