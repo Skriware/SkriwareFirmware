@@ -146,6 +146,8 @@ typedef struct {
 
   uint32_t segment_time_us;
 
+  float extruder_speed;         // Skriware modification for Optical sensor speed tracking
+
 } block_t;
 
 #define HAS_POSITION_FLOAT (ENABLED(LIN_ADVANCE) || HAS_FEEDRATE_SCALING)
