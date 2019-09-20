@@ -6693,11 +6693,11 @@ inline void gcode_G92() {
         #elif HAS_POSITION_SHIFT
           if (i == E_CART) {
             didE = true;
-            	#ifdef ENABLE_LEVELING_FADE_HEIGHT
-    				g92_efade(didE);        //Skriware
-    			#endif
+    		g92_efade(didE);        //Skriware
     		g92_retraction_controll(&v);    //Skriware
             current_position[E_CART] = v; // When using coordinate spaces, only E is set directly
+          	SERIAL_ECHO("E after G92:");
+          	SERIAL_ECHOLN(current_position[E_AXIS]);
           }
           else {
             position_shift[i] += d;       // Other axes simply offset the coordinate space

@@ -1357,7 +1357,8 @@ void Planner::check_axes_activity() {
     #if ENABLED(SKEW_CORRECTION)
       skew(rx, ry, rz);
     #endif
-    efade_and_retract_control_calculation(rz,e,rx,ry);    //Skriware
+      float gcode_z = rz + home_offset[Z_AXIS];
+    efade_and_retract_control_calculation(gcode_z,e,rx,ry);    //Skriware
     if (!leveling_active) return;
 
     #if ABL_PLANAR
@@ -1373,7 +1374,7 @@ void Planner::check_axes_activity() {
     #elif HAS_MESH
 
       #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-        const float fade_scaling_factor = fade_scaling_factor_for_z(rz);
+        const float fade_scaling_factor = fade_scaling_factor_for_z(gcode_z);
       #else
         constexpr float fade_scaling_factor = 1.0;
       #endif

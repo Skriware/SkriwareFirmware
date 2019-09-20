@@ -348,8 +348,10 @@ void g92_efade(bool didE){
 }
 
 void g92_retraction_controll(float *v){
+ 
   if(Planner::Retract_menagement[active_extruder] == 2)Planner::Retraction_from_start_gcode[active_extruder] = 0.0;
   if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retraction_from_start_gcode[active_extruder] != 0.0 && *v == 0.0){       //ukikoza
+     SERIAL_ECHOLN("RETRACTION CONTROLL!");
     *v = -Planner::Retraction_from_start_gcode[active_extruder];
     Planner::last_e_gcode[active_extruder] = *v;
     Planner::e_real[active_extruder] = *v;
