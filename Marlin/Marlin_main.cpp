@@ -14033,6 +14033,7 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
    * Prepare a bilinear-leveled linear move on Cartesian,
    * splitting the move where it crosses grid borders.
    */
+  #define DEBUG_SPLIT
   void bilinear_line_to_destination(float fr_mm_s){   //Skriware    
      int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
         cy1 = CELL_INDEX(Y, current_position[Y_AXIS]),
@@ -14045,14 +14046,7 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
 
    #define LINE_SEGMENT_END(A) (current_position[A ##_AXIS] + (destination[A ##_AXIS] - current_position[A ##_AXIS]) * normalized_dist)
 
-
-      if (cx1 == cx2 && cy1 == cy2) {
-      // Start and end on same mesh square
-         buffer_line_to_destination(fr_mm_s);
-      	 set_current_from_destination();
-        return;
-      }else{
-        #ifdef DEBUG_SPLIT
+      #ifdef DEBUG_SPLIT
       SERIAL_ECHO("NEW GCODE: ");
       SERIAL_ECHO(" X: ");
       SERIAL_ECHO(destination[X_AXIS]);
@@ -14063,6 +14057,14 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
       SERIAL_ECHO(" E: ");
       SERIAL_ECHOLN(destination[E_AXIS]);
       #endif
+
+      if (cx1 == cx2 && cy1 == cy2) {
+      // Start and end on same mesh square
+         buffer_line_to_destination(fr_mm_s);
+      	 set_current_from_destination();
+        return;
+      }else{
+        
         int X_grid = cx2-cx1;    
         int Y_grid = cy2-cy1;      //calculate how many gid sections line corsses.
 
@@ -14136,10 +14138,13 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
           }
           destination[Z_AXIS] = current_position[Z_AXIS] + Z_movement*normalized_dist;
           destination[E_AXIS] = current_position[E_AXIS] + E_movement*normalized_dist;
+         
           #ifdef DEBUG_SPLIT
           SERIAL_ECHO("SPLIT ");
           SERIAL_ECHO(yy);
           SERIAL_ECHOLN(":  ");
+          SERIAL_ECHO("deltaE: ");
+          SERIAL_ECHOLN(normalized_dist*E_movement);
           #endif
            buffer_line_to_destination(fr_mm_s);
       	   set_current_from_destination();

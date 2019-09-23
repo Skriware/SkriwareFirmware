@@ -53,7 +53,7 @@
 #endif
 #endif
 #define DEBUG_E_FADE
-#define LAYER_DEBUG
+//#define LAYER_DEBUG
 void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &lx, float &ly){
 	#ifdef E_FADE
    float tmp[XYZ] = { lx, ly, 0 };
@@ -68,7 +68,6 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
             Retracted_filament[active_extruder] -= de_gcode;    //Retract monitoring
             de_real = de_gcode;
           }else if(de_gcode > 0){
-             SERIAL_ECHOLN("A");
               if(Retracted_filament[active_extruder] > 0.0){        
                       de_real = de_gcode;
                       Retracted_filament[active_extruder] -= de_gcode;
@@ -78,13 +77,11 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
                           de_real -= Retracted_filament[active_extruder];
                           de_real += (1-bilinear_z_offset(tmp)/z_fade_height)*Retracted_filament[active_extruder];
                           if((1-bilinear_z_offset(tmp)/z_fade_height)*dz_gcode > E_FADE_MAX_LAYER_HIGH && dz_gcode < E_FADE_MAX_LAYER_HIGH) de_real += E_FADE_MAX_LAYER_HIGH/dz_gcode*Retracted_filament[active_extruder];
-                          SERIAL_ECHOLN("B1");
                       }
                         Retracted_filament[active_extruder] = 0.0;
                       }
               }else if(Retracted_filament[active_extruder] == 0.0){
-                    SERIAL_ECHO("C:");
-                    SERIAL_ECHOLN(lz);
+    
                    if((lz - last_new_layer_z) > 0.001 && e > 0.0){
                         nLayer++;
                         #ifdef LAYER_DEBUG
@@ -99,7 +96,7 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
                         last_new_layer_z = lz;
                     } 
                     if(nLayer > 1 && e > 0.0){
-                      SERIAL_ECHOLN("B2");
+  
                       de_real = (1-bilinear_z_offset(tmp)/z_fade_height)*de_gcode;
 
                       if((1-bilinear_z_offset(tmp)/z_fade_height)*dz_gcode > E_FADE_MAX_LAYER_HIGH && dz_gcode < E_FADE_MAX_LAYER_HIGH)de_real = E_FADE_MAX_LAYER_HIGH/dz_gcode*de_gcode;
