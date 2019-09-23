@@ -52,7 +52,7 @@
       #endif
 #endif
 #endif
-#define DEBUG_E_FADE
+//#define DEBUG_E_FADE
 //#define LAYER_DEBUG
 void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &lx, float &ly){
 	#ifdef E_FADE

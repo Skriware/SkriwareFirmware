@@ -14033,7 +14033,7 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
    * Prepare a bilinear-leveled linear move on Cartesian,
    * splitting the move where it crosses grid borders.
    */
-  #define DEBUG_SPLIT
+  //#define DEBUG_SPLIT
   void bilinear_line_to_destination(float fr_mm_s){   //Skriware    
      int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
         cy1 = CELL_INDEX(Y, current_position[Y_AXIS]),

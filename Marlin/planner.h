@@ -621,7 +621,7 @@ class Planner {
       #if ENABLED(HANGPRINTER)
         ARG_E1,
       #endif
-      float &e, const float &fr_mm_s, const uint8_t extruder, const float millimeters = 0.0
+      float e, const float &fr_mm_s, const uint8_t extruder, const float millimeters = 0.0
     ) {
       #if PLANNER_LEVELING && IS_CARTESIAN
         apply_leveling(rx,ry,rz,e);
