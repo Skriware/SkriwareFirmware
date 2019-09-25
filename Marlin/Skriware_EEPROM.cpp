@@ -11,7 +11,6 @@
 void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
 
     EEPROM_WRITE(planner.filament_sensor_type);           
-    
     EEPROM_WRITE(home_offset_E1);
     EEPROM_WRITE(home_offset_E0);
     EEPROM_WRITE(extruder_change_time_offset);
@@ -19,7 +18,6 @@ void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
     EEPROM_WRITE(servo_down_pos);
     EEPROM_WRITE(up_delay);
     EEPROM_WRITE(extruder_type);
-
     EEPROM_WRITE(X_up_pos);
     EEPROM_WRITE(X_down_pos);
     EEPROM_WRITE(Y_change);
@@ -30,10 +28,13 @@ void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
 
 }
 
-void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index){
+void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index, char version[4]){
 
+ int sk_eeprom_verison = version[3]-'0'+10*(version[2]-'0');  
+ SERIAL_ECHOLN(sk_eeprom_verison);
+if(version == "V56"){
+    SERIAL_ECHOLN("PASS");
     EEPROM_READ(planner.filament_sensor_type);    
-
     EEPROM_READ(home_offset_E1);
     EEPROM_READ(home_offset_E0);
     EEPROM_READ(extruder_change_time_offset);
@@ -41,7 +42,6 @@ void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index){
     EEPROM_READ(servo_down_pos);
     EEPROM_READ(up_delay);
     EEPROM_READ(extruder_type);
-
     EEPROM_READ(X_up_pos);
     EEPROM_READ(X_down_pos);
     EEPROM_READ(Y_change);
@@ -49,6 +49,9 @@ void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index){
     EEPROM_READ(dX_change);
     EEPROM_READ(Stepper::Software_Invert);
     EEPROM_READ(Stepper::E0_inverted);
+}
+
+
 }
 
 void MarlinSettings::reset_eeprom_sk2(){
