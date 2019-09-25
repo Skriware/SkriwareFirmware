@@ -75,8 +75,8 @@ class MarlinSettings {
 
       static void write_data(int &pos, const uint8_t *value, uint16_t size, uint16_t *crc);
       static void read_data(int &pos, uint8_t *value, uint16_t size, uint16_t *crc);
-      static void save_eeprom_sk2(uint16_t working_crc,int eeprom_index);       //Skriware EEPROM COMMANDS
-      static void load_eeprom_sk2(uint16_t working_crc,int eeprom_index);
+      static void save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index);       //Skriware EEPROM COMMANDS
+      static void load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index);
       static void reset_eeprom_sk2();
       static bool nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y]);
     #endif

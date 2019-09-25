@@ -9,10 +9,10 @@
 #include "configuration_store.h"
 
 
-#define EEPROM_WRITE(VAR) write_data(eeprom_index, (uint8_t*)&VAR, sizeof(VAR), &working_crc)
-#define EEPROM_READ(VAR) read_data(eeprom_index, (uint8_t*)&VAR, sizeof(VAR), &working_crc)
+#define EEPROM_WRITE(VAR) write_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
+#define EEPROM_READ(VAR) read_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
 
-void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
+void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
 
     EEPROM_WRITE(planner.filament_sensor_type);           
     
@@ -34,7 +34,7 @@ void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
 
 }
 
-void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index){
+void MarlinSettings::load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
 
     EEPROM_READ(planner.filament_sensor_type);    
 
