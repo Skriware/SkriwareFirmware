@@ -25,13 +25,12 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     EEPROM_WRITE(dX_change);
     EEPROM_WRITE(Stepper::Software_Invert);
     EEPROM_WRITE(Stepper::E0_inverted);
-
+    EEPROM_WRITE(sensor_noise_offset);
 }
 
 void MarlinSettings::load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, char version[4]){
  int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');  
 if(version > 55){
-   
     EEPROM_READ(home_offset_E1);
     EEPROM_READ(home_offset_E0);
     EEPROM_READ(extruder_change_time_offset);
@@ -46,6 +45,10 @@ if(version > 55){
     EEPROM_READ(dX_change);
     EEPROM_READ(Stepper::Software_Invert);
     EEPROM_READ(Stepper::E0_inverted);
+}
+
+if(version > 56){
+    EEPROM_READ(sensor_noise_offset);
 }
 
 
