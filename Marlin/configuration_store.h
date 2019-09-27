@@ -74,10 +74,10 @@ class MarlinSettings {
       FORCE_INLINE
       static void report(const bool forReplay=false) { UNUSED(forReplay); }
     #endif
-      void save_eeprom_sk2(uint16_t working_crc,int eeprom_index)
-      void load_eeprom_sk2(uint16_t working_crc,int eeprom_index, char version[4])
-      void reset_eeprom_sk2()
-      bool nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y])
+      static void save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index);
+      static void load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, char version[4]);
+      static void reset_eeprom_sk2();
+      static bool nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y]);
 
   private:
     static void postprocess();

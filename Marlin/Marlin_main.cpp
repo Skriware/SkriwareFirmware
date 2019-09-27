@@ -12914,8 +12914,8 @@ void process_parsed_command() {
         case 42: gcode_G42(); break;                              // G42: Move to mesh point
       #endif
 
-      case 90: relative_mode = false; break;                      // G90: Absolute coordinates
-      case 91: relative_mode = true; break;                       // G91: Relative coordinates
+      case 90: relative_mode = false; Planner::relative_mode = false; break;                      // G90: Absolute coordinates
+      case 91: relative_mode = true; Planner::relative_mode = true; break;                       // G91: Relative coordinates
 
       case 92: gcode_G92(); break;                                // G92: Set Position
       #if ENABLED(MECHADUINO_I2C_COMMANDS)

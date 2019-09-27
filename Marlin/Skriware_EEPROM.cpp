@@ -5,12 +5,12 @@
 #include "configuration_store.h"
 
 
-#define EEPROM_WRITE(VAR) write_data(eeprom_index, (uint8_t*)&VAR, sizeof(VAR), &working_crc)
-#define EEPROM_READ(VAR) read_data(eeprom_index, (uint8_t*)&VAR, sizeof(VAR), &working_crc)
+#define EEPROM_WRITE(VAR) write_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
+#define EEPROM_READ(VAR) read_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
 
-void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
+void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
 
-    EEPROM_WRITE(planner.filament_sensor_type);           
+  
     EEPROM_WRITE(home_offset_E1);
     EEPROM_WRITE(home_offset_E0);
     EEPROM_WRITE(extruder_change_time_offset);
@@ -28,13 +28,10 @@ void MarlinSettings::save_eeprom_sk2(uint16_t working_crc,int eeprom_index){
 
 }
 
-void MarlinSettings::load_eeprom_sk2(uint16_t working_crc,int eeprom_index, char version[4]){
-
- int sk_eeprom_verison = version[3]-'0'+10*(version[2]-'0');  
- SERIAL_ECHOLN(sk_eeprom_verison);
-if(version == "V56"){
-    SERIAL_ECHOLN("PASS");
-    EEPROM_READ(planner.filament_sensor_type);    
+void MarlinSettings::load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, char version[4]){
+ int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');  
+if(version > 55){
+   
     EEPROM_READ(home_offset_E1);
     EEPROM_READ(home_offset_E0);
     EEPROM_READ(extruder_change_time_offset);
@@ -55,9 +52,7 @@ if(version == "V56"){
 }
 
 void MarlinSettings::reset_eeprom_sk2(){
-	#if ENABLED(FILAMENT_JAM_SENSOR) || ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
-  		planner.filament_sensor_type = 0;
-  	#endif
+	
     home_offset_E1 = 0.0;
     home_offset_E0 = 0.0;
     servo_up_pos = SERVO_POS_UP;

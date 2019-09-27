@@ -989,6 +989,8 @@ void MarlinSettings::postprocess() {
       for (uint8_t q = MAX_EXTRUDERS * 2; q--;) EEPROM_WRITE(dummy);
     #endif
 
+
+    save_eeprom_sk2(&working_crc,&eeprom_index);    //Skriware
     //
     // Validate CRC and Data Size
     //
@@ -1010,7 +1012,7 @@ void MarlinSettings::postprocess() {
         SERIAL_ECHOLNPGM(")");
       #endif
 
-      eeprom_error |= size_error(eeprom_size);
+      //eeprom_error |= size_error(eeprom_size);
     }
 
     //
@@ -1611,8 +1613,9 @@ void MarlinSettings::postprocess() {
       #else
         for (uint8_t q = MAX_EXTRUDERS * 2; q--;) EEPROM_READ(dummy);
       #endif
+      load_eeprom_sk2(&working_crc,&eeprom_index, version); //Skriware
 
-      eeprom_error = size_error(eeprom_index - (EEPROM_OFFSET));
+      //eeprom_error = size_error(eeprom_index - (EEPROM_OFFSET));
       if (eeprom_error) {
         SERIAL_ECHO_START();
         SERIAL_ECHOPAIR("Index: ", int(eeprom_index - (EEPROM_OFFSET)));
@@ -1819,7 +1822,7 @@ void MarlinSettings::reset() {
   planner.travel_acceleration = DEFAULT_TRAVEL_ACCELERATION;
   planner.min_feedrate_mm_s = DEFAULT_MINIMUMFEEDRATE;
   planner.min_travel_feedrate_mm_s = DEFAULT_MINTRAVELFEEDRATE;
-
+  reset_eeprom_sk2();
   #if ENABLED(JUNCTION_DEVIATION)
     planner.junction_deviation_mm = float(JUNCTION_DEVIATION_MM);
   #else
