@@ -33,6 +33,7 @@
     	extern byte fil_alarm_counter;
     	extern byte fil_alarm_counter_error_level;
         extern bool optical_sensor_on;
+        extern float sensor_noise_offset;
     #endif
 
      #ifdef EXT_CHEACKSTATION

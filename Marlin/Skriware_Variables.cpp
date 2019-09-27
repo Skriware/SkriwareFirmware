@@ -10,6 +10,7 @@
      byte servo_down_pos = SERVO_POS_DOWN;
      int extruder_change_time_offset = EXT_CHANGE_TIME_OFFSET;
      int up_delay = MOTOR_UP_TIME;
+     float sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET;
      byte extruder_type = 0;
      float X_up_pos  =  0.0;
      float X_down_pos  =  0.0;
