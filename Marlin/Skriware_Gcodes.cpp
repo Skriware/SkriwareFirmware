@@ -127,6 +127,8 @@ void gcode_M65(){
       if (parser.seen('I'))  fil_sens->set_integration_time(parser.value_linear_units());
       if (parser.seen('M')) fil_sens->set_measurement_time(parser.value_linear_units());
       if (parser.seen('T')) fil_alarm_counter_error_level = parser.value_linear_units();
+      if (parser.seen('O')) optical_sensor_noise_offset = parser.value_linear_units();
+
     #endif
 }
 void gcode_M66(){

@@ -31,6 +31,7 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     EEPROM_WRITE(dX_change);
     EEPROM_WRITE(Stepper::Software_Invert);
     EEPROM_WRITE(Stepper::E0_inverted);
+    EEPROM_WRITE(optical_sensor_noise_offset);
 
 }
 

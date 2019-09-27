@@ -32,6 +32,7 @@
     byte fil_alarm_counter = 0;
     byte fil_alarm_counter_error_level = OPTICAL_SENSOR_ERROR_LEVEL;
     bool optical_sensor_on  = true;
+    float optical_sensor_noise_offset  = OPTICAL_SENSOR_NOISE_OFFSET;
     #endif
 
      #ifdef EXT_CHEACKSTATION
