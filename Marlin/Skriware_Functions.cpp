@@ -287,7 +287,6 @@ void optical_sensor_chech(){
         Fil_sens_check_time = millis();
         fil_sens->readData();
         float r_speed = fil_sens->readSpeed_Y();
-        SERIAL_ECHOLN(fil_sens->readSpeed_Y());
         if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 30){
           fil_alarm_counter++;
           if(fil_alarm_counter == fil_alarm_counter_error_level){
