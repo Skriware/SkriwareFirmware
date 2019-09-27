@@ -286,8 +286,9 @@ void optical_sensor_chech(){
        if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
         Fil_sens_check_time = millis();
         fil_sens->readData();
-        float r_speed = fil_sens->readSpeed_X();
-        if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 0.0001){
+        float r_speed = fil_sens->readSpeed_Y();
+        SERIAL_ECHOLN(fil_sens->readSpeed_Y());
+        if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < 30){
           fil_alarm_counter++;
           if(fil_alarm_counter == fil_alarm_counter_error_level){
           SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");

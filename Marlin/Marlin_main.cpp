@@ -12771,7 +12771,7 @@ void disable_all_steppers() {
 void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
 
   optical_sensor_chech();       //Skriware
-  binary_sensor_check();
+  //binary_sensor_check();
 
 
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
