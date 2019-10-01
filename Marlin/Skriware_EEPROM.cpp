@@ -10,7 +10,7 @@
 
 void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
 
-  
+    //V56
     EEPROM_WRITE(home_offset_E1);
     EEPROM_WRITE(home_offset_E0);
     EEPROM_WRITE(extruder_change_time_offset);
@@ -25,11 +25,13 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     EEPROM_WRITE(dX_change);
     EEPROM_WRITE(Stepper::Software_Invert);
     EEPROM_WRITE(Stepper::E0_inverted);
+    //V57
     EEPROM_WRITE(sensor_noise_offset);
 }
 
 void MarlinSettings::load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, char version[4]){
  int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');  
+
 if(version > 55){
     EEPROM_READ(home_offset_E1);
     EEPROM_READ(home_offset_E0);
@@ -45,12 +47,12 @@ if(version > 55){
     EEPROM_READ(dX_change);
     EEPROM_READ(Stepper::Software_Invert);
     EEPROM_READ(Stepper::E0_inverted);
+
 }
 
 if(version > 56){
     EEPROM_READ(sensor_noise_offset);
 }
-
 
 }
 
@@ -68,6 +70,7 @@ void MarlinSettings::reset_eeprom_sk2(){
     Y_change = 0.0;
     dY_change = 0.0;
     dX_change = 0.0;
+    sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET
 }
 
  bool MarlinSettings::nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y]){
