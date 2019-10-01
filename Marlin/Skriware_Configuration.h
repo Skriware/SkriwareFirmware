@@ -95,11 +95,7 @@
 #define Z_HOME_DIR -1
 
 #define X_MIN_POS 0
-#ifdef MOVING_EXTRUDER
-#define Y_MIN_POS -15
-#else
 #define Y_MIN_POS 0
-#endif
 #define Z_MIN_POS -3
 
 #define X_MAX_POS 210
@@ -298,6 +294,8 @@
 #define MOTOR_UP_TIME 2000
 #define EXT_CHANGE_TIME_OFFSET 500
 #define DEF_EXTRDER_TYPE 0
+#define Y_MIN_POS -15
+
 #endif
 
 
@@ -311,6 +309,7 @@
 	#define OPTICAL_SENSOR_MEASUREMENT_TIME 100
 	#define OPTICAL_SENSOR_N_TO_MEAN 20
   #define OPTICAL_SENSOR_ERROR_LEVEL 8 
+  #define OPTICAL_SENSOR_NOISE_OFFSET 30 
 #endif
 
 #define FILAMENT_JAM_SENSOR     //ukikoza
