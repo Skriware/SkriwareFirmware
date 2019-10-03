@@ -1,4 +1,3 @@
-
 #include "Skriware_Variables.h"
 #include "Skriware_Functions.h"
 #include "planner.h"

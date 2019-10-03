@@ -278,7 +278,7 @@ void Set_up_Time(int time){
 }
 #endif
 
-void optical_sensor_chech(){
+void optical_sensor_check(){
   #ifdef OPTICAL_SENSOR
        if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
         Fil_sens_check_time = millis();

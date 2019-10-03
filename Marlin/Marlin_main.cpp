@@ -9755,6 +9755,8 @@ inline void gcode_M205() {
    * ***              In the next 1.2 release, it will simply be disabled by default.
    */
   inline void gcode_M206() {
+    if (parser.seen('E')) home_offset_E1 = parser.value_linear_units();
+    if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
     LOOP_XYZ(i)
       if (parser.seen(axis_codes[i]))
         set_home_offset((AxisEnum)i, parser.value_linear_units());
@@ -13334,8 +13336,8 @@ void process_parsed_command() {
     break;
 
     case 'T': 
-    gcode_T(parser.codenum); 
     tmp = active_extruder;
+    gcode_T(parser.codenum); 
     #ifdef MOVING_EXTRUDER
       extruder_swap(parser.codenum,tmp);      //Skriware
     #endif
@@ -15003,8 +15005,8 @@ void disable_all_steppers() {
  */
 void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
 
-  optical_sensor_chech();       //Skriware
-  binary_sensor_check();
+  optical_sensor_check();       //Skriware
+  //binary_sensor_check();
 	
 
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
