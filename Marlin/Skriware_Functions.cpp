@@ -168,13 +168,9 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
         prepare_move_to_destination();
         planner.synchronize();
         Extruder_Down();
-        
         while (PENDING(millis(), extruder_change_time_offset )) idle();
         current_position[Z_AXIS] = tmp_Z+3.0 + home_offset_E1 - home_offset[Z_AXIS];
         home_offset[Z_AXIS] = home_offset_E1;
-        //prepare_move_to_destination();
-        //planner.synchronize();  
-        //current_position[Z_AXIS] += home_offset_E1 - home_offset[Z_AXIS];
         SYNC_PLAN_POSITION_KINEMATIC();
         report_current_position();
     }
