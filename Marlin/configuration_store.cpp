@@ -384,7 +384,7 @@ void MarlinSettings::postprocess() {
   const char version[4] = EEPROM_VERSION;
 
   bool MarlinSettings::eeprom_error, MarlinSettings::validating;
-  bool MarlinSettings::older_eeprom_config = false;
+ 
 
   void MarlinSettings::write_data(int &pos, const uint8_t *value, uint16_t size, uint16_t *crc) {
     if (eeprom_error) { pos += size; return; }
@@ -1023,7 +1023,7 @@ void MarlinSettings::postprocess() {
       if (ubl.storage_slot >= 0)
         store_mesh(ubl.storage_slot);
     #endif
-        older_eeprom_config = false;
+        older_eeprom_config = false; // Skriware
     return !eeprom_error;
   }
 
@@ -1056,15 +1056,15 @@ void MarlinSettings::postprocess() {
       eeprom_error = true;
     }
 
-    int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');               //Skriware
+    int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');               //Skriware EEPROM BACKUP
     int sk_eeprom_verison_stored = (stored_ver[2]-'0')+10*(stored_ver[1]-'0'); 
-    SERIAL_ECHOLN(sk_eeprom_verison);
-    SERIAL_ECHOLN(sk_eeprom_verison_stored);
     if(sk_eeprom_verison_stored < sk_eeprom_verison){
     eeprom_error = false; //newer version of EEPROM need to be loaded
     SERIAL_ECHOLN("OLDER EEPROM VERSION DETECTED! RESTORING SETTINGS");
     older_eeprom_config = true;
     }
+
+
     if(!eeprom_error){
       float dummy = 0;
       #if DISABLED(AUTO_BED_LEVELING_UBL) || DISABLED(FWRETRACT) || ENABLED(NO_VOLUMETRICS)

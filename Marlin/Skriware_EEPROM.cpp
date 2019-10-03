@@ -7,6 +7,8 @@
 
 #define EEPROM_WRITE(VAR) write_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
 #define EEPROM_READ(VAR) read_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
+ 
+bool MarlinSettings::older_eeprom_config = false;
 
 void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
 
@@ -28,7 +30,7 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     //V57
     EEPROM_WRITE(sensor_noise_offset);
   
-    
+
 }
 
 void MarlinSettings::load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, char version[4]){
@@ -55,6 +57,7 @@ if(sk_eeprom_verison > 55){
 if(sk_eeprom_verison > 56){
     EEPROM_READ(sensor_noise_offset);
 }
+
 }
 
 void MarlinSettings::reset_eeprom_sk2(){
