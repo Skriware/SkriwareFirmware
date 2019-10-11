@@ -1734,6 +1734,7 @@ uint32_t Stepper::stepper_block_phase_isr() {
         advance_divisor_m = e_steps << 1;
       #else
         active_extruder = current_block->active_extruder;
+        current_extruder_speed = current_block->extruder_speed; //Skriware
       #endif
 
       // Initialize the trapezoid generator from the current block.

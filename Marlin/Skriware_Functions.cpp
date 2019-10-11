@@ -283,7 +283,7 @@ void optical_sensor_check(){
        if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
         Fil_sens_check_time = millis();
         fil_sens->readData();
-          float r_speed = fil_sens->readSpeed_X();
+          float r_speed = fil_sens->readSpeed_Y();
           SERIAL_ECHO("SENSOR_DEBUG:");
           SERIAL_ECHO(millis());
           SERIAL_ECHO(":");
