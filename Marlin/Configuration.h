@@ -676,8 +676,8 @@
  *      O-- FRONT --+
  *    (0,0)
  */
-#define X_PROBE_OFFSET_FROM_EXTRUDER 20  // X offset: -left  +right  [of the nozzle]
-#define Y_PROBE_OFFSET_FROM_EXTRUDER 32  // Y offset: -front +behind [the nozzle]
+#define X_PROBE_OFFSET_FROM_EXTRUDER 24  // X offset: -left  +right  [of the nozzle]
+#define Y_PROBE_OFFSET_FROM_EXTRUDER 50  // Y offset: -front +behind [the nozzle]
 #define Z_PROBE_OFFSET_FROM_EXTRUDER 0   // Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
@@ -773,7 +773,7 @@
 // Travel limits after homing (units are in mm)
 #define X_MIN_POS 0
 #define Y_MIN_POS -15
-#define Z_MIN_POS -3
+#define Z_MIN_POS -5
 #ifdef EXT_CHECKSTATION
 #define Z_MIN_POS -200    
 #endif
@@ -907,10 +907,10 @@
   #define GRID_MAX_POINTS_Y 5//GRID_MAX_POINTS_X
 
   // Set the boundaries for probing (where the probe can reach).
-  #define LEFT_PROBE_BED_POSITION 20
+  #define LEFT_PROBE_BED_POSITION 24
   #define RIGHT_PROBE_BED_POSITION 180
-  #define FRONT_PROBE_BED_POSITION 32
-  #define BACK_PROBE_BED_POSITION 255
+  #define FRONT_PROBE_BED_POSITION 50
+  #define BACK_PROBE_BED_POSITION 230
 
   // The Z probe minimum outer margin (to validate G29 parameters).
   #define MIN_PROBE_EDGE 0

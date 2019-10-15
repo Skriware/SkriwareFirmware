@@ -13846,6 +13846,7 @@ void setup() {
     Set_Extruder_Type(extruder_type);         //ukikoza
     Set_up_Time(up_delay);
     #endif
+    #ifdef OPTICAL_SENSOR
     fil_sens = new Filament_Sensor(15);
      fil_sens->Init();
    // put your setup code here, to run once:
@@ -13858,6 +13859,8 @@ void setup() {
      }else{
       SERIAL_ECHOLN("SENSOR_FAIL!");
      }
+     #endif
+     
      if(!checkTestPin(29)){
       invert_E0();
      }
