@@ -284,12 +284,14 @@ void optical_sensor_check(){
         Fil_sens_check_time = millis();
         fil_sens->readData();
           float r_speed = fil_sens->readSpeed_Y();
+         #ifdef SENSOR_DEBUG
           SERIAL_ECHO("SENSOR_DEBUG:");
           SERIAL_ECHO(millis());
           SERIAL_ECHO(":");
           SERIAL_ECHO(Stepper::current_extruder_speed);
           SERIAL_ECHO(":");
           SERIAL_ECHOLN(r_speed);
+        #endif
         if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < sensor_noise_offset){
           fil_alarm_counter++;
           if(fil_alarm_counter == fil_alarm_counter_error_level){
@@ -351,10 +353,10 @@ void g92_efade(bool didE){
 
 void g92_retraction_controll(float *v){
  
-  if(Planner::Retract_menagement[active_extruder] == 2)Planner::Retraction_from_start_gcode[active_extruder] = 0.0;
-  if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retraction_from_start_gcode[active_extruder] != 0.0 && *v == 0.0){       //ukikoza
+  if(Planner::Retract_menagement[active_extruder] == 2)Planner::Retracted_filament[active_extruder] = 0.0;
+  if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retracted_filament[active_extruder] > 0.00001 && *v == 0.0){       //ukikoza
      SERIAL_ECHOLN("RETRACTION CONTROLL!");
-    *v = -Planner::Retraction_from_start_gcode[active_extruder];
+    *v = -Planner::Retracted_filament[active_extruder];
     Planner::last_e_gcode[active_extruder] = *v;
     Planner::e_real[active_extruder] = *v;
   }

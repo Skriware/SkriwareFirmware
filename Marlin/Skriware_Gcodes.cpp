@@ -33,7 +33,10 @@ void gcode_M58(){
 void gcode_M59(){
   #ifdef E_FADE
           Planner::use_e_fade = false;
-          for(byte tt = 0; tt < EXTRUDERS; tt++)Planner::Retract_menagement[tt] = 0;
+          for(byte tt = 0; tt < EXTRUDERS; tt++){
+            Planner::Retract_menagement[tt] = 0;
+            Planner::Retraction_from_start_gcode[tt] = 0.0;
+          }
           SERIAL_ECHOLN("E Fade disabled");
   #endif
 }

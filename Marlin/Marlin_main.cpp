@@ -6682,7 +6682,7 @@ inline void gcode_G92() {
       const float l = parser.value_axis_units((AxisEnum)i),
                   v = i == E_CART ? l : LOGICAL_TO_NATIVE(l, i),
                   d = v - current_position[i];
-      if (!NEAR_ZERO(d)
+      if (true
         #if ENABLED(HANGPRINTER)
           || true // Hangprinter needs to update its line lengths whether current_position changed or not
         #endif
