@@ -29,6 +29,11 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     EEPROM_WRITE(Stepper::E0_inverted);
     //V57
     EEPROM_WRITE(sensor_noise_offset);
+    //V58
+    EEPROM_WRITE(A_calibration_param);
+    EEPROM_WRITE(B_calibration_param);
+    EEPROM_WRITE(C_calibration_param);
+    EEPROM_WRITE(D_calibration_param);
   
 
 }
@@ -51,11 +56,15 @@ if(sk_eeprom_verison > 55){
     EEPROM_READ(dX_change);
     EEPROM_READ(Stepper::Software_Invert);
     EEPROM_READ(Stepper::E0_inverted);
-
 }
-
 if(sk_eeprom_verison > 56){
     EEPROM_READ(sensor_noise_offset);
+}
+if(sk_eeprom_verison > 57){
+    EEPROM_READ(A_calibration_param);
+    EEPROM_READ(B_calibration_param);
+    EEPROM_READ(C_calibration_param);
+    EEPROM_READ(D_calibration_param);
 }
 
 }
@@ -75,6 +84,10 @@ void MarlinSettings::reset_eeprom_sk2(){
     dY_change = 0.0;
     dX_change = 0.0;
     sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET;
+    A_calibration_param = 0.0;
+    B_calibration_param = 0.0;
+    C_calibration_param = 0.0;
+    D_calibration_param = 0.0;
 }
 
  bool MarlinSettings::nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y]){

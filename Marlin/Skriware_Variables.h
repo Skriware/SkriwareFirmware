@@ -42,6 +42,11 @@
         extern float Z_down;
      #endif
 
+    extern float A_calibration_param;
+    extern float B_calibration_param;
+    extern float C_calibration_param;
+    extern float D_calibration_param;
+
 #ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR
 	extern bool filament_binary_sensor_E0_on;
 	extern bool filament_binary_sensor_E1_on;

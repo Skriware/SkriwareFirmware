@@ -40,7 +40,10 @@
         float Z_up = 0.0;
         float Z_down = 0.0;
      #endif
-
+    float A_calibration_param = 0.0;
+    float B_calibration_param = 0.0;
+    float C_calibration_param = 0.0;
+    float D_calibration_param = 0.0;
 
 	#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR		//Mechanical runout sensor
  		bool filament_binary_sensor_E0_on = true;

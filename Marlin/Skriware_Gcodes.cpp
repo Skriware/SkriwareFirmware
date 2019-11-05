@@ -134,7 +134,21 @@ void gcode_M65(){
     #endif
 }
 void gcode_M66(){
-
+      if(parser.seen('A'))A_calibration_param = parser.value_float();
+      if(parser.seen('B'))B_calibration_param = parser.value_float();
+      if(parser.seen('C'))C_calibration_param = parser.value_float();
+      if(parser.seen('D'))D_calibration_param = parser.value_float();
+      if(parser.seen('R')){
+        SERIAL_ECHO("A:");
+        SERIAL_ECHO(A_calibration_param);
+        SERIAL_ECHO("B:");
+        SERIAL_ECHO(B_calibration_param);
+        SERIAL_ECHO("C:");
+        SERIAL_ECHO(C_calibration_param);
+        SERIAL_ECHO("D:");
+        SERIAL_ECHO(D_calibration_param);
+        SERIAL_ECHOLN(" ");
+      }
 }
 void gcode_M67(){
 
@@ -173,7 +187,7 @@ void gcode_M78(){
 
 }
 void gcode_M79(){
-
+  SERIAL_ECHOLN("IQ of Kuba Zaborowski: 0");
 }
 void gcode_M80(){
     #ifdef MOVING_EXTRUDER

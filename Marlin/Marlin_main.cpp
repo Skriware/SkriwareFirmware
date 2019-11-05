@@ -12989,37 +12989,66 @@ void process_parsed_command() {
       #endif
 
         //Skriware
+       case 57:
+          gcode_M57();
+       break;
+       case 58:
+          gcode_M58();
+       break;
+       case 59:
+          gcode_M59();
+       break;
+       case 60:
+          gcode_M60();
+       break;
        case 61:
           gcode_M61();
-        break;
-        case 62:
+       break;
+       case 62:
           gcode_M62();
-        break;
-        case 63:
+       break;
+       case 63:
           gcode_M63();
-        break;
-      case 60:
-          gcode_M60();
-        break;
-      case 59:
-          gcode_M59();
-        break;
-      case 58:
-          gcode_M58();
-         break;
-        case 57:
-          gcode_M57();
-        break;
-      case 65:
-          gcode_M65();
-      break;
-      case 64:
+       break;
+       case 64:
           gcode_M64();
-      break;
+       break;
+       case 65:
+          gcode_M65();
+       break;
+       case 66:
+          gcode_M66();
+       break;
+       case 67:
+          gcode_M67();
+       break;
+       case 68:
+          gcode_M68();
+       break;
+       case 69:
+          gcode_M69();
+       break;
+       case 70:
+          gcode_M70();
+       break;
+       case 71:
+          gcode_M71();
+       break;
+       case 72:
+          gcode_M72();
+       break;
+       case 73:
+          gcode_M73();
+       break;
+       case 74:
+          gcode_M74();
+       break;
+       case 79:
+          gcode_M79();
+       break;
        case 80:
           gcode_M80();
        break;
-
 
       #if ENABLED(ULTRA_LCD) && ENABLED(LCD_SET_PROGRESS_MANUALLY)
         case 73: gcode_M73(); break;                              // M73: Set Print Progress %
