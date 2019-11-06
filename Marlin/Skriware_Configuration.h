@@ -1,6 +1,7 @@
 #ifndef SK_CONFIG
 #define SK_CONFIG
 
+//#define SKRIWARE_DEBUG
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
@@ -94,11 +95,7 @@
 #define Z_HOME_DIR -1
 
 #define X_MIN_POS 0
-#ifdef MOVING_EXTRUDER
-#define Y_MIN_POS -15
-#else
 #define Y_MIN_POS 0
-#endif
 #define Z_MIN_POS -3
 
 #define X_BED_SIZE 210

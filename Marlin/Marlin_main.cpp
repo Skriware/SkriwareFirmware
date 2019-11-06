@@ -9762,7 +9762,9 @@ inline void gcode_M205() {
    */
   inline void gcode_M206() {
     if (parser.seen('E')) home_offset_E1 = parser.value_linear_units();
-    if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
+    #ifdef MOVING_EXTRUDER
+    	if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
+    #endif
     LOOP_XYZ(i)
       if (parser.seen(axis_codes[i]))
         set_home_offset((AxisEnum)i, parser.value_linear_units());
@@ -15040,8 +15042,8 @@ void disable_all_steppers() {
  */
 void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
 
-  optical_sensor_check();       //Skriware
-  //binary_sensor_check();
+  filament_sensor_check();      //Skriware
+  
 	
 
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)

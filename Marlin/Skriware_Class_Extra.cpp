@@ -61,7 +61,9 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
               if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0 &&  e > 0.0){
                 E_fade_applied[active_extruder] = false;
                 E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
+                #ifdef SKRIWARE_DEBUG
                 SERIAL_ECHOLN("END O E_FADE");
+                #endif
               }
           if(de_gcode < 0){
             Retracted_filament[active_extruder] -= de_gcode;    //Retract monitoring

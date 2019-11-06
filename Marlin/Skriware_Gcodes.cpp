@@ -17,14 +17,18 @@ void gcode_M57(){
 }
 void gcode_M58(){
   #ifdef START_GCODE_EXTRUSION_CORRECTION
+        #ifdef SKRIWARE_DEBUG
         SERIAL_ECHOLN("Saving Retracts after start gcode:");
+        #endif
         for(byte yy = 0; yy < EXTRUDERS; yy++){
         Planner::Retraction_from_start_gcode[yy] = Planner::Retracted_filament[yy];
         Planner::Retract_menagement[yy] = 1;
+        #ifdef SKRIWARE_DEBUG
         SERIAL_ECHO("E");
         SERIAL_ECHO(yy*1);
         SERIAL_ECHO(":");
         SERIAL_ECHOLN(Planner::Retracted_filament[yy]);
+        #endif
         }  
         Planner::nLayer = 0;
         Planner::last_new_layer_z = 0.0;
@@ -37,14 +41,18 @@ void gcode_M59(){
             Planner::Retract_menagement[tt] = 0;
             Planner::Retraction_from_start_gcode[tt] = 0.0;
           }
+          #ifdef SKRIWARE_DEBUG
           SERIAL_ECHOLN("E Fade disabled");
+          #endif
   #endif
 }
 void gcode_M60(){
   #ifdef E_FADE
     if(planner.z_fade_height != 0.0){
         Planner::use_e_fade = true;
+        #ifdef SKRIWARE_DEBUG
         SERIAL_ECHOLN("E Fade enabled");
+        #endif
       }
           Planner::dz_gcode = 0.0;
           Planner::de_real = 0.0;
@@ -84,7 +92,7 @@ void gcode_M62(){
           filament_binary_sensor_E1_on = false;
         }
          #endif
-         #ifdef OPTICAL_SENSOR
+        #ifdef OPTICAL_SENSOR
          optical_sensor_on = false;
          SERIAL_ECHOLN("OPTICAL SENSOR OFF");
         #endif

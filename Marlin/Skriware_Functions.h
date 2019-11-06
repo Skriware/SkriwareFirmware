@@ -15,6 +15,7 @@ void Set_up_Time(int time);
 void extruder_swap(uint8_t tmp_extruder,uint8_t active);
 void optical_sensor_check();
 void binary_sensor_check();
+void filament_sensor_check();
 void g92_efade(bool didE);
 void g92_retraction_controll(float *v);
 void Skriware_Init();

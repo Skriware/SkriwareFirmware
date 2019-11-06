@@ -355,7 +355,9 @@ void g92_retraction_controll(float *v){
  
   if(Planner::Retract_menagement[active_extruder] == 2)Planner::Retracted_filament[active_extruder] = 0.0;
   if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retracted_filament[active_extruder] > 0.00001 && *v == 0.0){       //ukikoza
-     SERIAL_ECHOLN("RETRACTION CONTROLL!");
+     #ifdef SKRIWARE_DEBUG
+      SERIAL_ECHOLN("RETRACTION CONTROLL!");
+     #endif
     *v = -Planner::Retracted_filament[active_extruder];
     Planner::last_e_gcode[active_extruder] = *v;
     Planner::e_real[active_extruder] = *v;
@@ -370,15 +372,17 @@ void Skriware_Init(){
     fil_sens = new Filament_Sensor(15);
     fil_sens->Init();
    // put your setup code here, to run once:
+    #ifdef OPTICAL_SENSOR
     fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
     fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
     fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);
     fil_sens->set_resolution(0xFF,0xFF);
-       if( fil_sens->upload_config()){
+    if( fil_sens->upload_config()){
       SERIAL_ECHOLN("SENSOR OK!");
      }else{
       SERIAL_ECHOLN("SENSOR_FAIL!");
      }
+     #endif
      pinMode(27,INPUT_PULLUP);
   if(!Stepper::Software_Invert){
     if(checkTestPin(27)){
@@ -392,6 +396,13 @@ void Skriware_Init(){
   SERIAL_ECHOLN(stepper.Software_Invert);
 }
 
+void filament_sensor_check(){
+  #ifdef OPTICAL_SENSOR
+    optical_sensor_check();
+  #else
+    binary_sensor_check();
+  #endif
+}
 
 /************* Correction for ABL *************************
 void bilinear_line_to_destination(float fr_mm_s){       
