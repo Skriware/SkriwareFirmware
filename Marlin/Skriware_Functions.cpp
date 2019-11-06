@@ -10,7 +10,9 @@
 extern void prepare_move_to_destination();
 extern float destination[XYZE];
 extern float home_offset[XYZ];
-extern Servo servo[NUM_SERVOS];
+#ifdef MOVING_EXTRUDER
+  extern Servo servo[NUM_SERVOS];
+#endif
 extern float current_position[XYZE];
 extern float feedrate_mm_s;
 extern void sync_plan_position_kinematic();
@@ -382,6 +384,9 @@ void Skriware_Init(){
      }else{
       SERIAL_ECHOLN("SENSOR_FAIL!");
      }
+     #else
+     pinMode(FILAMENT_JAM_SENSOR_PIN_E0,INPUT);
+     pinMode(FILAMENT_JAM_SENSOR_PIN_E1,INPUT);
      #endif
      pinMode(27,INPUT_PULLUP);
   if(!Stepper::Software_Invert){
@@ -402,6 +407,16 @@ void filament_sensor_check(){
   #else
     binary_sensor_check();
   #endif
+}
+
+void zero_bed_levelig_grid(){
+for(byte yy = 0 ; yy < GRID_MAX_POINTS_Y; yy++){
+    for(byte xx = 0; xx < GRID_MAX_POINTS_X; xx++){
+        z_values[xx][yy] = 0.0;      
+    }
+}
+bilinear_grid_spacing[X_AXIS] = (RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSITION) / (GRID_MAX_POINTS_X - 1);
+bilinear_grid_spacing[Y_AXIS] = (BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (GRID_MAX_POINTS_X - 1);
 }
 
 /************* Correction for ABL *************************

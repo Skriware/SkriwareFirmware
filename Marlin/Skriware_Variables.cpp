@@ -3,8 +3,12 @@
 	
     bool Matrix_calibration_corruption = false; // bilinear_z_offset and g29- implementation
 
+    
+    #ifdef MOVING_EXTRUDER      				
+	OneWire  *ds;
+	bool servo_extruder = false;
     #if HAS_HOME_OFFSET
-	 float home_offset_E1 = 0.0;    				//MOVING EXTRUDER HOME OFFSET CHANGE
+     float home_offset_E1 = 0.0;                    //MOVING EXTRUDER HOME OFFSET CHANGE
      float home_offset_E0 = 0.0;
      byte servo_up_pos = SERVO_POS_UP;
      byte servo_down_pos = SERVO_POS_DOWN;
@@ -17,14 +21,11 @@
      float dY_change =  0.0;
      float dX_change =  0.0;
      bool extruder_up = true;
-    #ifdef MOVING_EXTRUDER      				
-	OneWire  *ds;
-	bool servo_extruder = false;
 	#endif
     #endif
 
+    Filament_Sensor *fil_sens;                  // Optical Filament sensor
     #ifdef OPTICAL_SENSOR
-    Filament_Sensor *fil_sens;					// Optical Filament sensor
     int C_time = 0.0;
     int NM =0;
     byte tmp;

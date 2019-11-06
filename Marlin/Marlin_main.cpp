@@ -4983,7 +4983,7 @@ void home_all_axes() { gcode_G28(true); }
                 ;
 
     // Don't allow auto-leveling without homing first
-    if (axis_unhomed_error()) return;
+    if (!parser.seen('R') && !parser.seen('W') && axis_unhomed_error()) return;   //Skriware
 
     if (!no_action && planner.leveling_active && parser.boolval('O')) { // Auto-level only if needed
       #if ENABLED(DEBUG_LEVELING_FEATURE)
@@ -5090,6 +5090,11 @@ void home_all_axes() { gcode_G28(true); }
       #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
 
         const bool seen_w = parser.seen('W');
+        if(parser.seen('R')){						//Skriare
+          		zero_bed_levelig_grid();
+          		SERIAL_ECHOLN("Grid reset");
+         	return;
+         }
         if (seen_w) {
           if (!leveling_is_valid()) {
             SERIAL_ERROR_START();
@@ -9761,10 +9766,10 @@ inline void gcode_M205() {
    * ***              In the next 1.2 release, it will simply be disabled by default.
    */
   inline void gcode_M206() {
-    if (parser.seen('E')) home_offset_E1 = parser.value_linear_units();
     #ifdef MOVING_EXTRUDER
-    	if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
-    #endif
+    if (parser.seen('E')) home_offset_E1 = parser.value_linear_units(); 
+    if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
+   #endif
     LOOP_XYZ(i)
       if (parser.seen(axis_codes[i]))
         set_home_offset((AxisEnum)i, parser.value_linear_units());
@@ -13373,7 +13378,9 @@ void process_parsed_command() {
     break;
 
     case 'T': 
+    #ifdef MOVING_EXTRUDER
     tmp = active_extruder;
+    #endif
     gcode_T(parser.codenum); 
     #ifdef MOVING_EXTRUDER
       extruder_swap(parser.codenum,tmp);      //Skriware

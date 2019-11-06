@@ -19,5 +19,6 @@ void filament_sensor_check();
 void g92_efade(bool didE);
 void g92_retraction_controll(float *v);
 void Skriware_Init();
+void zero_bed_levelig_grid();
 
 #endif

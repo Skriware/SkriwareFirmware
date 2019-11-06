@@ -288,7 +288,7 @@
 
 #define START_GCODE_EXTRUSION_CORRECTION
 
-#define MOVING_EXTRUDER
+//#define MOVING_EXTRUDER
 //Moving extruder variables:
 #ifdef MOVING_EXTRUDER
 #define HAS_SERVO
@@ -307,7 +307,7 @@
 /***************************************************************************************/
 
 /**************************** FILAMENT SENSORS *****************************************/
-#define OPTICAL_SENSOR
+//#define OPTICAL_SENSOR
 #ifdef OPTICAL_SENSOR
 	#define OPTICAL_SENSOR_INT_TIME 500
 	#define OPTICAL_SENSOR_MEASUREMENT_TIME 100

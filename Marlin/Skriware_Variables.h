@@ -24,8 +24,7 @@
     extern OneWire  *ds;
 	extern bool servo_extruder;
     #endif
-    #ifdef OPTICAL_SENSOR
-    extern Filament_Sensor *fil_sens;					//Filament sensor
+        extern Filament_Sensor *fil_sens;					//Filament sensor
     	extern int C_time;
     	extern int NM;
     	extern byte tmp;
@@ -34,7 +33,7 @@
     	extern byte fil_alarm_counter_error_level;
         extern bool optical_sensor_on;
         extern float sensor_noise_offset;
-    #endif
+    
 
      #ifdef EXT_CHEACKSTATION
      	extern float Z_start;
