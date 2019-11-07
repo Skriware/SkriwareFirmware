@@ -179,8 +179,7 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
     if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
        planner.synchronize();
        Extruder_Up();
-       
-        while (PENDING(millis(), extruder_change_time_offset )) idle();
+       while (PENDING(millis(), extruder_change_time_offset )) idle();
        delay(extruder_change_time_offset);
        current_position[Z_AXIS] += home_offset_E0 - home_offset[Z_AXIS];
        home_offset[Z_AXIS] = home_offset_E0;

@@ -33,6 +33,8 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     EEPROM_WRITE(Y_change);
     EEPROM_WRITE(dY_change);
     EEPROM_WRITE(dX_change);
+    #endif
+    #ifdef OPTICAL_SENSOR
     EEPROM_WRITE(sensor_noise_offset);
     #endif
 
@@ -48,7 +50,7 @@ if(sk_eeprom_verison > 55){
     EEPROM_READ(A_calibration_param);
     EEPROM_READ(B_calibration_param);
     EEPROM_READ(C_calibration_param);
-    EEPROM_READ(D_calibration_param);
+    EEPROM_READ(D_calibration_param);               //1.2.0 version
 }
 if(sk_eeprom_verison > 56){             //For new versions
     #ifdef MOVING_EXTRUDER
@@ -64,9 +66,14 @@ if(sk_eeprom_verison > 56){             //For new versions
     EEPROM_READ(Y_change);
     EEPROM_READ(dY_change);
     EEPROM_READ(dX_change);
-    EEPROM_READ(sensor_noise_offset);
     #endif
 }
+
+    #ifdef OPTICAL_SENSOR
+    EEPROM_READ(sensor_noise_offset);
+    #endif
+    
+
 
 }
 
