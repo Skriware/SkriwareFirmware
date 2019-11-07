@@ -109,6 +109,7 @@ void gcode_M63(){
     #endif
     #ifdef OPTICAL_SENSOR
         fil_alarm_counter = 0;
+        sensor_alarm = false;
     #endif
 }
 
@@ -139,6 +140,8 @@ void gcode_M65(){
       if (parser.seen('M')) fil_sens->set_measurement_time(parser.value_linear_units());
       if (parser.seen('T')) fil_alarm_counter_error_level = parser.value_linear_units();
       if (parser.seen('O')) sensor_noise_offset = parser.value_linear_units();
+      if (parser.seen('X')) sensor_orientation = 0;
+      if (parser.seen('Y')) sensor_orientation = 1;
     #endif
 }
 void gcode_M66(){

@@ -285,7 +285,13 @@ void optical_sensor_check(){
        if(optical_sensor_on && millis()-Fil_sens_check_time > 500){
         Fil_sens_check_time = millis();
         fil_sens->readData();
-          float r_speed = fil_sens->readSpeed_Y();
+          float r_speed;
+if (sensor_orientation == 0)
+{
+  r_speed = fil_sens->readSpeed_Y();
+} else{
+  r_speed = fil_sens->readSpeed_X();
+}         
          #ifdef SENSOR_DEBUG
           SERIAL_ECHO("SENSOR_DEBUG:");
           SERIAL_ECHO(millis());
@@ -297,7 +303,11 @@ void optical_sensor_check(){
         if(active_extruder == 0 && abs(Stepper::current_extruder_speed) > 0.0001 && abs(r_speed) < sensor_noise_offset){
           fil_alarm_counter++;
           if(fil_alarm_counter == fil_alarm_counter_error_level){
-          SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+          if(!sensor_alarm){
+            SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
+            sensor_alarm = true;
+          }
+
           fil_alarm_counter = 0;
           }
         }else{

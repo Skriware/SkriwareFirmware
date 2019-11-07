@@ -65,6 +65,8 @@ if(sk_eeprom_verison > 56){             //For new versions
     EEPROM_READ(dY_change);
     EEPROM_READ(dX_change);
     EEPROM_READ(sensor_noise_offset);
+    EEPROM_READ(sensor_orientation);
+  
     #endif
 }
 
@@ -86,6 +88,7 @@ void MarlinSettings::reset_eeprom_sk2(){
         dY_change = 0.0;
         dX_change = 0.0;
         sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET;
+        sensor_orientation = OPTICAL_SENSOR_ORIENTATION;
     #endif
     A_calibration_param = 0.0;
     B_calibration_param = 0.0;
