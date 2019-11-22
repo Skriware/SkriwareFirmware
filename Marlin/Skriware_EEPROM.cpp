@@ -67,12 +67,13 @@ if(sk_eeprom_verison > 56){             //For new versions
     EEPROM_READ(dY_change);
     EEPROM_READ(dX_change);
     #endif
-}
-
     #ifdef OPTICAL_SENSOR
     EEPROM_READ(sensor_noise_offset);
     #endif
     
+}
+
+   
 
 
 }
