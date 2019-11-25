@@ -34,6 +34,7 @@
 
 
 /************************** Z PROBE **************************************************/
+
 #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 #define FIX_MOUNTED_PROBE
 
@@ -251,7 +252,9 @@
 	//#define USE_ZMAX_PLUG 
 	#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 800,2070, 204}     
 	#define DEFAULT_MAX_FEEDRATE          {1000, 1000, 1000, 100} 
-	#define Z_MIN_POS -200   
+	#define Z_MIN_POS -200
+  #define Z_MIN_ENDSTOP_INVERTING false   
+  #define Z_MIN_PROBE_ENDSTOP_INVERTING false
 	//#define Z_HOME_DIR -1 
 #endif
 

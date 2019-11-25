@@ -205,7 +205,7 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
     destination[Z_AXIS] = Z_dist;
     prepare_move_to_destination();
     planner.synchronize();
-    Z_dist += 0.001;
+    Z_dist += 0.1;
   }
   SERIAL_ECHO(c);
   SERIAL_ECHO("1 [mm*1000]: ");
@@ -216,11 +216,11 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
     planner.synchronize();
      Extruder_Down();
      Z_dist = Z_start;
-  while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
+  while(!checkTestPin(15)){        ///going up with the table, till it touches the nozzle
     destination[Z_AXIS] = Z_dist;
     prepare_move_to_destination();
     planner.synchronize();
-    Z_dist += 0.001;
+    Z_dist += 0.1;
   }                               
   SERIAL_ECHO(c);
   SERIAL_ECHO("2 [mm*1000]: ");
