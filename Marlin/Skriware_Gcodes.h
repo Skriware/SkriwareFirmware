@@ -1,5 +1,6 @@
 #ifndef SK_G
 #define SK_G
+#include "MarlinConfig.h"
 #include "Skriware_Variables.h"
 #include "Skriware_Functions.h"
 #include "parser.h"

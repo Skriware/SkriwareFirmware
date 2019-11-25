@@ -93,6 +93,9 @@ void MarlinSettings::reset_eeprom_sk2(){
         Y_change = 0.0;
         dY_change = 0.0;
         dX_change = 0.0;
+    #endif
+
+    #ifdef OPTICAL_SENSOR
         sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET;
     #endif
     A_calibration_param = 0.0;

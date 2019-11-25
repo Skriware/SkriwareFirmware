@@ -196,13 +196,13 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
    Extruder_Down(); 
   for(int c = 0; c < N_Cycles; c++){
      
-    destination[X_AXIS] = Z_start;
+    destination[Z_AXIS] = Z_start;
     prepare_move_to_destination();
     planner.synchronize();
      Extruder_Up();
     float Z_dist = Z_start;
   while(!checkTestPin(15)){        ///going up with the table, till it touches the nozzle
-    destination[X_AXIS] = Z_dist;
+    destination[Z_AXIS] = Z_dist;
     prepare_move_to_destination();
     planner.synchronize();
     Z_dist += 0.001;
@@ -211,13 +211,13 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
   SERIAL_ECHO("1 [mm*1000]: ");
   SERIAL_ECHOLN(Z_dist*1000);   ////Reporting the distance to PC   
      
-    destination[X_AXIS] = Z_start;
+    destination[Z_AXIS] = Z_start;
     prepare_move_to_destination();
     planner.synchronize();
      Extruder_Down();
      Z_dist = Z_start;
   while(!checkTestPin(2)){        ///going up with the table, till it touches the nozzle
-    destination[X_AXIS] = Z_dist;
+    destination[Z_AXIS] = Z_dist;
     prepare_move_to_destination();
     planner.synchronize();
     Z_dist += 0.001;
@@ -233,7 +233,7 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
 void Set_Extruder_Type(byte TYPE){
       if(TYPE == 3){
         servo[0].detach();
-        servo[0].attach(4);
+        servo[0].attach(40);
         servo_extruder = true;
         Extruder_Up();
       }else if(TYPE != 0 && TYPE != 4){
@@ -370,10 +370,11 @@ void Skriware_Init(){
     Set_Extruder_Type(extruder_type);         //ukikoza
     Set_up_Time(up_delay);
     #endif
-    fil_sens = new Filament_Sensor(15);
-    fil_sens->Init();
+   
    // put your setup code here, to run once:
     #ifdef OPTICAL_SENSOR
+    fil_sens = new Filament_Sensor(15);
+    fil_sens->Init();
     fil_sens->set_measurement_time(OPTICAL_SENSOR_MEASUREMENT_TIME);
     fil_sens->set_integration_time(OPTICAL_SENSOR_INT_TIME);
     fil_sens->set_readout_to_mean(OPTICAL_SENSOR_N_TO_MEAN);

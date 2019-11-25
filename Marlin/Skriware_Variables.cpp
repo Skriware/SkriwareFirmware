@@ -21,25 +21,27 @@
      float dY_change =  0.0;
      float dX_change =  0.0;
      bool extruder_up = true;
-	#endif
+	 byte tmp;
     #endif
 
-    Filament_Sensor *fil_sens;                  // Optical Filament sensor
+    #endif
+    
+    
     #ifdef OPTICAL_SENSOR
-    int C_time = 0.0;
-    int NM =0;
-    byte tmp;
-    long Fil_sens_check_time = 0.0;
-    byte fil_alarm_counter = 0;
-    byte fil_alarm_counter_error_level = OPTICAL_SENSOR_ERROR_LEVEL;
-    float sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET;
-    bool optical_sensor_on  = true;
+        int C_time = 0.0;
+        Filament_Sensor *fil_sens;                  // Optical Filament sensor
+        long Fil_sens_check_time = 0.0;
+        byte fil_alarm_counter = 0;
+        byte fil_alarm_counter_error_level = OPTICAL_SENSOR_ERROR_LEVEL;
+        float sensor_noise_offset = OPTICAL_SENSOR_NOISE_OFFSET;
+        bool optical_sensor_on  = true;
     #endif
 
-     #ifdef EXT_CHEACKSTATION
+     #ifdef EXT_CHECKSTATION
      	float Z_start = 0.0;
         float Z_up = 0.0;
         float Z_down = 0.0;
+        int NM = 0;
      #endif
     float A_calibration_param = 0.0;
     float B_calibration_param = 0.0;

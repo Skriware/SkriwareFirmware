@@ -4,8 +4,8 @@ void gcode_M57(){
         if (parser.seen('S')) Z_start = parser.value_float();
         if (parser.seen('N')) NM = parser.value_linear_units();
         Z_distance_Test(Z_start,NM);
-        break;
-        #else
+
+#else
          if(parser.seen('E')){
             invert_E0();
          }else{
@@ -13,7 +13,7 @@ void gcode_M57(){
          }
          if(parser.seen('S')) stepper.Software_Invert = 1;
          if(parser.seen('R')) stepper.Software_Invert = 0;
-         #endif
+#endif
 }
 void gcode_M58(){
   #ifdef START_GCODE_EXTRUSION_CORRECTION

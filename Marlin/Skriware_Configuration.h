@@ -245,14 +245,14 @@
 /***************************************************************************************/
 
 /*********************************EXTRUDER CHECKSTATIOB ********************************/
-//#define EXT_CHECKSTATION
+#define EXT_CHECKSTATION
 #ifdef EXT_CHECKSTATION
 	#define EXTRUDE_MINTEMP -30 
-	#define USE_ZMAX_PLUG 
-	#define DEFAULT_AXIS_STEPS_PER_UNIT   { 2070, 80, 800, 204}     
-	#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 1000, 100 } 
+	//#define USE_ZMAX_PLUG 
+	#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 800,2070, 204}     
+	#define DEFAULT_MAX_FEEDRATE          {1000, 1000, 1000, 100} 
 	#define Z_MIN_POS -200   
-	#define Z_HOME_DIR 1 
+	//#define Z_HOME_DIR -1 
 #endif
 
 
@@ -288,7 +288,7 @@
 
 #define START_GCODE_EXTRUSION_CORRECTION
 
-//#define MOVING_EXTRUDER
+#define MOVING_EXTRUDER
 //Moving extruder variables:
 #ifdef MOVING_EXTRUDER
 #define HAS_SERVO
