@@ -1358,6 +1358,8 @@ void Planner::check_axes_activity() {
       skew(rx, ry, rz);
     #endif
       float gcode_z = rz + home_offset[Z_AXIS];
+    SERIAL_ECHO("RAW_Z:");
+    SERIAL_ECHOLN(rz);
     efade_and_retract_control_calculation(gcode_z,e,rx,ry);    //Skriware
     if (!leveling_active) return;
 

@@ -3,6 +3,12 @@
 
 //#define SKRIWARE_DEBUG
 
+//MAIN SKRIWARE SETTINGS:
+
+//#define MOVING_EXTRUDER
+//#define OPTICAL_SENSOR
+//#define EXT_CHECKSTATION
+
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
 
@@ -246,16 +252,17 @@
 /***************************************************************************************/
 
 /*********************************EXTRUDER CHECKSTATIOB ********************************/
-#define EXT_CHECKSTATION
 #ifdef EXT_CHECKSTATION
+  #define MOVING_EXTRUDER
 	#define EXTRUDE_MINTEMP -30 
 	//#define USE_ZMAX_PLUG 
-	#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 800,2070, 204}     
+	#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 800,2560,204}     
 	#define DEFAULT_MAX_FEEDRATE          {1000, 1000, 1000, 100} 
 	#define Z_MIN_POS -200
   #define Z_MIN_ENDSTOP_INVERTING false   
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false
-	//#define Z_HOME_DIR -1 
+	#define INVERT_X_DIR true
+  #define Z_HOMING_HEIGHT 0
 #endif
 
 
@@ -291,18 +298,17 @@
 
 #define START_GCODE_EXTRUSION_CORRECTION
 
-#define MOVING_EXTRUDER
 //Moving extruder variables:
 #ifdef MOVING_EXTRUDER
-#define HAS_SERVO
-#define NUM_SERVOS 1
-#define SERVO_DELAY {300}
-#define SERVO_POS_DOWN 80
-#define SERVO_POS_UP   33
-#define MOTOR_UP_TIME 2000
-#define EXT_CHANGE_TIME_OFFSET 500
-#define DEF_EXTRDER_TYPE 0
-#define Y_MIN_POS -10
+  #define HAS_SERVO
+  #define NUM_SERVOS 1
+  #define SERVO_DELAY {300}
+  #define SERVO_POS_DOWN 80
+  #define SERVO_POS_UP   33
+  #define MOTOR_UP_TIME 2000
+  #define EXT_CHANGE_TIME_OFFSET 500
+  #define DEF_EXTRDER_TYPE 0
+  #define Y_MIN_POS -10
 #endif
 
 
@@ -310,7 +316,6 @@
 /***************************************************************************************/
 
 /**************************** FILAMENT SENSORS *****************************************/
-//#define OPTICAL_SENSOR
 #ifdef OPTICAL_SENSOR
 	#define OPTICAL_SENSOR_INT_TIME 500
 	#define OPTICAL_SENSOR_MEASUREMENT_TIME 100

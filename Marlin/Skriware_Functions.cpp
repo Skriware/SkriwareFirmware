@@ -22,7 +22,7 @@ extern void report_current_position();
 
 
 void set_to_print_Z(){ 
-  destination[Z_AXIS] = Planner::last_new_layer_z;
+  destination[Z_AXIS] = Planner::last_new_layer_z - home_offset[Z_AXIS];
   prepare_move_to_destination();
 }
 
@@ -205,7 +205,7 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
     destination[Z_AXIS] = Z_dist;
     prepare_move_to_destination();
     planner.synchronize();
-    Z_dist += 0.1;
+    Z_dist += 0.005;
   }
   SERIAL_ECHO(c);
   SERIAL_ECHO("1 [mm*1000]: ");
@@ -220,7 +220,7 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
     destination[Z_AXIS] = Z_dist;
     prepare_move_to_destination();
     planner.synchronize();
-    Z_dist += 0.1;
+    Z_dist += 0.005;
   }                               
   SERIAL_ECHO(c);
   SERIAL_ECHO("2 [mm*1000]: ");
@@ -233,7 +233,7 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
 void Set_Extruder_Type(byte TYPE){
       if(TYPE == 3){
         servo[0].detach();
-        servo[0].attach(40);
+        servo[0].attach(4);
         servo_extruder = true;
         Extruder_Up();
       }else if(TYPE != 0 && TYPE != 4){

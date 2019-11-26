@@ -52,7 +52,7 @@
 #endif
 #endif
 //#define DEBUG_E_FADE
-//#define LAYER_DEBUG
+#define LAYER_DEBUG
 void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &lx, float &ly){
 	#ifdef E_FADE
    float tmp[XYZ] = { lx, ly, 0 };
@@ -136,6 +136,10 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
           }
           last_e_gcode[active_extruder] = e;
   }
+  #ifdef LAYER_DEBUG
+      SERIAL_ECHO("lZ:");
+      SERIAL_ECHOLN(lz);
+  #endif
     #endif
 }
 
@@ -146,8 +150,9 @@ void Planner::apply_efade_above_fade_high(float &e){
             #ifdef DEBUG_E_FADE
               SERIAL_ECHO("E_G: ");
               SERIAL_ECHOLN(e);
-              SERIAL_ECHO("E_R: ");
+              SERIAL_ECHO("E_R: "); 
             #endif 
+
             if(use_e_fade){
               if(E_fade_applied[active_extruder]){
                   e = e_real[active_extruder];

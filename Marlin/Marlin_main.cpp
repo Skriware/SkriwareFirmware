@@ -4408,7 +4408,8 @@ inline void gcode_G28(const bool always_home_all) {
 
 #ifdef MOVING_EXTRUDER
     Extruder_Up();      //Skriware
-#endif             
+#endif
+	tool_change(0,0.0,true);// Skriware            
 
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) {
@@ -9766,7 +9767,7 @@ inline void gcode_M205() {
    * ***              In the next 1.2 release, it will simply be disabled by default.
    */
   inline void gcode_M206() {
-    #ifdef MOVING_EXTRUDER
+   #ifdef MOVING_EXTRUDER
     if (parser.seen('E')) home_offset_E1 = parser.value_linear_units(); 
     if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
    #endif
@@ -12705,9 +12706,10 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
           #endif
 
           // The newly-selected extruder XY is actually at...
+         if(!no_move){								//Skriware
           current_position[X_AXIS] += xdiff;
           current_position[Y_AXIS] += ydiff;
-
+      	 }
           // Set the new active extruder
           active_extruder = tmp_extruder;
 
@@ -12740,6 +12742,7 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
           #endif
           // Move back to the original (or tweaked) position
           do_blocking_move_to(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS]);
+
           #if ENABLED(DUAL_X_CARRIAGE)
             active_extruder_parked = false;
           #endif
