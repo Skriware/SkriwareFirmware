@@ -12632,11 +12632,12 @@ inline void invalid_extruder_error(const uint8_t e) {
  */
 void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool no_move/*=false*/) {
   planner.synchronize();
-
+  								//EXTRUDER SWAP DEBUG
   #if HAS_LEVELING
     // Set current position to the physical position
     const bool leveling_was_active = planner.leveling_active;
-    set_bed_leveling_enabled(false);
+    set_bed_leveling_enabled(false); //Skriware
+
   #endif
 
   #if ENABLED(MIXING_EXTRUDER) && MIXING_VIRTUAL_TOOLS > 1
@@ -12742,7 +12743,6 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
           #endif
           // Move back to the original (or tweaked) position
           do_blocking_move_to(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS]);
-
           #if ENABLED(DUAL_X_CARRIAGE)
             active_extruder_parked = false;
           #endif

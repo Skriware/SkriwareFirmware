@@ -1,7 +1,10 @@
 #ifndef SK_CONFIG
 #define SK_CONFIG
 
+//Debug settings:
 //#define SKRIWARE_DEBUG
+//#define DEBUG_E_FADE
+//#define LAYER_DEBUG
 
 //MAIN SKRIWARE SETTINGS:
 
@@ -257,12 +260,14 @@
 	#define EXTRUDE_MINTEMP -30 
 	//#define USE_ZMAX_PLUG 
 	#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 800,2560,204}     
-	#define DEFAULT_MAX_FEEDRATE          {1000, 1000, 1000, 100} 
+	#define DEFAULT_MAX_FEEDRATE          {1000, 1000, 500, 100}
+  #define DEFAULT_MAX_ACCELERATION      {100,100, 50, 1500} 
 	#define Z_MIN_POS -200
   #define Z_MIN_ENDSTOP_INVERTING false   
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false
 	#define INVERT_X_DIR true
   #define Z_HOMING_HEIGHT 0
+  #undef COREXY
 #endif
 
 

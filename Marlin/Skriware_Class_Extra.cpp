@@ -52,13 +52,13 @@
 #endif
 #endif
 //#define DEBUG_E_FADE
-#define LAYER_DEBUG
+//#define LAYER_DEBUG
 void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &lx, float &ly){
 	#ifdef E_FADE
    float tmp[XYZ] = { lx, ly, 0 };
 	if(use_e_fade){
                de_gcode = e-last_e_gcode[active_extruder];
-              if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && Retracted_filament[active_extruder] == 0.0 &&  e > 0.0){
+              if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && (Retracted_filament[active_extruder] == 0.0 || de_gcode > Retracted_filament[active_extruder]) &&  e > 0.0){
                 E_fade_applied[active_extruder] = false;
                 E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
                 #ifdef SKRIWARE_DEBUG
@@ -136,10 +136,11 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
           }
           last_e_gcode[active_extruder] = e;
   }
-  #ifdef LAYER_DEBUG
+  /*#ifdef LAYER_DEBUG
       SERIAL_ECHO("lZ:");
       SERIAL_ECHOLN(lz);
   #endif
+  */
     #endif
 }
 

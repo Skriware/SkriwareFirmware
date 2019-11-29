@@ -1357,9 +1357,7 @@ void Planner::check_axes_activity() {
     #if ENABLED(SKEW_CORRECTION)
       skew(rx, ry, rz);
     #endif
-      float gcode_z = rz + home_offset[Z_AXIS];
-    SERIAL_ECHO("RAW_Z:");
-    SERIAL_ECHOLN(rz);
+    float gcode_z = rz + home_offset[Z_AXIS];
     efade_and_retract_control_calculation(gcode_z,e,rx,ry);    //Skriware
     if (!leveling_active) return;
 
@@ -1398,9 +1396,7 @@ void Planner::check_axes_activity() {
           fade_scaling_factor ? fade_scaling_factor * bilinear_z_offset(raw) : 0.0
         #endif
       );
-
       fade_scaling_factor ? apply_efade_below_fade_high(e) : apply_efade_above_fade_high(e);    //Skriware
-
     #endif
   }
 

@@ -47,6 +47,7 @@ void Extruder_Up(){
       if(extruder_type == 3){
         servo[0].write(servo_up_pos);
       }else if(extruder_type == 4 && !extruder_up){
+        #ifndef EXT_CHECKSTATION 
         float tmp_f = feedrate_mm_s;
         float tmp_X = current_position[X_AXIS];
         float tmp_Y = current_position[Y_AXIS];
@@ -75,6 +76,11 @@ void Extruder_Up(){
          prepare_move_to_destination();
          planner.synchronize();
          feedrate_mm_s = tmp_f;
+         #else
+         destination[X_AXIS] = X_up_pos;
+         prepare_move_to_destination();
+         planner.synchronize();
+         #endif
          extruder_up = true;
       }else if(extruder_type != 0 && extruder_type != 4){
         bool done = false;
@@ -106,6 +112,7 @@ void Extruder_Down(){
      if(extruder_type == 3){
       servo[0].write(servo_down_pos);
      }else if(extruder_type == 4 && extruder_up){
+      #ifndef EXT_CHECKSTATION
          float tmp_f = feedrate_mm_s;
         float tmp_X = current_position[X_AXIS];
         float tmp_Y = current_position[Y_AXIS];
@@ -134,6 +141,11 @@ void Extruder_Down(){
          prepare_move_to_destination();
          planner.synchronize();
          feedrate_mm_s = tmp_f;
+         #else
+         destination[X_AXIS] = X_down_pos;
+         prepare_move_to_destination();
+         planner.synchronize();
+         #endif
           extruder_up = false;
      }else if(extruder_type != 0 && extruder_type != 4){
        bool done = false;
@@ -354,7 +366,11 @@ void g92_efade(bool didE){
 
 void g92_retraction_controll(float *v){
  
-  if(Planner::Retract_menagement[active_extruder] == 2)Planner::Retracted_filament[active_extruder] = 0.0;
+/*  if(Planner::Retract_menagement[active_extruder] == 2 && *v < 0.0001){
+    SERIAL_ECHOLN("RESET RETRACTION!");
+    Planner::Retracted_filament[active_extruder] = 0.0;
+  }
+*/
   if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retracted_filament[active_extruder] > 0.00001 && *v == 0.0){       //ukikoza
      #ifdef SKRIWARE_DEBUG
       SERIAL_ECHOLN("RETRACTION CONTROLL!");
@@ -362,6 +378,7 @@ void g92_retraction_controll(float *v){
     *v = -Planner::Retracted_filament[active_extruder];
     Planner::last_e_gcode[active_extruder] = *v;
     Planner::e_real[active_extruder] = *v;
+    //Planner::Retract_menagement[active_extruder] = 2;
   }
 }
 
