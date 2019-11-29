@@ -12636,7 +12636,7 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
   #if HAS_LEVELING
     // Set current position to the physical position
     const bool leveling_was_active = planner.leveling_active;
-    set_bed_leveling_enabled(false); //Skriware
+    //set_bed_leveling_enabled(false); //Skriware
 
   #endif
 
@@ -12796,7 +12796,7 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_s/*=0.0*/, bool n
 
     #if HAS_LEVELING
       // Restore leveling to re-establish the logical position
-      set_bed_leveling_enabled(leveling_was_active);
+      //set_bed_leveling_enabled(leveling_was_active);
     #endif
 
     SERIAL_ECHO_START();
