@@ -98,4 +98,6 @@
  */
 #define FASTER_GCODE_PARSER
 
+#define EMERGENCY_PARSER
+
 #endif
