@@ -51,7 +51,7 @@ public:
     EP_IGNORE // to '\n'
   };
 
-  static bool killed_by_M112;
+  static bool killed_by_M112,quickstop_byM410;
   static State state;
 
   EmergencyParser() {}
@@ -127,7 +127,7 @@ public:
               killed_by_M112 = true;
               break;
             case EP_M410:
-              quickstop_stepper();
+              quickstop_byM410 = true;    //Skriware
               break;
             default:
               break;

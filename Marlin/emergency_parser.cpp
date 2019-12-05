@@ -33,7 +33,7 @@
 // Static data members
 bool EmergencyParser::killed_by_M112; // = false
 EmergencyParser::State EmergencyParser::state; // = EP_RESET
-
+bool EmergencyParser::quickstop_byM410 = false;
 // Global instance
 EmergencyParser emergency_parser;
 

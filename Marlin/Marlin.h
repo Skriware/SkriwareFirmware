@@ -43,6 +43,9 @@
 #include "fastio.h"
 #include "utility.h"
 #include "serial.h"
+#ifdef EMERGENCY_PARSER
+#include "emergency_parser.h"
+#endif
 
 void idle(
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
