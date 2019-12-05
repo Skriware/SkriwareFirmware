@@ -1459,7 +1459,6 @@ void Planner::quick_stop() {
   // that is why we set head to tail - But there is a race condition that
   // must be handled: The tail could change between the read and the assignment
   // so this must be enclosed in a critical section
-
   const bool was_enabled = STEPPER_ISR_ENABLED();
   if (was_enabled) DISABLE_STEPPER_DRIVER_INTERRUPT();
 
@@ -1536,7 +1535,9 @@ float Planner::get_axis_position_mm(const AxisEnum axis) {
 /**
  * Block until all buffered steps are executed / cleaned
  */
-void Planner::synchronize() { while (has_blocks_queued() || cleaning_buffer_counter) idle(); }
+void Planner::synchronize() { 
+  while (has_blocks_queued() || cleaning_buffer_counter) idle(); 
+}
 
 #if ENABLED(UNREGISTERED_MOVE_SUPPORT)
   #define COUNT_MOVE count_it

@@ -748,7 +748,6 @@ float Temperature::get_pid_output(const int8_t e) {
  *  - Update the heated bed PID output value
  */
 void Temperature::manage_heater() {
-
   #if ENABLED(PROBING_HEATERS_OFF) && ENABLED(BED_LIMIT_SWITCHING)
     static bool last_pause_state;
   #endif
