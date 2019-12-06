@@ -413,6 +413,9 @@ void Skriware_Init(){
         Stepper::E0_inverted = 0;
     }
   }
+
+  pinMode(11,OUTPUT);
+  digitalWrite(11,LOW);
   SERIAL_ECHO("E0 INVERT options:");
   SERIAL_ECHO(stepper.E0_inverted);
   SERIAL_ECHOLN(stepper.Software_Invert);
