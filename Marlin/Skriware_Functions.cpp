@@ -366,11 +366,6 @@ void g92_efade(bool didE){
 
 void g92_retraction_controll(float *v){
  
-/*  if(Planner::Retract_menagement[active_extruder] == 2 && *v < 0.0001){
-    SERIAL_ECHOLN("RESET RETRACTION!");
-    Planner::Retracted_filament[active_extruder] = 0.0;
-  }
-*/
   if(Planner::Retract_menagement[active_extruder] == 1 && Planner::Retracted_filament[active_extruder] > 0.00001 && *v == 0.0){       //ukikoza
      #ifdef SKRIWARE_DEBUG
       SERIAL_ECHOLN("RETRACTION CONTROLL!");
@@ -384,7 +379,7 @@ void g92_retraction_controll(float *v){
 
 void Skriware_Init(){
    #ifdef MOVING_EXTRUDER
-    Set_Extruder_Type(extruder_type);         //ukikoza
+    Set_Extruder_Type(extruder_type);     
     Set_up_Time(up_delay);
     #endif
    
@@ -416,9 +411,11 @@ void Skriware_Init(){
 
   pinMode(11,OUTPUT);
   digitalWrite(11,LOW);
+  #ifdef SKRIWARE_DEBUG
   SERIAL_ECHO("E0 INVERT options:");
   SERIAL_ECHO(stepper.E0_inverted);
   SERIAL_ECHOLN(stepper.Software_Invert);
+  #endif
 }
 
 void filament_sensor_check(){
