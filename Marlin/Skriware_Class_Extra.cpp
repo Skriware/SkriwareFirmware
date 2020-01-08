@@ -61,7 +61,7 @@ void Planner::efade_and_retract_control_calculation(float &lz, float &e, float &
               if(E_fade_applied[active_extruder] && lz > z_fade_height && de_gcode > 0 && (Retracted_filament[active_extruder] == 0.0 || de_gcode > Retracted_filament[active_extruder]) &&  e > 0.0){
                 E_fade_applied[active_extruder] = false;
                 E_fade_extrusion_difference[active_extruder] = e_real[active_extruder] - last_e_gcode[active_extruder];
-                #ifdef SKRIWARE_DEBUG
+                #ifdef DEBUG_E_FADE
                 SERIAL_ECHOLN("END O E_FADE");
                 #endif
               }
@@ -158,7 +158,7 @@ void Planner::apply_efade_above_fade_high(float &e){
               if(E_fade_applied[active_extruder]){
                   e = e_real[active_extruder];
               }else{                      
-                    e+=E_fade_extrusion_difference[active_extruder];
+                  e+=E_fade_extrusion_difference[active_extruder];
               }
             }
             #ifdef DEBUG_E_FADE
