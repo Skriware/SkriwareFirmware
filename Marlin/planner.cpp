@@ -1539,7 +1539,7 @@ void Planner::synchronize() {
   while (has_blocks_queued() || cleaning_buffer_counter) idle(); 
 }
 
-#if ENABLED(UNREGISTERED_MOVE_SUPPORT)
+#if ENABLED(UNREGISTERED_MOVE_SUPPORT) 
   #define COUNT_MOVE count_it
 #else
   #define COUNT_MOVE true

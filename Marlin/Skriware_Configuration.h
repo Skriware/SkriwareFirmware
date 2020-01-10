@@ -8,7 +8,7 @@
 
 //MAIN SKRIWARE SETTINGS:
 
-#define MOVING_EXTRUDER
+//#define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
 //#define EXT_CHECKSTATION
 
@@ -33,8 +33,8 @@
 #define USE_YMIN_PLUG
 #define USE_ZMIN_PLUG
 
-#define X_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Y_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+#define X_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Y_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #define Z_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
@@ -47,8 +47,8 @@
 #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 #define FIX_MOUNTED_PROBE
 
-#define X_PROBE_OFFSET_FROM_EXTRUDER 20  // X offset: -left  +right  [of the nozzle]
-#define Y_PROBE_OFFSET_FROM_EXTRUDER 32  // Y offset: -front +behind [the nozzle]
+#define X_PROBE_OFFSET_FROM_EXTRUDER 0  // X offset: -left  +right  [of the nozzle]
+#define Y_PROBE_OFFSET_FROM_EXTRUDER 0  // Y offset: -front +behind [the nozzle]
 #define Z_PROBE_OFFSET_FROM_EXTRUDER 0   // Z offset: -below +above  [the nozzle]
 
 #define MIN_PROBE_EDGE 5
@@ -59,10 +59,10 @@
 #define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
 
 // Speed for the "accurate" probe of each point
-#define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
+#define Z_PROBE_SPEED_SLOW HOMING_FEEDRATE_Z
 
 // Use double touch for probing
-#define MULTIPLE_PROBING 2
+//#define MULTIPLE_PROBING 1
 
 #define Z_CLEARANCE_DEPLOY_PROBE   0 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
@@ -87,9 +87,9 @@
 
 #define DISABLE_INACTIVE_EXTRUDER true // Keep only the active extruder enabled.
 
-#define INVERT_X_DIR false
-#define INVERT_Y_DIR false
-#define INVERT_Z_DIR false
+#define INVERT_X_DIR true
+#define INVERT_Y_DIR true
+#define INVERT_Z_DIR true
 
 #define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
@@ -152,7 +152,7 @@
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
 #define HEATER_4_MAXTEMP 275
-#define BED_MAXTEMP 150
+#define BED_MAXTEMP 20
 
 #define HEATER_0_MINTEMP 5
 #define HEATER_1_MINTEMP 5
@@ -250,7 +250,7 @@
 #define DEFAULT_EJERK                 5.0
 
 #define HOMING_FEEDRATE_XY (40*60)
-#define HOMING_FEEDRATE_Z  (10*60)
+#define HOMING_FEEDRATE_Z  200
 
 /***************************************************************************************/
 
