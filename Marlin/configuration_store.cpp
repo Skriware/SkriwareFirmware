@@ -908,11 +908,11 @@ void MarlinSettings::postprocess() {
         #else
           0,
         #endif
-        #if Z_SENSORLESS
+        //#if Z_SENSORLESS
           stepperZ.sgt()
-        #else
-          0
-        #endif
+        //#else
+          //0
+        //#endif
       #else
         0
       #endif
@@ -1538,14 +1538,14 @@ void MarlinSettings::postprocess() {
               stepperY2.sgt(tmc_sgt[1]);
             #endif
           #endif
-          #ifdef Z_HOMING_SENSITIVITY
-            #if AXIS_HAS_STALLGUARD(Z)
-              stepperZ.sgt(tmc_sgt[2]);
-            #endif
+          //#ifdef Z_HOMING_SENSITIVITY
+           // #if AXIS_HAS_STALLGUARD(Z)
+              stepperZ.sgt(tmc_sgt[2]); 
+           // #endif
             #if AXIS_HAS_STALLGUARD(Z2)
               stepperZ2.sgt(tmc_sgt[2]);
             #endif
-          #endif
+          //#endif
         }
       #endif
 
@@ -2756,9 +2756,9 @@ void MarlinSettings::reset() {
           #if Y_SENSORLESS
             SERIAL_ECHOPAIR(" Y", stepperY.sgt());
           #endif
-          #if Z_SENSORLESS
+          //#if Z_SENSORLESS
             SERIAL_ECHOPAIR(" Z", stepperZ.sgt());
-          #endif
+          //#endif
           SERIAL_EOL();
         #endif
 
