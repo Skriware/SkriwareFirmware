@@ -2464,14 +2464,10 @@ void clean_up_after_endstop_or_probe_move() {
       probing_pause(true);
     #endif
 
-    #ifdef SENSORLESS_HOMING
-    	tmc_sensorless_homing(stepperZ, true);
-    #endif
+
     // Move down until probe triggered
     do_blocking_move_to_z(z, fr_mm_s);
-    #ifdef SENSORLESS_HOMING
-    	tmc_sensorless_homing(stepperZ, false);
-    #endif
+
     // Check to see if the probe was triggered
     const bool probe_triggered = TEST(endstops.trigger_state(),
       #if ENABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
@@ -3162,7 +3158,7 @@ void clean_up_after_endstop_or_probe_move() {
           #endif
           break;
       #endif
-      //#if Z_SENSORLESS
+      #if Z_SENSORLESS
         case Z_AXIS:
           tmc_sensorless_homing(stepperZ, enable);
           #if CORE_IS_XZ && X_SENSORLESS
@@ -3171,7 +3167,7 @@ void clean_up_after_endstop_or_probe_move() {
             tmc_sensorless_homing(stepperY, enable);
           #endif
           break;
-      //#endif
+      #endif
       default: break;
     }
   }
@@ -3225,7 +3221,6 @@ static void do_homing_move(const AxisEnum axis, const float distance, const floa
     // Disable stealthChop if used. Enable diag1 pin on driver.
     #if ENABLED(SENSORLESS_HOMING)
       sensorless_homing_per_axis(axis);
-      SERIAL_ECHOLN("HOMING SENSORLESS!");
     #endif
   }
 
@@ -11985,7 +11980,7 @@ inline void gcode_M502() {
               #endif
               break;
           #endif
-          //#if Z_SENSORLESS
+          #if Z_SENSORLESS
             case Z_AXIS:
               #if AXIS_HAS_STALLGUARD(Z)
                 if (index < 2) TMC_SET_SGT(Z);
@@ -11994,7 +11989,7 @@ inline void gcode_M502() {
                 if (!(index & 1)) TMC_SET_SGT(Z2);
               #endif
               break;
-          //#endif
+          #endif
         }
       }
 
@@ -12015,14 +12010,14 @@ inline void gcode_M502() {
             TMC_SAY_SGT(Y2);
           #endif
         #endif
-        //#if Z_SENSORLESS
+        #if Z_SENSORLESS
           #if AXIS_HAS_STALLGUARD(Z)
             TMC_SAY_SGT(Z);
           #endif
           #if AXIS_HAS_STALLGUARD(Z2)
             TMC_SAY_SGT(Z2);
           #endif
-        //#endif
+        #endif
       }
     }
   #endif // SENSORLESS_HOMING

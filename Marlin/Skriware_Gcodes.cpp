@@ -159,10 +159,11 @@ void gcode_M66(){
       }
 }
 void gcode_M67(){
-
+    setZ_Offset_TMC();
 }
 void gcode_M68(){
-
+    if(parser.seen('N'))std_norm = parser.value_float();
+    if(parser.seen('S'))SG = parser.value_linear_units();
 }
 void gcode_M69(){
 

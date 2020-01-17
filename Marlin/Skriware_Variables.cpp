@@ -3,7 +3,8 @@
 	
     bool Matrix_calibration_corruption = false; // bilinear_z_offset and g29- implementation
 
-    
+    float std_norm =0.8;
+    byte SG = 30;
     #ifdef MOVING_EXTRUDER      				
 	OneWire  *ds;
 	bool servo_extruder = false;

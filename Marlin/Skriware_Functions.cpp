@@ -439,6 +439,76 @@ bilinear_grid_spacing[X_AXIS] = (RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSIT
 bilinear_grid_spacing[Y_AXIS] = (BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (GRID_MAX_POINTS_X - 1);
 }
 
+void setZ_Offset_TMC(){
+  
+  destination[Z_AXIS] = 5.0;
+  prepare_move_to_destination();
+  planner.synchronize();
+  digitalWrite(Z_ENABLE_PIN, LOW);
+  stepperZ.coolstep_min_speed(1024UL * 1024UL - 1UL);
+  stepperZ.stealthChop(1);
+  stepperZ.diag1_stall(1);
+  stepperZ.sg_stall_value(SG);
+  int TT = 5;
+  long st_mean = 0;
+  int last_mean = 0;
+  long st_mean_sum =0;
+  long Mean_of_Means = 0;
+  long SqareSum = 0;
+  long Standard_dev_of_means = 0;
+  int N = 0;
+  int NM = 0;
+  stepperZ.shaft_dir(1);
+  long Start_time = millis();
+  long step_taken = 0;
+  while(true){
+  digitalWrite(Z_STEP_PIN, HIGH);
+  delayMicroseconds(200);
+  digitalWrite(Z_STEP_PIN, LOW);
+  delayMicroseconds(200);
+  step_taken++;
+  uint32_t ms = millis();
+  static uint32_t last_time = 0;
+  if((ms - last_time) >1){
+   st_mean_sum +=stepperZ.sg_result();
+   N++;
+   TT+=1; 
+   if(TT >100){
+    SERIAL_ECHOLN(st_mean);
+    SERIAL_ECHOLN("ok");
+    TT =0;
+   }
+  }
+  if ((ms - last_time) > 10) {
+    last_mean =st_mean;
+    st_mean = st_mean_sum/N;
+
+    st_mean_sum = 0;
+    N =0;
+    if((Mean_of_Means/NM - st_mean) > Standard_dev_of_means +long(std_norm*Standard_dev_of_means) && step_taken > 400*5){
+      SERIAL_ECHO("Z hit: ");
+      SERIAL_ECHO(step_taken);
+      SERIAL_ECHO(" ");
+      float Z_off = (float)step_taken/400 - 5.0;
+      SERIAL_ECHOLN(Z_off);
+      break;
+  }
+  SqareSum += st_mean*st_mean;
+  Mean_of_Means += st_mean;
+  NM++;
+  Standard_dev_of_means = long(sqrt(SqareSum/NM -Mean_of_Means/NM*Mean_of_Means/NM));
+  last_time = millis();
+  }
+  }
+  stepperZ.shaft_dir(0);
+  for(int step_back = 0; step_back < step_taken;step_back++){
+  digitalWrite(Z_STEP_PIN, HIGH);
+  delayMicroseconds(200);
+  digitalWrite(Z_STEP_PIN, LOW);
+  delayMicroseconds(200);
+  }
+}
+
 /************* Correction for ABL *************************
 void bilinear_line_to_destination(float fr_mm_s){       
      int cx1 = CELL_INDEX(X, current_position[X_AXIS]),
