@@ -441,7 +441,7 @@ bilinear_grid_spacing[Y_AXIS] = (BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSIT
 
 void setZ_Offset_TMC(){
   
-  destination[Z_AXIS] = 5.0;
+  destination[Z_AXIS] = 15.0;
   prepare_move_to_destination();
   planner.synchronize();
   digitalWrite(Z_ENABLE_PIN, LOW);
@@ -463,33 +463,45 @@ void setZ_Offset_TMC(){
   long step_taken = 0;
   while(true){
   digitalWrite(Z_STEP_PIN, HIGH);
-  delayMicroseconds(200);
+  delayMicroseconds(400);
   digitalWrite(Z_STEP_PIN, LOW);
-  delayMicroseconds(200);
+  delayMicroseconds(400);
   step_taken++;
+  if(step_taken%400 == 0){
+    thermalManager.print_heaterstates();
+     SERIAL_EOL();
+  }
   uint32_t ms = millis();
+  if(step_taken > 400){
   static uint32_t last_time = 0;
-  if((ms - last_time) >1){
+  if((ms - last_time) >10){
    st_mean_sum +=stepperZ.sg_result();
    N++;
    TT+=1; 
    if(TT >100){
-    SERIAL_ECHOLN(st_mean);
-    SERIAL_ECHOLN("ok");
+   // SERIAL_ECHOLN(st_mean);
+   // SERIAL_ECHOLN("ok");
     TT =0;
    }
   }
-  if ((ms - last_time) > 10) {
+  if ((ms - last_time) > 50) {
     last_mean =st_mean;
     st_mean = st_mean_sum/N;
-
     st_mean_sum = 0;
     N =0;
-    if((Mean_of_Means/NM - st_mean) > Standard_dev_of_means +long(std_norm*Standard_dev_of_means) && step_taken > 400*5){
+    /*SERIAL_ECHO("M: ");
+    SERIAL_ECHO(Mean_of_Means/NM);
+    SERIAL_ECHO(" SD: ");
+    SERIAL_ECHO(Standard_dev_of_means);
+    SERIAL_ECHO(" R: ");
+    SERIAL_ECHOLN(st_mean);
+    */
+    long MTC = (Mean_of_Means/NM - st_mean);
+    if(MTC > 10 && MTC > Standard_dev_of_means +long(std_norm*Standard_dev_of_means) && step_taken > 400*5){
       SERIAL_ECHO("Z hit: ");
       SERIAL_ECHO(step_taken);
       SERIAL_ECHO(" ");
-      float Z_off = (float)step_taken/400 - 5.0;
+      float Z_off = (float)step_taken/400 - 15.0;
       SERIAL_ECHOLN(Z_off);
       break;
   }
@@ -500,13 +512,18 @@ void setZ_Offset_TMC(){
   last_time = millis();
   }
   }
+}
   stepperZ.shaft_dir(0);
   for(int step_back = 0; step_back < step_taken;step_back++){
   digitalWrite(Z_STEP_PIN, HIGH);
-  delayMicroseconds(200);
+  delayMicroseconds(400);
   digitalWrite(Z_STEP_PIN, LOW);
-  delayMicroseconds(200);
+  delayMicroseconds(400);
+  if(step_back%400 == 0){
+    idle();
   }
+  }
+
 }
 
 /************* Correction for ABL *************************

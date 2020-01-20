@@ -82,7 +82,7 @@
 // Microstep setting (Only functional when stepper driver microstep pins are connected to MCU.
 #define MICROSTEP_MODES {16,16,16,16,16} // [1,2,4,8,16]
 
-#define USE_WATCHDOG
+//#define USE_WATCHDOG
 
 #define AUTO_REPORT_TEMPERATURES
 
