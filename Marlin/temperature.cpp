@@ -798,7 +798,7 @@ void Temperature::manage_heater() {
       if (ABS(current_temperature[0] - redundant_temperature) > MAX_REDUNDANT_TEMP_SENSOR_DIFF)
         _temp_error(0, PSTR(MSG_REDUNDANCY), PSTR(MSG_ERR_REDUNDANT_TEMP));
     #endif
-
+    if(current_temperature[e] > HEATER_0_MAXTEMP)max_temp_error(e);  //Skriware
   } // HOTEND_LOOP
 
   #if HAS_AUTO_FAN
