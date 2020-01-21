@@ -8,6 +8,7 @@
     extern bool Matrix_calibration_corruption;
     extern float std_norm;
     extern byte SG;
+    extern byte TMC_checkTime;
     #ifdef MOVING_EXTRUDER
 	#if HAS_HOME_OFFSET
         	extern float home_offset_E1;    				//MOVING EXTRUDER HOME OFFSET CHANGE

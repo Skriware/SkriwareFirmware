@@ -10,7 +10,7 @@
 
 //#define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
-//#define EXT_CHECKSTATION
+#define EXT_CHECKSTATION
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
@@ -250,7 +250,7 @@
 #define DEFAULT_EJERK                 5.0
 
 #define HOMING_FEEDRATE_XY (40*60)
-#define HOMING_FEEDRATE_Z  600
+#define HOMING_FEEDRATE_Z  100
 
 /***************************************************************************************/
 
@@ -261,7 +261,7 @@
 	//#define USE_ZMAX_PLUG 
 	#define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 800,2560,204}     
 	#define DEFAULT_MAX_FEEDRATE          {1000, 1000, 500, 100}
-  #define DEFAULT_MAX_ACCELERATION      {100,100, 50, 1500} 
+  #define DEFAULT_MAX_ACCELERATION      {100,100, 10, 1500} 
 	#define Z_MIN_POS -200
   #define Z_MIN_ENDSTOP_INVERTING false   
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false

@@ -5,6 +5,7 @@
 
     float std_norm =0.8;
     byte SG = 30;
+    byte TMC_checkTime = 50;
     #ifdef MOVING_EXTRUDER      				
 	OneWire  *ds;
 	bool servo_extruder = false;
