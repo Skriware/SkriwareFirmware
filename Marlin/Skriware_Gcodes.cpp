@@ -159,7 +159,7 @@ void gcode_M66(){
       }
 }
 void gcode_M67(){
-    setZ_Offset_TMC();
+    for(int tt = 0;tt<20;tt++)setZ_Offset_TMC();
 }
 void gcode_M68(){
     if(parser.seen('N'))std_norm = parser.value_float();

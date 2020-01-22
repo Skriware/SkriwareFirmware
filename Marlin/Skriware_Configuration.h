@@ -10,7 +10,7 @@
 
 //#define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
-#define EXT_CHECKSTATION
+//#define EXT_CHECKSTATION
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
@@ -250,7 +250,7 @@
 #define DEFAULT_EJERK                 5.0
 
 #define HOMING_FEEDRATE_XY (40*60)
-#define HOMING_FEEDRATE_Z  100
+#define HOMING_FEEDRATE_Z  400
 
 /***************************************************************************************/
 
