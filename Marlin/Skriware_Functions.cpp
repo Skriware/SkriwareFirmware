@@ -440,13 +440,16 @@ bilinear_grid_spacing[Y_AXIS] = (BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSIT
 }
 
 void setZ_Offset_TMC(){
-  pinMode(15,INPUT);
+  pinMode(15,INPUT_PULLUP);
   /*destination[Z_AXIS] = 15.0;
   prepare_move_to_destination();
   planner.synchronize();
+
   */digitalWrite(Z_ENABLE_PIN, LOW);
+  
   stepperZ.coolstep_min_speed(1024UL * 1024UL - 1UL);
-  stepperZ.stealthChop(1);
+  stepperZ.microsteps(2);
+  stepperZ.stealthChop(0);
   stepperZ.diag1_stall(1);
   stepperZ.sg_stall_value(26);
   //SERIAL_ECHOLN(stepperZ.stallguard());
@@ -466,9 +469,9 @@ void setZ_Offset_TMC(){
   long step_taken = 0;
    while(true){
   digitalWrite(Z_STEP_PIN, HIGH);
-  delayMicroseconds(200);
+  delayMicroseconds(2000);
   digitalWrite(Z_STEP_PIN, LOW);
-  delayMicroseconds(200);
+  delayMicroseconds(2000);
   step_taken++;
   uint32_t ms = millis();
   static uint32_t last_time = 0;
@@ -477,21 +480,25 @@ void setZ_Offset_TMC(){
    N++;
    TT+=1; 
   }
-  if ((ms - last_time) > 10) {
+  if ((ms - last_time) > 1) {
+    if(z_touch_moment == 0 && checkTestPin(15)){
+      z_touch_moment = step_taken;
+    
+    }
     last_mean =st_mean;
     st_mean = st_mean_sum/N;
     //SERIAL_ECHOLN(st_mean);
     st_mean_sum = 0;
     N =0;
-    if((Mean_of_Means/NM - st_mean) > Standard_dev_of_means +long(0.8*Standard_dev_of_means) && (millis() - Start_time) > 500){
-      SERIAL_ECHOLN(step_taken);
+    if((Mean_of_Means/NM - st_mean) > Standard_dev_of_means +long(1.0*Standard_dev_of_means) && step_taken >150){
+      SERIAL_ECHOLN(step_taken-z_touch_moment);
       stepperZ.shaft_dir(1);
       long lt = millis();
     for(int ii = 0; ii <step_taken;ii++){
       digitalWrite(Z_STEP_PIN, HIGH);
-      delayMicroseconds(200);
+      delayMicroseconds(2000);
       digitalWrite(Z_STEP_PIN, LOW);
-      delayMicroseconds(200);
+      delayMicroseconds(2000);
     }
     step_taken = 0;
     break;
