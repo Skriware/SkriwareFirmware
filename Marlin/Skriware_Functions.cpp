@@ -441,12 +441,14 @@ bilinear_grid_spacing[Y_AXIS] = (BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSIT
 
 void setZ_Offset_TMC(){
   pinMode(15,INPUT_PULLUP);
-  /*destination[Z_AXIS] = 15.0;
+  destination[Z_AXIS] = 5.0;
   prepare_move_to_destination();
   planner.synchronize();
 
-  */digitalWrite(Z_ENABLE_PIN, LOW);
-  
+  digitalWrite(Z_ENABLE_PIN, LOW);
+  destination[Z_AXIS] = 5.0;
+  prepare_move_to_destination();
+  planner.synchronize();
   stepperZ.coolstep_min_speed(1024UL * 1024UL - 1UL);
   stepperZ.microsteps(2);
   stepperZ.stealthChop(0);
@@ -455,19 +457,27 @@ void setZ_Offset_TMC(){
   //SERIAL_ECHOLN(stepperZ.stallguard());
   //SERIAL_ECHOLN(stepperZ.sg_result());
   int TT = 5;
+  byte rr = 0;
   long st_mean = 0;
   int last_mean = 0;
   long st_mean_sum =0;
-  long Mean_of_Means = 0;
-  long SqareSum = 0;
-  long Standard_dev_of_means = 0;
-  int N = 0;
-  int NM = 0;
-  long z_touch_moment = 0;
-  stepperZ.shaft_dir(0);
+  long X_1 = 0;
+  long X_2 = 0;
+  long X_s = 0;
+  long A_1 =0;
+  long B_1 =0;
+  long A_2 =0;
+  long B_2 =0;
+  long A_s =0;
+  long B_s =0;
+  int A_n = 0;
+  int B_n = 0;
+  int N   = 0;
+  int X_n  = 0;
+  stepperZ.shaft_dir(1);
   long Start_time = millis();
   long step_taken = 0;
-   while(true){
+  while(true){
   digitalWrite(Z_STEP_PIN, HIGH);
   delayMicroseconds(2000);
   digitalWrite(Z_STEP_PIN, LOW);
@@ -481,48 +491,55 @@ void setZ_Offset_TMC(){
    TT+=1; 
   }
   if ((ms - last_time) > 1) {
-    if(z_touch_moment == 0 && checkTestPin(15)){
-      z_touch_moment = step_taken;
     
-    }
     last_mean =st_mean;
     st_mean = st_mean_sum/N;
-    //SERIAL_ECHOLN(st_mean);
+    /*SERIAL_ECHO(digitalRead(15)*800);
+    SERIAL_ECHO(",");
+    SERIAL_ECHO(B_1/B_n);
+    SERIAL_ECHO(",");
+    SERIAL_ECHO(A_1/A_n);
+    SERIAL_ECHO(",");
+    SERIAL_ECHOLN(st_mean);
+    */
     st_mean_sum = 0;
     N =0;
-    if((Mean_of_Means/NM - st_mean) > Standard_dev_of_means +long(1.0*Standard_dev_of_means) && step_taken >150){
-      SERIAL_ECHOLN(step_taken-z_touch_moment);
-      stepperZ.shaft_dir(1);
-      long lt = millis();
-    for(int ii = 0; ii <step_taken;ii++){
-      digitalWrite(Z_STEP_PIN, HIGH);
-      delayMicroseconds(2000);
-      digitalWrite(Z_STEP_PIN, LOW);
-      delayMicroseconds(2000);
-    }
-    step_taken = 0;
-    break;
-
-  }
-    SqareSum += st_mean*st_mean;
-    Mean_of_Means += st_mean;
-    NM++;
-    Standard_dev_of_means = long(sqrt(SqareSum/NM -Mean_of_Means/NM*Mean_of_Means/NM));
-    /*Serial.print("M:");
-    Serial.print(Mean_of_Means/NM);
-    Serial.print("SD:");
-    Serial.println(Standard_dev_of_means);
-    /*if (dir) {
+    if(step_taken > 250 && ( (st_mean > X_1 && (A_1/A_n - st_mean) > A_s +long(1.5*A_s) ) || (st_mean < X_1 && (B_1/B_n - st_mean) > B_s +long(1.5*B_s)))){
+      step_taken = 0;
       stepperZ.shaft_dir(0);
-    } else {
-      stepperZ.shaft_dir(1);
-    }*/
+      SERIAL_ECHOLN((step_taken-250)/50);
+      long lt = millis();
+      SERIAL_ECHOLN((float)(step_taken - 250)/50); 
+      for(int yy = 0; yy< step_taken;yy++){
+        digitalWrite(Z_STEP_PIN, HIGH);
+        delayMicroseconds(2000);
+        digitalWrite(Z_STEP_PIN, LOW);
+        delayMicroseconds(2000);
+      }
+      break;
+    }
+      X_2 += st_mean*st_mean;
+      X_1 += st_mean;
+      X_n++;
+      X_s = long(sqrt(X_2/X_n -X_1/X_n*X_1/X_n));
+    //if(millis() - Start_time > MEAN_CALIBARION_TIME){
+      if(st_mean > X_1/X_n){
+        A_2 += st_mean*st_mean;
+        A_1 += st_mean;
+        A_n++;
+        A_s = long(sqrt(A_2/A_n -A_1/A_n*A_1/A_n));
+      }else{
+        B_2 += st_mean*st_mean;
+        B_1 += st_mean;
+        B_n++;
+        B_s = long(sqrt(B_2/B_n -B_1/B_n*B_1/B_n));
+      }
+    //}
+    
     last_time = millis();
-    TT = 100;
     
   }
-
-}
+  }
 }
 
 /************* Correction for ABL *************************
