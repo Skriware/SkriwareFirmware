@@ -22,5 +22,7 @@ void g92_retraction_controll(float *v);
 void Skriware_Init();
 void zero_bed_levelig_grid();
 void setZ_Offset_TMC();
+void TMC_init_FOR_probe();
+void TMC_back_to_regular();
 
 #endif

@@ -187,7 +187,7 @@
     #endif
     st.begin();
     st.setCurrent(mA, R_SENSE, HOLD_MULTIPLIER);
-    st.microsteps(microsteps);
+    st.microsteps(16);
     st.blank_time(24);
     st.off_time(5); // Only enables the driver if used with stealthChop
     st.interpolate(INTERPOLATE);
@@ -199,7 +199,7 @@
       st.stealth_autoscale(1);
       st.stealth_gradient(5);
       st.stealth_amplitude(255);
-      st.stealthChop(1);
+      st.stealthChop(0);
       #if ENABLED(HYBRID_THRESHOLD)
         st.stealth_max_speed(12650000UL*microsteps/(256*thrs*spmm));
       #endif

@@ -439,21 +439,49 @@ bilinear_grid_spacing[X_AXIS] = (RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSIT
 bilinear_grid_spacing[Y_AXIS] = (BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (GRID_MAX_POINTS_X - 1);
 }
 
-void setZ_Offset_TMC(){
+void TMC_init_FOR_probe(){
   pinMode(15,INPUT_PULLUP);
-  destination[Z_AXIS] = 5.0;
-  prepare_move_to_destination();
-  planner.synchronize();
-
-  digitalWrite(Z_ENABLE_PIN, LOW);
-  destination[Z_AXIS] = 5.0;
-  prepare_move_to_destination();
-  planner.synchronize();
+  //destination[Z_AXIS] = 15.0;
+  //prepare_move_to_destination();
+  //planner.synchronize();
+/*  //stepperZ.begin();
+  stepperZ.setCurrent(800, 0.11, 0.5);
+ 
+  stepperZ.blank_time(24);
+  stepperZ.off_time(5); // Only enables the driver if used with stealthChop
+  stepperZ.interpolate(true);
+  stepperZ.power_down_delay(128); // ~2s until driver lowers to hold current
+  stepperZ.hysteresis_start(3);
+  stepperZ.hysteresis_end(2);
+  stepperZ.stealth_freq(1); // f_pwm = 2/683 f_clk
+  stepperZ.stealth_autoscale(1);
+  stepperZ.stealth_gradient(5);
+  stepperZ.stealth_amplitude(255);
+  stepperZ.stealthChop(1);
   stepperZ.coolstep_min_speed(1024UL * 1024UL - 1UL);
+  stepperZ.microsteps(2);
+  */
   stepperZ.microsteps(2);
   stepperZ.stealthChop(0);
   stepperZ.diag1_stall(1);
   stepperZ.sg_stall_value(26);
+  stepperZ.shaft_dir(1);
+  for(int tt = 0; tt< 750;tt++){
+        digitalWrite(Z_STEP_PIN, HIGH);
+        delayMicroseconds(2000);
+        digitalWrite(Z_STEP_PIN, LOW);
+        delayMicroseconds(2000);
+    }
+
+}
+
+void TMC_back_to_regular(){
+   stepperZ.microsteps(16);
+   stepperZ.stealthChop(1);
+}
+
+void setZ_Offset_TMC(){
+  digitalWrite(Z_ENABLE_PIN, LOW);
   //SERIAL_ECHOLN(stepperZ.stallguard());
   //SERIAL_ECHOLN(stepperZ.sg_result());
   int TT = 5;
@@ -474,7 +502,7 @@ void setZ_Offset_TMC(){
   int B_n = 0;
   int N   = 0;
   int X_n  = 0;
-  stepperZ.shaft_dir(1);
+  stepperZ.shaft_dir(0);
   long Start_time = millis();
   long step_taken = 0;
   while(true){
@@ -485,14 +513,11 @@ void setZ_Offset_TMC(){
   step_taken++;
   uint32_t ms = millis();
   static uint32_t last_time = 0;
-  if((ms - last_time) >1){
+  if((ms - last_time) >0){
    st_mean_sum +=stepperZ.sg_result();
    N++;
-   TT+=1; 
   }
-  if ((ms - last_time) > 1) {
-    
-    last_mean =st_mean;
+  if ((ms - last_time) > 0) {
     st_mean = st_mean_sum/N;
     /*SERIAL_ECHO(digitalRead(15)*800);
     SERIAL_ECHO(",");
@@ -502,20 +527,27 @@ void setZ_Offset_TMC(){
     SERIAL_ECHO(",");
     SERIAL_ECHOLN(st_mean);
     */
+    //if(step_taken%20 == 0)SERIAL_ECHOLN(step_taken);
     st_mean_sum = 0;
     N =0;
-    if(step_taken > 250 && ( (st_mean > X_1 && (A_1/A_n - st_mean) > A_s +long(1.5*A_s) ) || (st_mean < X_1 && (B_1/B_n - st_mean) > B_s +long(1.5*B_s)))){
-      step_taken = 0;
-      stepperZ.shaft_dir(0);
-      SERIAL_ECHOLN((step_taken-250)/50);
+    if(step_taken > 750 && ( (st_mean > X_1 && (A_1/A_n - st_mean) > A_s +long(1.5*A_s) ) || (st_mean < X_1 && (B_1/B_n - st_mean) > B_s +long(1.5*B_s)))){
       long lt = millis();
-      SERIAL_ECHOLN((float)(step_taken - 250)/50); 
-      for(int yy = 0; yy< step_taken;yy++){
+      SERIAL_ECHOLN((float)(step_taken - 750)/50); 
+      stepperZ.shaft_dir(1);
+     for(int uu = 0; uu <15;uu++){ 
         digitalWrite(Z_STEP_PIN, HIGH);
         delayMicroseconds(2000);
         digitalWrite(Z_STEP_PIN, LOW);
         delayMicroseconds(2000);
       }
+      delay(5000);
+      for(int uu = 0; uu <step_taken-15;uu++){ 
+        digitalWrite(Z_STEP_PIN, HIGH);
+        delayMicroseconds(2000);
+        digitalWrite(Z_STEP_PIN, LOW);
+        delayMicroseconds(2000);
+      }
+      step_taken = 0;
       break;
     }
       X_2 += st_mean*st_mean;
@@ -540,6 +572,8 @@ void setZ_Offset_TMC(){
     
   }
   }
+
+
 }
 
 /************* Correction for ABL *************************

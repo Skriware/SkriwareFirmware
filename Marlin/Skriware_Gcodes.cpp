@@ -159,7 +159,9 @@ void gcode_M66(){
       }
 }
 void gcode_M67(){
-    for(int tt = 0;tt<20;tt++)setZ_Offset_TMC();
+  TMC_init_FOR_probe();
+    for(int tt = 0;tt<10;tt++)setZ_Offset_TMC();
+  TMC_back_to_regular();
 }
 void gcode_M68(){
     if(parser.seen('N'))std_norm = parser.value_float();
