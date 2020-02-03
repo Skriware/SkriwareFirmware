@@ -466,12 +466,7 @@ void TMC_init_FOR_probe(){
   stepperZ.diag1_stall(1);
   stepperZ.sg_stall_value(26);
   stepperZ.shaft_dir(1);
-  for(int tt = 0; tt< 750;tt++){
-        digitalWrite(Z_STEP_PIN, HIGH);
-        delayMicroseconds(2000);
-        digitalWrite(Z_STEP_PIN, LOW);
-        delayMicroseconds(2000);
-    }
+
 
 }
 
@@ -502,9 +497,32 @@ void setZ_Offset_TMC(){
   int B_n = 0;
   int N   = 0;
   int X_n  = 0;
-  stepperZ.shaft_dir(0);
+
+  stepperZ.shaft_dir(1);
   long Start_time = millis();
   long step_taken = 0;
+    while(millis() - Start_time <2000){
+        digitalWrite(Z_STEP_PIN, HIGH);
+        delayMicroseconds(1500);
+        digitalWrite(Z_STEP_PIN, LOW);
+        delayMicroseconds(1500);
+    }
+
+  stepperZ.shaft_dir(0);
+  while(digitalRead(18) == HIGH){
+        digitalWrite(Z_STEP_PIN, HIGH);
+        delayMicroseconds(1500);
+        digitalWrite(Z_STEP_PIN, LOW);
+        delayMicroseconds(1500);
+    }
+  stepperZ.shaft_dir(1);
+  for(int tt = 0; tt< 750;tt++){
+        digitalWrite(Z_STEP_PIN, HIGH);
+        delayMicroseconds(2000);
+        digitalWrite(Z_STEP_PIN, LOW);
+        delayMicroseconds(2000);
+  }
+  stepperZ.shaft_dir(0);
   while(true){
   digitalWrite(Z_STEP_PIN, HIGH);
   delayMicroseconds(2000);
@@ -540,7 +558,7 @@ void setZ_Offset_TMC(){
         digitalWrite(Z_STEP_PIN, LOW);
         delayMicroseconds(2000);
       }
-      delay(5000);
+      delay(1000);
       for(int uu = 0; uu <step_taken-15;uu++){ 
         digitalWrite(Z_STEP_PIN, HIGH);
         delayMicroseconds(2000);

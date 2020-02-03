@@ -250,7 +250,7 @@
 #define DEFAULT_EJERK                 5.0
 
 #define HOMING_FEEDRATE_XY (40*60)
-#define HOMING_FEEDRATE_Z  100
+#define HOMING_FEEDRATE_Z  200
 
 /***************************************************************************************/
 
