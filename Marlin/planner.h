@@ -409,6 +409,7 @@ class Planner {
             last_fade_z = rz;
             z_fade_factor = 1 - rz * inverse_z_fade_height;
           }
+          
           return z_fade_factor;
         }
         return 1;
