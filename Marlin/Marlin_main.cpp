@@ -15301,6 +15301,9 @@ void idle(
  * After this the machine will need to be reset.
  */
 void kill(const char* lcd_msg) {
+  
+  SERIAL_ERROR_START();
+  SERIAL_ERRORLN(lcd_msg);
   SERIAL_ERROR_START();
   SERIAL_ERRORLNPGM(MSG_ERR_KILLED);
 

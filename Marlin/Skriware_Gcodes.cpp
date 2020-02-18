@@ -195,7 +195,7 @@ void gcode_M78(){
 
 }
 void gcode_M79(){
-  SERIAL_ECHOLN("IQ of Kuba Zaborowski: 0");
+  kill("KILL CAUSE MSG");
 }
 void gcode_M80(){
     #ifdef MOVING_EXTRUDER
