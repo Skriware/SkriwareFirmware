@@ -69,6 +69,7 @@ void gcode_M60(){
     #endif
 }
 void gcode_M61(){
+    planner.synchronize();
 		#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR	
 		if (parser.seen('L')) filament_binary_sensor_E0_on = true;
         if (parser.seen('R')) filament_binary_sensor_E1_on = true;
@@ -84,6 +85,7 @@ void gcode_M61(){
 }
 
 void gcode_M62(){
+    planner.synchronize();
 		#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR	
 		if (parser.seen('L')) filament_binary_sensor_E0_on = false;
         if (parser.seen('R')) filament_binary_sensor_E1_on = false;
@@ -99,6 +101,7 @@ void gcode_M62(){
 }
 
 void gcode_M63(){
+  planner.synchronize();
 	#ifdef SKRIWARE_FILAMENT_RUNOUT_SENSOR
 	  	if (parser.seen('L')) filament_runout_E0 = false; 
         if (parser.seen('R')) filament_runout_E1 = false;
@@ -195,7 +198,7 @@ void gcode_M78(){
 
 }
 void gcode_M79(){
-  SERIAL_ECHOLN("IQ of Kuba Zaborowski: 0");
+  kill("KILL CAUSE MSG");
 }
 void gcode_M80(){
     #ifdef MOVING_EXTRUDER

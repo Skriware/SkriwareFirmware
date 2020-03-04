@@ -319,6 +319,7 @@ void optical_sensor_check(){
 }
 void binary_sensor_check(){
   #if ENABLED(SKRIWARE_FILAMENT_RUNOUT_SENSOR)
+    if(abs(Stepper::current_extruder_speed) > 0.0001){
     if(filament_binary_sensor_E0_on && !filament_runout_E0 && digitalRead(SKRIWARE_FILAMENT_RUNOUT_SENSOR_PIN_E0) == LOW){
       if(millis() - Last_runout_Signal_E0 > BINARY_SENSOR_DEBOUNCE_TIME && Last_runout_Signal_E0 != 0){
           SERIAL_ECHOLN("FILAMENT_RUNOUT_E0");
@@ -346,6 +347,7 @@ void binary_sensor_check(){
           Last_runout_Signal_E1 = 0;
     
     }
+  }
    #endif
 }
 

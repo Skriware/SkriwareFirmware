@@ -820,7 +820,7 @@
   #define MSG_HEATING_FAILED_LCD_BED          _UxGT("Bed heating failed")
 #endif
 #ifndef MSG_ERR_REDUNDANT_TEMP
-  #define MSG_ERR_REDUNDANT_TEMP              _UxGT("Err: REDUNDANT TEMP")
+  #define MSG_ERR_REDUNDANT_TEMP              _UxGT("REDUNDANT TEMP")
 #endif
 #ifndef MSG_THERMAL_RUNAWAY
   #define MSG_THERMAL_RUNAWAY                 _UxGT("THERMAL RUNAWAY")
@@ -829,16 +829,16 @@
   #define MSG_THERMAL_RUNAWAY_BED             _UxGT("BED THERMAL RUNAWAY")
 #endif
 #ifndef MSG_ERR_MAXTEMP
-  #define MSG_ERR_MAXTEMP                     _UxGT("Err: MAXTEMP")
+  #define MSG_ERR_MAXTEMP                     _UxGT("MAXTEMP")
 #endif
 #ifndef MSG_ERR_MINTEMP
-  #define MSG_ERR_MINTEMP                     _UxGT("Err: MINTEMP")
+  #define MSG_ERR_MINTEMP                     _UxGT("MINTEMP")
 #endif
 #ifndef MSG_ERR_MAXTEMP_BED
-  #define MSG_ERR_MAXTEMP_BED                 _UxGT("Err: MAXTEMP BED")
+  #define MSG_ERR_MAXTEMP_BED                 _UxGT("MAXTEMP BED")
 #endif
 #ifndef MSG_ERR_MINTEMP_BED
-  #define MSG_ERR_MINTEMP_BED                 _UxGT("Err: MINTEMP BED")
+  #define MSG_ERR_MINTEMP_BED                 _UxGT("MINTEMP BED")
 #endif
 #ifndef MSG_ERR_Z_HOMING
   #define MSG_ERR_Z_HOMING                    MSG_HOME _UxGT(" ") MSG_X MSG_Y _UxGT(" ") MSG_FIRST

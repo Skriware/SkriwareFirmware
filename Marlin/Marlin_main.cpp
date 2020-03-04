@@ -2767,7 +2767,6 @@ void clean_up_after_endstop_or_probe_move() {
         #endif
 
       #else // ABL
-
         #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
           // Force bilinear_z_offset to re-calculate next time
           const float reset[XYZ] = { -9999.999, -9999.999, 0 };
@@ -2801,14 +2800,13 @@ void clean_up_after_endstop_or_probe_move() {
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
 
     void set_z_fade_height(const float zfh, const bool do_report/*=true*/) {
-
       if (planner.z_fade_height == zfh) return;
 
       const bool leveling_was_active = planner.leveling_active;
       set_bed_leveling_enabled(false);
 
       planner.set_z_fade_height(zfh);
-
+      
       if (leveling_was_active) {
         const float oldpos[] = { current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] };
         set_bed_leveling_enabled(true);
@@ -15303,6 +15301,9 @@ void idle(
  * After this the machine will need to be reset.
  */
 void kill(const char* lcd_msg) {
+  
+  SERIAL_ERROR_START();
+  SERIAL_ERRORLN(lcd_msg);
   SERIAL_ERROR_START();
   SERIAL_ERRORLNPGM(MSG_ERR_KILLED);
 
