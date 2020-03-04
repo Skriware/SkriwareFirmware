@@ -593,11 +593,15 @@ void Temperature::_temp_error(const int8_t e, const char * const serial_msg, con
 }
 
 void Temperature::max_temp_error(const int8_t e) {
-  _temp_error(e, PSTR(MSG_T_MAXTEMP), TEMP_ERR_PSTR(MSG_ERR_MAXTEMP, e));
+  char buff[50] = "";
+  sprintf(buff,"%s %d",MSG_ERR_MAXTEMP,e);
+  _temp_error(e, PSTR(MSG_T_MAXTEMP), buff);
 }
 
 void Temperature::min_temp_error(const int8_t e) {
-  _temp_error(e, PSTR(MSG_T_MINTEMP), TEMP_ERR_PSTR(MSG_ERR_MINTEMP, e));
+   char buff[50] = "";
+  sprintf(buff,"%s %d",MSG_ERR_MINTEMP,e);
+  _temp_error(e, PSTR(MSG_T_MINTEMP), buff);
 }
 
 float Temperature::get_pid_output(const int8_t e) {

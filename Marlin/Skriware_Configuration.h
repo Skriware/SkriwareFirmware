@@ -111,7 +111,7 @@
 #define X_BED_SIZE 200
 #define Y_BED_SIZE 275
 
-#define X_MAX_POS 200
+#define X_MAX_POS 210
 #define Y_MAX_POS 275
 #define Z_MAX_POS 210
 
