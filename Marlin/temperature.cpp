@@ -927,7 +927,7 @@ float Temperature::analog_to_celsius_hotend(const int raw, const uint8_t e) {
       SERIAL_ERROR_START();
       SERIAL_ERROR((int)e);
       SERIAL_ERRORLNPGM(MSG_INVALID_EXTRUDER_NUM);
-      kill(PSTR(MSG_KILLED));
+      kill("Invalid Extruder number.");
       return 0.0;
     }
 

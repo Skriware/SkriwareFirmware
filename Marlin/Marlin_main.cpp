@@ -1122,7 +1122,7 @@ inline void get_serial_commands() {
             wait_for_user = false;
           #endif
         }
-        if (strcmp(command, "M112") == 0) kill(PSTR(MSG_KILLED));
+        if (strcmp(command, "M112") == 0) kill("M112 kill called");
         if (strcmp(command, "M410") == 0) quickstop_stepper();
       #endif
 
@@ -8572,7 +8572,7 @@ inline void gcode_M105() {
   /**
    * M112: Emergency Stop
    */
-  inline void gcode_M112() { kill(PSTR(MSG_KILLED)); }
+  inline void gcode_M112() { kill("M112 kill called"); }
 
 
   /**
@@ -15066,7 +15066,7 @@ void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
   if (max_inactive_time && ELAPSED(ms, previous_move_ms + max_inactive_time)) {
     SERIAL_ERROR_START();
     SERIAL_ECHOLNPAIR(MSG_KILL_INACTIVE_TIME, parser.command_ptr);
-    kill(PSTR(MSG_KILLED));
+    kill("Stepper timeout");
   }
   // Prevent steppers timing-out in the middle of M600
   #if ENABLED(ADVANCED_PAUSE_FEATURE) && ENABLED(PAUSE_PARK_NO_STEPPER_TIMEOUT)
@@ -15122,7 +15122,7 @@ void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
     if (killCount >= KILL_DELAY) {
       SERIAL_ERROR_START();
       SERIAL_ERRORLNPGM(MSG_KILL_BUTTON);
-      kill(PSTR(MSG_KILLED));
+      kill("killed by button");
     }
   #endif
 
