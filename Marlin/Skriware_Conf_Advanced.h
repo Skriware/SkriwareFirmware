@@ -8,14 +8,14 @@
   #define THERMAL_PROTECTION_PERIOD 45        // Seconds
   #define THERMAL_PROTECTION_HYSTERESIS 5     // Degrees Celsius
   #define WATCH_TEMP_PERIOD 45                // Seconds
-  #define WATCH_TEMP_INCREASE 1               // Degrees Celsius
+  #define WATCH_TEMP_INCREASE 2               // Degrees Celsius
 #endif
 
 #if ENABLED(THERMAL_PROTECTION_BED)
   #define THERMAL_PROTECTION_BED_PERIOD 45    // Seconds
   #define THERMAL_PROTECTION_BED_HYSTERESIS 2 // Degrees Celsius
   #define WATCH_BED_TEMP_PERIOD 90                // Seconds
-  #define WATCH_BED_TEMP_INCREASE 1               // Degrees Celsius
+  #define WATCH_BED_TEMP_INCREASE 2               // Degrees Celsius
 #endif
 
 #define AUTOTEMP

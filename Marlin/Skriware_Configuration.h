@@ -8,7 +8,7 @@
 
 //MAIN SKRIWARE SETTINGS:
 
-#define MOVING_EXTRUDER
+//#define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
 //#define EXT_CHECKSTATION
 
@@ -89,7 +89,7 @@
 
 #define INVERT_X_DIR false
 #define INVERT_Y_DIR false
-#define INVERT_Z_DIR false
+#define INVERT_Z_DIR true
 
 #define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
@@ -108,7 +108,7 @@
 #define Y_MIN_POS 0
 #define Z_MIN_POS -3
 
-#define X_BED_SIZE 200
+#define X_BED_SIZE 210
 #define Y_BED_SIZE 275
 
 #define X_MAX_POS 210
@@ -119,7 +119,9 @@
 
 #define MAX_SOFTWARE_ENDSTOPS
 
-#define QUICK_HOME 
+#define QUICK_HOME
+
+#define Z_DRIVER_TYPE  TMC2130 
 
 
 /***************************************************************************************/
@@ -236,9 +238,9 @@
 
 /**************************** SPEED & ACCELERATIONS ************************************/
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 800, 204} 
-#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 1000, 100 }
-#define DEFAULT_MAX_ACCELERATION      { 1500, 1500, 1500, 1500}
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 204} 
+#define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 50, 100 }
+#define DEFAULT_MAX_ACCELERATION      { 1500, 1500, 50, 1500}
 
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
