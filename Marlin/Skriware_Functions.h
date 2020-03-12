@@ -3,6 +3,7 @@
 #include "Skriware_Variables.h"
 #include "stepper.h"
 #include "planner.h"
+#define SKRIWARE_DEBUG
 
 void set_to_print_Z();
 bool checkTestPin(int pin);

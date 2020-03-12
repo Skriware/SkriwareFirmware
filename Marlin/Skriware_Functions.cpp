@@ -410,17 +410,24 @@ void Skriware_Init(){
      pinMode(27,INPUT_PULLUP);
   if(!Stepper::Software_Invert){
     if(checkTestPin(27)){
-        Stepper::E0_inverted = 1;
+        Stepper::E0_inverted = true;
     }else{
-        Stepper::E0_inverted = 0;
+        Stepper::E0_inverted = false;
     }
   }
+  stepper.set_directions();
 
   pinMode(11,OUTPUT);
   digitalWrite(11,LOW);
   SERIAL_ECHO("E0 INVERT options:");
+<<<<<<< Updated upstream
   SERIAL_ECHO(stepper.E0_inverted);
   SERIAL_ECHOLN(stepper.Software_Invert);
+=======
+  SERIAL_ECHO(Stepper::E0_inverted);
+  SERIAL_ECHOLN(Stepper::Software_Invert);
+  #endif
+>>>>>>> Stashed changes
 }
 
 void filament_sensor_check(){
