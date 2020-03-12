@@ -37,9 +37,9 @@ bool checkTestPin(int pin){
   void invert_E0(){
           Stepper::E0_inverted = !Stepper::E0_inverted;
           stepper.set_directions();
-          if(Stepper::E0_inverted){SERIAL_ECHOLN("E1 INVERTED!");
+          if(Stepper::E0_inverted){SERIAL_ECHOLN("E0 INVERTED!");
           }else{
-            SERIAL_ECHOLN("E1 AS IN CONFIG FILE!");
+            SERIAL_ECHOLN("E0 AS IN CONFIG FILE!");
           }
   }
 #ifdef MOVING_EXTRUDER
@@ -411,7 +411,6 @@ void Skriware_Init(){
     }
   }
   stepper.set_directions();
-
   pinMode(11,OUTPUT);
   digitalWrite(11,LOW);
   #ifdef SKRIWARE_DEBUG

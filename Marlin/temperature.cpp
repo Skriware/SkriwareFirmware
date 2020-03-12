@@ -585,7 +585,7 @@ void Temperature::_temp_error(const int8_t e, const char * const serial_msg, con
     if (!killed) {
       Running = false;
       killed = true;
-      kill(lcd_msg);
+      kill(serial_msg);
     }
     else
       disable_all_heaters(); // paranoia
