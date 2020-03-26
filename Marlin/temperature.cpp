@@ -1440,7 +1440,8 @@ void Temperature::init() {
     */
 
     const int heater_index = heater_id >= 0 ? heater_id : HOTENDS;
-
+    char buff[50] = "";
+    
     #if HEATER_IDLE_HANDLER
       // If the heater idle timeout expires, restart
       if ((heater_id >= 0 && heater_idle_timeout_exceeded[heater_id])
@@ -1477,7 +1478,8 @@ void Temperature::init() {
         else if (PENDING(millis(), *timer)) break;
         *state = TRRunaway;
       case TRRunaway:
-        _temp_error(heater_id, PSTR(MSG_T_THERMAL_RUNAWAY), TEMP_ERR_PSTR(MSG_THERMAL_RUNAWAY, heater_id));
+        sprintf(buff,"Heating Error. Heater ID: %d",heater_id);
+        _temp_error(heater_id, buff, TEMP_ERR_PSTR(MSG_THERMAL_RUNAWAY, heater_id));
     }
   }
 
