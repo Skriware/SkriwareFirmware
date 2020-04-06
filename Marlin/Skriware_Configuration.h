@@ -87,9 +87,9 @@
 
 #define DISABLE_INACTIVE_EXTRUDER true // Keep only the active extruder enabled.
 
-#define INVERT_X_DIR false
-#define INVERT_Y_DIR false
-#define INVERT_Z_DIR false
+#define INVERT_X_DIR true
+#define INVERT_Y_DIR true
+#define INVERT_Z_DIR true
 
 #define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
