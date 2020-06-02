@@ -3,6 +3,7 @@
 #include "stepper.h"
 #include "Skriware_Variables.h"
 #include "configuration_store.h"
+#include "Skriware_Functions.h"
 
 
 #define EEPROM_WRITE(VAR) write_data(*eeprom_index, (uint8_t*)&VAR, sizeof(VAR), working_crc)
@@ -47,6 +48,15 @@ void MarlinSettings::load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, ch
 if(sk_eeprom_verison > 55){
     EEPROM_READ(Stepper::Software_Invert);
     EEPROM_READ(Stepper::E0_inverted);
+    if(Stepper::Software_Invert){
+        Stepper::E0_inverted = true;
+    }else{
+        if(checkTestPin(27)){
+            Stepper::E0_inverted = true;
+        }else{
+            Stepper::E0_inverted = false;
+        }
+    }
     EEPROM_READ(A_calibration_param);
     EEPROM_READ(B_calibration_param);
     EEPROM_READ(C_calibration_param);
@@ -72,9 +82,6 @@ if(sk_eeprom_verison > 56){             //For new versions
     #endif
     
 }
-
-   
-
 
 }
 
