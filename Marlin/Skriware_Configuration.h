@@ -89,7 +89,7 @@
 
 #define INVERT_X_DIR true
 #define INVERT_Y_DIR true
-#define INVERT_Z_DIR true
+#define INVERT_Z_DIR false
 
 #define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
@@ -236,7 +236,7 @@
 
 /**************************** SPEED & ACCELERATIONS ************************************/
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 204} 
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 800, 204} 
 #define DEFAULT_MAX_FEEDRATE          { 1000, 1000, 1000, 100 }
 #define DEFAULT_MAX_ACCELERATION      { 1500, 1500, 1500, 1500}
 
