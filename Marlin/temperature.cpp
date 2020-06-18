@@ -309,7 +309,8 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
     }
 
     if (target > GHV(BED_MAXTEMP, maxttemp[hotend]) - 15) {
-      SERIAL_ECHOLNPGM(MSG_PID_TEMP_TOO_HIGH);
+      SERIAL_ERROR_START();
+      SERIAL_ERRORLNPGM(MSG_PID_TEMP_TOO_HIGH);
       return;
     }
 
@@ -361,7 +362,6 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
               bias += (d * (t_high - t_low)) / (t_low + t_high);
               bias = constrain(bias, 20, max_pow - 20);
               d = (bias > max_pow >> 1) ? max_pow - 1 - bias : bias;
-
               SERIAL_PROTOCOLPAIR(MSG_BIAS, bias);
               SERIAL_PROTOCOLPAIR(MSG_D, d);
               SERIAL_PROTOCOLPAIR(MSG_T_MIN, min);
@@ -408,7 +408,8 @@ uint8_t Temperature::soft_pwm_amount[HOTENDS];
         #define MAX_OVERSHOOT_PID_AUTOTUNE 20
       #endif
       if (current > target + MAX_OVERSHOOT_PID_AUTOTUNE) {
-        SERIAL_PROTOCOLLNPGM(MSG_PID_TEMP_TOO_HIGH);
+      SERIAL_ERROR_START();
+      SERIAL_ERRORLNPGM(MSG_PID_TEMP_TOO_HIGH);
         break;
       }
 
