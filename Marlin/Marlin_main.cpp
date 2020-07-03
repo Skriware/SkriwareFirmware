@@ -1011,7 +1011,6 @@ void gcode_line_error(const char* err, bool doFlush = true) {
   SERIAL_ERROR_START();
   serialprintPGM(err);
   SERIAL_ERRORLN(gcode_LastN);
-  //Serial.println(gcode_N);
   if (doFlush) flush_and_request_resend();
   serial_count = 0;
 }
@@ -1073,19 +1072,26 @@ inline void get_serial_commands() {
 
         gcode_N = strtol(npos + 1, NULL, 10);
 
-        if (gcode_N != gcode_LastN + 1 && !M110)
+        if (gcode_N != gcode_LastN + 1 && !M110){
+            SERIAL_ECHO("BAD COMMAND:");
+          	SERIAL_ECHOLN(command);
           return gcode_line_error(PSTR(MSG_ERR_LINE_NO));
-
+      }
         char *apos = strrchr(command, '*');
         if (apos) {
           uint8_t checksum = 0, count = uint8_t(apos - command);
           while (count) checksum ^= command[--count];
-          if (strtol(apos + 1, NULL, 10) != checksum)
+          if (strtol(apos + 1, NULL, 10) != checksum){
+          	SERIAL_ECHO("BAD COMMAND:");
+          	SERIAL_ECHOLN(command);
             return gcode_line_error(PSTR(MSG_ERR_CHECKSUM_MISMATCH));
         }
-        else
+        }
+        else{
+         SERIAL_ECHO("BAD COMMAND:");
+         SERIAL_ECHOLN(command);
           return gcode_line_error(PSTR(MSG_ERR_NO_CHECKSUM));
-
+      }
         gcode_LastN = gcode_N;
       }
       #if ENABLED(SDSUPPORT)
