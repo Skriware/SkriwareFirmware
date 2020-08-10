@@ -187,6 +187,9 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
         home_offset[Z_AXIS] = home_offset_E1;
         SYNC_PLAN_POSITION_KINEMATIC();
         report_current_position();
+        destination[Z_AXIS] = tmp_Z;
+        prepare_move_to_destination();
+        planner.synchronize();
     }
     if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
        planner.synchronize();
@@ -197,6 +200,9 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
        home_offset[Z_AXIS] = home_offset_E0;
        SYNC_PLAN_POSITION_KINEMATIC();
        report_current_position();
+      destination[Z_AXIS] = tmp_Z;
+      prepare_move_to_destination();
+      planner.synchronize();
     }
 }
 
