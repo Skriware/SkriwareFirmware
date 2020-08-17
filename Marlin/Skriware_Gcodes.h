@@ -23,10 +23,6 @@ void gcode_M71();
 void gcode_M72();
 void gcode_M73();
 void gcode_M74();
-void gcode_M75();
-void gcode_M76();
-void gcode_M77();
-void gcode_M78();
 void gcode_M79();
 void gcode_M80();
 

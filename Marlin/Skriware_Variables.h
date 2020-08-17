@@ -2,7 +2,9 @@
 #define SKRI_V
 #include "MarlinConfig.h"
 #include "OneWire.h"
+#ifdef OPTICAL_SENSOR
 #include "Filament_Sensor.h"
+#endif
 #include "servo.h"
     
     extern bool Matrix_calibration_corruption;
