@@ -1,19 +1,6 @@
 #include "Skriware_Gcodes.h"
 void gcode_M57(){
-#ifdef EXT_CHECKSTATION
-        if (parser.seen('S')) Z_start = parser.value_float();
-        if (parser.seen('N')) NM = parser.value_linear_units();
-        Z_distance_Test(Z_start,NM);
-
-#else
-         if(parser.seen('E')){
-            invert_E0();
-         }else{
-          set_to_print_Z();
-         }
-         if(parser.seen('S')) stepper.Software_Invert = 1;
-         if(parser.seen('R')) stepper.Software_Invert = 0;
-#endif
+  set_to_print_Z();
 }
 void gcode_M58(){
   #ifdef START_GCODE_EXTRUSION_CORRECTION
@@ -162,7 +149,21 @@ void gcode_M66(){
       }
 }
 void gcode_M67(){
+#ifdef EXT_CHECKSTATION
+        if (parser.seen('S')) Z_start = parser.value_float();
+        if (parser.seen('N')) NM = parser.value_linear_units();
+        Z_distance_Test(Z_start,NM);
 
+#else
+         if(parser.seen('E')){
+            Stepper::E0_inverted = false;
+         }else if(parser.seen('I')){
+            Stepper::E0_inverted = true;
+         }
+         
+         if(parser.seen('S')) stepper.Software_Invert = 1;
+         if(parser.seen('R')) stepper.Software_Invert = 0;
+#endif
 }
 void gcode_M68(){
 

@@ -419,11 +419,6 @@ void Skriware_Init(){
   stepper.set_directions();
   pinMode(11,OUTPUT);
   digitalWrite(11,LOW);
-  #ifdef SKRIWARE_DEBUG
-  SERIAL_ECHO("E0 INVERT options:");
-  SERIAL_ECHO(Stepper::E0_inverted);
-  SERIAL_ECHOLN(Stepper::Software_Invert);
-  #endif
 
 
 }
