@@ -1092,6 +1092,8 @@ inline void get_serial_commands() {
          SERIAL_ECHOLN(command);
           return gcode_line_error(PSTR(MSG_ERR_NO_CHECKSUM));
       }
+      	SERIAL_ECHO("LINE ACCEPTED:");
+      	SERIAL_ECHOLN(gcode_N);
         gcode_LastN = gcode_N;
       }
       #if ENABLED(SDSUPPORT)
@@ -13431,7 +13433,8 @@ void flush_and_request_resend() {
   SERIAL_FLUSH();
   SERIAL_PROTOCOLPGM(MSG_RESEND);
   SERIAL_PROTOCOLLN(gcode_LastN + 1);
-  ok_to_send();
+  SERIAL_ECHO("LINE ACCEPTED");
+  SERIAL_ECHOLN(gcode_LastN);
 }
 
 /**
