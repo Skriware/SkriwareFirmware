@@ -2849,6 +2849,7 @@ void MarlinSettings::reset() {
         #endif // EXTRUDERS > 2
       #endif // EXTRUDERS == 1
     #endif // ADVANCED_PAUSE_FEATURE
+  CONFIG_ECHO_START;         
   SERIAL_ECHO("E0 INVERT options:");              //Skriware 
   SERIAL_ECHO(Stepper::E0_inverted);
   SERIAL_ECHOLN(Stepper::Software_Invert);
