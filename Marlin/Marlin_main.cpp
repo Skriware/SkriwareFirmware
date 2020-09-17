@@ -13069,7 +13069,9 @@ void process_parsed_command() {
        case 80:
           gcode_M80();
        break;
-
+       case 666:
+       	  gcode_M666();
+       break;
       #if ENABLED(ULTRA_LCD) && ENABLED(LCD_SET_PROGRESS_MANUALLY)
         case 73: gcode_M73(); break;                              // M73: Set Print Progress %
       #endif

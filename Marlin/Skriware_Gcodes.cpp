@@ -216,3 +216,8 @@ void gcode_M80(){
         }
         #endif
 }
+
+void gcode_M666(){
+  eeprom_write_byte(120,255);
+  SERIAL_ECHOLN("YOUR EERPROM IS DOOMED!");
+}

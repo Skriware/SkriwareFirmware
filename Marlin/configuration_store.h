@@ -74,7 +74,7 @@ class MarlinSettings {
       FORCE_INLINE
       static void report(const bool forReplay=false) { UNUSED(forReplay); }
     #endif
-      static void save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index);
+      static void save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index);                             //Skriware
       static void load_eeprom_sk2(uint16_t *working_crc,int *eeprom_index, char version[4]);
       static void reset_eeprom_sk2();
       static bool nan_Matrix_Test(float z_values[GRID_MAX_POINTS_X][GRID_MAX_POINTS_Y]);

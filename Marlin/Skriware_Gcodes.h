@@ -4,6 +4,7 @@
 #include "Skriware_Variables.h"
 #include "Skriware_Functions.h"
 #include "parser.h"
+#include "configuration_store.h"
 
 void gcode_M57();
 void gcode_M58();
@@ -25,5 +26,6 @@ void gcode_M73();
 void gcode_M74();
 void gcode_M79();
 void gcode_M80();
+void gcode_M666();
 
 #endif
