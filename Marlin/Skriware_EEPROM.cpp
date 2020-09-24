@@ -34,6 +34,8 @@ void MarlinSettings::save_eeprom_sk2(uint16_t *working_crc,int *eeprom_index){
     EEPROM_WRITE(Y_change);
     EEPROM_WRITE(dY_change);
     EEPROM_WRITE(dX_change);
+    //V58
+    EEPROM_WRITE(extruder_servo_pin);
     #endif
     #ifdef OPTICAL_SENSOR
     EEPROM_WRITE(sensor_noise_offset);
@@ -76,11 +78,16 @@ if(sk_eeprom_verison > 56){             //For new versions
     EEPROM_READ(Y_change);
     EEPROM_READ(dY_change);
     EEPROM_READ(dX_change);
+
     #endif
     #ifdef OPTICAL_SENSOR
     EEPROM_READ(sensor_noise_offset);
     #endif
     
+}
+
+if(sk_eeprom_verison > 57){
+    EEPROM_READ(extruder_servo_pin);
 }
 
 }

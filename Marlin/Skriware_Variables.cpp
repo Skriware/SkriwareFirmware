@@ -22,6 +22,7 @@
      float dX_change =  0.0;
      bool extruder_up = true;
 	 byte tmp;
+     byte extruder_servo_pin = EXTRUDER_SERVO_PIN;
     #endif
 
     #endif

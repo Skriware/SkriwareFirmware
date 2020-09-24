@@ -314,6 +314,7 @@
   #define EXT_CHANGE_TIME_OFFSET 500
   #define DEF_EXTRDER_TYPE 0
   #define Y_MIN_POS -10
+  #define EXTRUDER_SERVO_PIN 4
 #endif
 
 

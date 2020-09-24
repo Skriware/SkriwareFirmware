@@ -251,7 +251,7 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
 void Set_Extruder_Type(byte TYPE){
       if(TYPE == 3){
         servo[0].detach();
-        servo[0].attach(4);
+        servo[0].attach(extruder_servo_pin);
         servo_extruder = true;
         Extruder_Up();
       }else if(TYPE != 0 && TYPE != 4){

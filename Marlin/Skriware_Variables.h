@@ -27,6 +27,7 @@
             extern OneWire  *ds;
         	extern bool servo_extruder;
             extern byte tmp;
+            extern byte extruder_servo_pin;
     #endif
     #endif
     #ifdef OPTICAL_SENSOR

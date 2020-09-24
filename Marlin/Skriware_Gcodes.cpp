@@ -202,7 +202,7 @@ void gcode_M80(){
           if (parser.seen('Y'))dY_change = parser.value_float();
           if (parser.seen('X'))dX_change = parser.value_float();
           if (parser.seen('B'))X_down_pos = parser.value_float();
-
+          if (parser.seen('P'))extruder_servo_pin = parser.value_linear_units();
         if (parser.seen('A')){ 
           up_delay = parser.value_linear_units();
           Set_up_Time(up_delay);
