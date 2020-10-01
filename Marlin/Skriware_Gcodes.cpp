@@ -221,3 +221,24 @@ void gcode_M666(){
   eeprom_write_byte(120,255);
   SERIAL_ECHOLN("YOUR EERPROM IS DOOMED!");
 }
+
+void gcode_M109_confirm(){
+      SERIAL_ECHO("M109 HEATING FINISHED ");
+      if(parser.seen('T')){
+        SERIAL_ECHO("T");
+        SERIAL_ECHO(parser.value_int());
+        SERIAL_ECHO(" ");
+      }
+      if(parser.seen('S')){
+        SERIAL_ECHO("S");
+        SERIAL_ECHOLN(parser.value_int());
+      }
+}
+
+void gcode_M190_confirm(){
+      SERIAL_ECHO("M190 HEATING FINISHED ");
+      if(parser.seen('S')){
+        SERIAL_ECHO("S");
+        SERIAL_ECHOLN(parser.value_int());
+      }
+}

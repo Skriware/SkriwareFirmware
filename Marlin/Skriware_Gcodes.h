@@ -27,5 +27,8 @@ void gcode_M74();
 void gcode_M79();
 void gcode_M80();
 void gcode_M666();
+void gcode_M109_confirm();
+void gcode_M190_confirm();
+
 
 #endif

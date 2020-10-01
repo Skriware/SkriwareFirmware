@@ -13108,11 +13108,14 @@ void process_parsed_command() {
         case 155: gcode_M155(); break;                            // M155: Set Temperature Auto-report Interval
       #endif
 
-      case 109: gcode_M109(); break;                              // M109: Set Hotend Temperature. Wait for target.
+      case 109: 
+      gcode_M109();
+      gcode_M109_confirm();				  //Skriware
+   	  break;                              // M109: Set Hotend Temperature. Wait for target.
 
       #if HAS_HEATED_BED
         case 140: gcode_M140(); break;                            // M140: Set Bed Temperature
-        case 190: gcode_M190(); break;                            // M190: Set Bed Temperature. Wait for target.
+        case 190: gcode_M190(); gcode_M190_confirm(); break;                            // M190: Set Bed Temperature. Wait for target.
       #endif
 
       #if FAN_COUNT > 0
@@ -15733,6 +15736,7 @@ void loop() {
   if(emergency_parser.quickstop_byM410){			//Skriware
 	quickstop_stepper();
 	emergency_parser.quickstop_byM410 = false;
+	clear_command_queue();
    }
   idle();
 }
