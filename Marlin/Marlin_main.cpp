@@ -15736,7 +15736,6 @@ void loop() {
   if(emergency_parser.quickstop_byM410){			//Skriware
 	quickstop_stepper();
 	emergency_parser.quickstop_byM410 = false;
-	clear_command_queue();
    }
   idle();
 }

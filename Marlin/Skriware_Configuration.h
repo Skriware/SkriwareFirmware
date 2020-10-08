@@ -11,6 +11,7 @@
 #define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
 //#define EXT_CHECKSTATION
+#define SKRIWARE_SILENT
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
@@ -348,6 +349,12 @@
   #define BINARY_SENSOR_DEBOUNCE_TIME 500
 #endif
 
+#ifdef SKRIWARE_SILENT
+#define X_DRIVER_TYPE  TMC2208
+#define Y_DRIVER_TYPE  TMC2208
+#define INVERT_X_DIR true
+#define INVERT_Y_DIR true
+#endif
 /***************************************************************************************/
 
 #endif

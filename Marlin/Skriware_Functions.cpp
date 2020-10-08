@@ -1,6 +1,6 @@
 #include "Skriware_Functions.h"
 #include "Skriware_Variables.h"
-
+#include "Skriware_capacity_sensor_utilities.h"
 #if IS_KINEMATIC
  #define SYNC_PLAN_POSITION_KINEMATIC() sync_plan_position_kinematic()
 #else
