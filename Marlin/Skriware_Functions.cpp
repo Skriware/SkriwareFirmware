@@ -257,7 +257,11 @@ while(true){
     planner.synchronize();
     SERIAL_ECHO(destination[Z_AXIS]);
     SERIAL_ECHO(":");
-    cap = read_capacity_from_Channel(0x02);
+    cap = 0;
+    for(byte ii = 0; ii <10; ii++){
+    cap += read_capacity_from_Channel(0x02);
+    }
+    cap/=10;
     SERIAL_ECHO(cap);
     SERIAL_ECHO(":");
     SERIAL_ECHOLN(cap - last_cap);
