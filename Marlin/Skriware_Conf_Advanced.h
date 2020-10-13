@@ -45,7 +45,9 @@
 #define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
 
 // When G28 is called, this option will make Y home before X
+#ifndef EXT_CHECKSTATION
 #define HOME_Y_BEFORE_X
+#endif
 
 // @section machine
 

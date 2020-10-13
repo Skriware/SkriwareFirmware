@@ -8,9 +8,14 @@
 
 //MAIN SKRIWARE SETTINGS:
 
-#define MOVING_EXTRUDER
+//#define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
+<<<<<<< Updated upstream
 //#define EXT_CHECKSTATION
+=======
+#define EXT_CHECKSTATION
+//#define SKRIWARE_SILENT
+>>>>>>> Stashed changes
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
@@ -265,7 +270,7 @@
 	#define Z_MIN_POS -200
   #define Z_MIN_ENDSTOP_INVERTING false   
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false
-	#define INVERT_X_DIR true
+	#define INVERT_Z_DIR true
   #define Z_HOMING_HEIGHT 0
   #undef COREXY
 #endif

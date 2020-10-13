@@ -166,6 +166,13 @@ void gcode_M67(){
 #endif
 }
 void gcode_M68(){
+      if(parser.seen('I')) cap_sensor_init();
+      if(parser.seen('R')){
+        SERIAL_ECHOLN(read_capacity_from_Channel(0x00));
+        SERIAL_ECHOLN(read_capacity_from_Channel(0x02));
+      }
+      if(parser.seen('C'))set_capdac(parser.value_linear_units());
+      if(parser.seen('P'))capacity_plot();
 
 }
 void gcode_M69(){

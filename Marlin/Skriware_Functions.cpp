@@ -247,6 +247,25 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
  
 }
 
+void capacity_plot(){
+ destination[Z_AXIS] = 20.0;
+ uint32_t last_cap = 0;
+ uint32_t cap = 0;
+while(true){
+    destination[Z_AXIS]+=0.1;
+    prepare_move_to_destination();
+    planner.synchronize();
+    SERIAL_ECHO(destination[Z_AXIS]);
+    SERIAL_ECHO(":");
+    cap = read_capacity_from_Channel(0x02);
+    SERIAL_ECHO(cap);
+    SERIAL_ECHO(":");
+    SERIAL_ECHOLN(cap - last_cap);
+    last_cap - cap;
+
+}
+
+}
 
 void Set_Extruder_Type(byte TYPE){
       if(TYPE == 3){

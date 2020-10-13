@@ -5,6 +5,7 @@
 #include "Skriware_Functions.h"
 #include "parser.h"
 #include "configuration_store.h"
+#include "Skriware_capacity_sensor_utilities.h"
 
 void gcode_M57();
 void gcode_M58();
