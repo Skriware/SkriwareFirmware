@@ -248,28 +248,64 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
 }
 
 void capacity_plot(){
- destination[Z_AXIS] = 20.0;
- uint32_t last_cap = 0;
- uint32_t cap = 0;
+ SERIAL_ECHOLN(data_slope(test_x,test_y,4)); 
+ destination[Z_AXIS] = 90.0;
+ int32_t cap = 0;
+ byte n_mes = 0;
+ bool first_pack = false;
+ float Z[20];
+ float C[20];
 while(true){
-    destination[Z_AXIS]+=0.1;
+    destination[Z_AXIS]+=0.2;
     prepare_move_to_destination();
     planner.synchronize();
-    SERIAL_ECHO(destination[Z_AXIS]);
-    SERIAL_ECHO(":");
     cap = 0;
     for(byte ii = 0; ii <10; ii++){
-    cap += read_capacity_from_Channel(0x02);
+    delay(20);
+    cap += read_capacity_from_Channel(0x00);
     }
     cap/=10;
+    Z[n_mes] = destination[Z_AXIS];
+    C[n_mes] = cap;
+    n_mes++;
+    if(n_mes == 20){
+      first_pack = true;
+      n_mes = 0;
+    }
+    if(first_pack){
+    SERIAL_ECHO(destination[Z_AXIS]);
+    SERIAL_ECHO(":");
     SERIAL_ECHO(cap);
     SERIAL_ECHO(":");
-    SERIAL_ECHOLN(cap - last_cap);
-    last_cap - cap;
+    SERIAL_ECHOLN((double)data_slope(Z,C,20));
+    }
 
 }
 
 }
+
+float data_slope(float *x_data,float *y_data,int N){
+  float XY = 0;
+  float Y_mean = 0;
+  float X_mean = 0;
+  float X2 = 0;
+  float X = 0;
+
+  for(byte xx = 0; xx <N; xx++){
+    X  += x_data[xx];
+    X2 += x_data[xx]*x_data[xx];
+    X_mean += x_data[xx];
+    Y_mean += y_data[xx];
+    XY += x_data[xx]*y_data[xx];
+  }
+  X_mean /=N;
+  Y_mean /=N;
+  float slope = (XY - Y_mean*X)/(X2 - X_mean*X);
+  return(slope);
+
+}
+
+
 
 void Set_Extruder_Type(byte TYPE){
       if(TYPE == 3){

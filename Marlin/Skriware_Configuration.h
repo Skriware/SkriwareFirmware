@@ -10,12 +10,9 @@
 
 //#define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
-<<<<<<< Updated upstream
-//#define EXT_CHECKSTATION
-=======
+
 #define EXT_CHECKSTATION
 //#define SKRIWARE_SILENT
->>>>>>> Stashed changes
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13

@@ -3,6 +3,7 @@
 #include "Skriware_Variables.h"
 #include "stepper.h"
 #include "planner.h"
+#include "Skriware_capacity_sensor_utilities.h"
 #define SKRIWARE_DEBUG
 
 void set_to_print_Z();
@@ -22,5 +23,6 @@ void g92_retraction_controll(float *v);
 void Skriware_Init();
 void zero_bed_levelig_grid();
 void capacity_plot();
+float data_slope(float *x_data,float *y_data,int N);
 
 #endif
