@@ -248,7 +248,6 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
 }
 
 void capacity_plot(){
- SERIAL_ECHOLN(data_slope(test_x,test_y,4)); 
  destination[Z_AXIS] = 90.0;
  int32_t cap = 0;
  byte n_mes = 0;
@@ -261,7 +260,7 @@ while(true){
     planner.synchronize();
     cap = 0;
     for(byte ii = 0; ii <10; ii++){
-    delay(20);
+    delay(100);
     cap += read_capacity_from_Channel(0x00);
     }
     cap/=10;
@@ -278,6 +277,7 @@ while(true){
     SERIAL_ECHO(cap);
     SERIAL_ECHO(":");
     SERIAL_ECHOLN((double)data_slope(Z,C,20));
+    if(data_slope(Z,C,20) < 10.0)break;
     }
 
 }
