@@ -172,7 +172,15 @@ void gcode_M68(){
         SERIAL_ECHOLN(read_capacity_from_Channel(0x02));
       }
       if(parser.seen('C'))set_capdac(parser.value_linear_units());
-      if(parser.seen('P'))capacity_plot();
+      if(parser.seen('P')){
+        cap_sensor_init();
+        set_capdac(95);
+        int N   = 20;
+        int TBR = 50;
+        if(parser.seen('N'))N = parser.value_linear_units();
+        if(parser.seen('T'))TBR = parser.value_linear_units();
+        capacity_plot(TBR,N);
+      }
 
 }
 void gcode_M69(){
