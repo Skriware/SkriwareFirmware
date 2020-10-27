@@ -248,53 +248,79 @@ void Z_distance_Test(float Z_start,int N_Cycles){   //Test for moving extruder p
 }
 
 #define N_SLOPE 15
+#define Z0 120.0
 
-void capacity_plot(int TBR, byte N_samples){
- destination[Z_AXIS] = 30.0;
+void capacity_plot(int TBR, byte N_samples,float start_Z,int S,float step_in_Z,uint32_t cap_trig){
+ destination[Z_AXIS] = start_Z;
+ const byte n_s = S;
  int32_t cap = 0;
  byte n_mes = 0;
  bool first_pack = false;
- float Z[N_SLOPE];
- float C[N_SLOPE];
+ float Z[n_s];
+ float C[n_s];
+ float m_Z[20];
+ float m_c[20];
+ byte steps = 0;
  double _slope = 0; 
+ float   z_sum = 0;
+ int32_t cap_sum = 0;
 while(true){
-    destination[Z_AXIS]+=0.05;
+    destination[Z_AXIS]+=step_in_Z;
     prepare_move_to_destination();
     planner.synchronize();
     cap = 0;
     for(byte ii = 0; ii <N_samples; ii++){
-     while (PENDING(millis(), TBR )) idle();
-    cap += read_capacity_from_Channel(0x00);
+       while (PENDING(millis(), TBR )) idle();
+       cap += read_capacity_from_Channel(0x00);
     }
     cap/=N_samples;
-    Z[n_mes] = destination[Z_AXIS];
+    Z[n_mes] = 1/(Z0 - destination[Z_AXIS]);
     C[n_mes] = cap;
+    cap_sum+=cap;
+    z_sum+= Z[n_mes];
     n_mes++;
-    if(n_mes == N_SLOPE){
+    if(n_mes == n_s){
       first_pack = true;
       n_mes = 0;
-      _slope= data_slope(Z,C,N_SLOPE);
+      m_c[steps] = cap_sum/n_s;
+      cap_sum = 0;
+      m_Z[steps] = z_sum/n_s;
+      z_sum = 0;    
+      if(first_pack){
+        SERIAL_ECHO(m_Z[steps]*1000);
+        SERIAL_ECHO(":");
+        SERIAL_ECHOLN(m_c[steps]);
+        if(steps > 1){
+          if((m_c[steps] - m_c[steps-1]) < cap_trig)break;
+        }
+        steps++;
+      
+      }
     }
-    if(first_pack){
-    SERIAL_ECHO(destination[Z_AXIS]);
-    SERIAL_ECHO(":");
-    SERIAL_ECHO(cap);
-    SERIAL_ECHO(":");
-    SERIAL_ECHOLN(_slope);
-    //if(_slope < 10.0)break;
-    }
+}
+  float *params = data_slope(m_Z,m_c,steps-1,true);
+  float Z_off = (m_c[steps] - params[1])/params[0];
+
+  Z_off = Z0 - 1/Z_off; //back to normal variables
+  SERIAL_ECHO("A:");
+  SERIAL_ECHOLN(params[0]);
+  SERIAL_ECHO("B:");
+  SERIAL_ECHOLN(params[1]);
+  SERIAL_ECHO("c_m:");
+  SERIAL_ECHOLN(m_c[steps]);
+  SERIAL_ECHO("Z Set:");
+  SERIAL_ECHOLN(Z_off);
 
 }
 
-}
-
-float data_slope(float *x_data,float *y_data,int _N){
+float* data_slope(float *x_data,float *y_data,int _N,bool A){
   const byte N = _N;
   float XY = 0;
   float Y_mean = 0;
   float X_mean = 0;
   float X2 = 0;
   float X = 0;
+  float Y = 0;
 
   for(byte xx = 0; xx <N; xx++){
     X  += x_data[xx];
@@ -306,7 +332,13 @@ float data_slope(float *x_data,float *y_data,int _N){
   X_mean /=N;
   Y_mean /=N;
   float slope = (XY - Y_mean*X)/(X2 - X_mean*X);
-  return(slope);
+  float intercept = Y_mean -slope*X_mean;
+  float output[2] = {0.0,0.0};
+  output[0] = slope;
+  output[1] = intercept;
+  SERIAL_ECHOLN(slope);
+  SERIAL_ECHOLN(intercept);
+  return(output);
 }
 
 

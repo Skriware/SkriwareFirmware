@@ -22,7 +22,7 @@ void g92_efade(bool didE);
 void g92_retraction_controll(float *v);
 void Skriware_Init();
 void zero_bed_levelig_grid();
-void capacity_plot(int TBR, byte N_samples);
-float data_slope(float *x_data,float *y_data,int N);
+void capacity_plot(int TBR, byte N_samples,float start_Z,int S,float step_in_Z,uint32_t cap_trig);
+float* data_slope(float *x_data,float *y_data,int N, bool A);
 
 #endif

@@ -177,9 +177,17 @@ void gcode_M68(){
         set_capdac(95);
         int N   = 20;
         int TBR = 50;
+        float _Z = 100.0;
+        byte S = 15;
+        float Z_step = 0.05;
+        uint32_t cap_trig = 40;
         if(parser.seen('N'))N = parser.value_linear_units();
         if(parser.seen('T'))TBR = parser.value_linear_units();
-        capacity_plot(TBR,N);
+        if(parser.seen('Z'))_Z = parser.value_float();
+        if(parser.seen('S'))S = parser.value_linear_units();
+        if(parser.seen('X'))Z_step = parser.value_float();
+        if(parser.seen('L'))cap_trig = parser.value_linear_units();
+        capacity_plot(TBR,N,_Z,S,Z_step,cap_trig);
       }
 
 }
