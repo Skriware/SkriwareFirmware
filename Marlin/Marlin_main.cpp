@@ -15733,6 +15733,12 @@ void loop() {
     }
   }
   endstops.event_handler();
+  if(emergency_parser.clear_gcode_byM411){
+  	quickstop_stepper();
+  	clear_command_queue();
+  	emergency_parser.clear_gcode_byM411 = false;
+  }
+
   if(emergency_parser.quickstop_byM410){			//Skriware
 	quickstop_stepper();
 	emergency_parser.quickstop_byM410 = false;

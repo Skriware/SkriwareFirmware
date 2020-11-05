@@ -11,7 +11,7 @@
 #define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
 //#define EXT_CHECKSTATION
-//#define SKRIWARE_SILENT
+#define SKRIWARE_SILENT
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13
@@ -356,5 +356,11 @@
 #define INVERT_Y_DIR true
 #endif
 /***************************************************************************************/
+
+#endif
+
+#ifdef SKRIWARE_SILENT
+
+#pragma message ("Compiled version for Skriware Silent setupt!!!!")
 
 #endif

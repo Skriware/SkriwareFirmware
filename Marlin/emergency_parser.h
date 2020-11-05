@@ -48,10 +48,11 @@ public:
     EP_M4,
     EP_M41,
     EP_M410,
+    EP_M411,
     EP_IGNORE // to '\n'
   };
 
-  static bool killed_by_M112,quickstop_byM410;
+  static bool killed_by_M112,quickstop_byM410,clear_gcode_byM411;
   static State state;
 
   EmergencyParser() {}
@@ -110,7 +111,11 @@ public:
         break;
 
       case EP_M41:
-        state = (c == '0') ? EP_M410 : EP_IGNORE;
+        switch(c){
+          case '0': state = EP_M410; break;
+          case '1': state = EP_M411; break;
+          default: state = EP_IGNORE;
+        }
         break;
 
       case EP_IGNORE:
@@ -128,6 +133,9 @@ public:
               break;
             case EP_M410:
               quickstop_byM410 = true;    //Skriware
+              break;
+            case EP_M411:
+              clear_gcode_byM411 = true;
               break;
             default:
               break;

@@ -34,6 +34,7 @@
 bool EmergencyParser::killed_by_M112; // = false
 EmergencyParser::State EmergencyParser::state; // = EP_RESET
 bool EmergencyParser::quickstop_byM410 = false;
+bool EmergencyParser::clear_gcode_byM411 = false;
 // Global instance
 EmergencyParser emergency_parser;
 
