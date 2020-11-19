@@ -9777,6 +9777,10 @@ inline void gcode_M205() {
    */
   inline void gcode_M206() {
    #ifdef MOVING_EXTRUDER
+    if (parser.seen('I')){
+    	SERIAL_ECHO("E:");
+    	SERIAL_ECHOLN(home_offset_E1);
+	}
     if (parser.seen('E')) home_offset_E1 = parser.value_linear_units(); 
     if (parser.seen('Z')) home_offset_E0 = parser.value_linear_units(); // Skriware
    #endif
