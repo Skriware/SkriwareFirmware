@@ -11,7 +11,7 @@
 #define MOVING_EXTRUDER
 //#define OPTICAL_SENSOR
 //#define EXT_CHECKSTATION
-#define SKRIWARE_SILENT
+//#define SKRIWARE_SILENT
 
 /**************************** PRINTER SETUP ********************************************/
 #define MOTHERBOARD BOARD_MKS_GEN_13

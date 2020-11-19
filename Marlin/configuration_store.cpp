@@ -1054,15 +1054,16 @@ void MarlinSettings::postprocess() {
       #endif
       eeprom_error = true;
     }
-
-    int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');               //Skriware EEPROM BACKUP
-    int sk_eeprom_verison_stored = (stored_ver[2]-'0')+10*(stored_ver[1]-'0'); 
-    if(sk_eeprom_verison_stored < sk_eeprom_verison){
-    eeprom_error = false; //newer version of EEPROM need to be loaded
-    #ifdef SKRIWAR_DEBUG
-    SERIAL_ECHOLN("OLDER EEPROM VERSION DETECTED! RESTORING SETTINGS");
-    #endif
-    older_eeprom_config = true;
+    if(stored_ver[0] == 'V'){                                                     // Validating previous EEprom config
+      int sk_eeprom_verison = (version[2]-'0')+10*(version[1]-'0');               //Skriware EEPROM BACKUP
+      int sk_eeprom_verison_stored = (stored_ver[2]-'0')+10*(stored_ver[1]-'0'); 
+      if(sk_eeprom_verison_stored < sk_eeprom_verison){
+        eeprom_error = false; //newer version of EEPROM need to be loaded
+      #ifdef SKRIWAR_DEBUG
+        SERIAL_ECHOLN("OLDER EEPROM VERSION DETECTED! RESTORING SETTINGS");
+      #endif
+        older_eeprom_config = true;
+      }
     }
 
     if(!eeprom_error){
