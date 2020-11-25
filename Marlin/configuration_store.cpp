@@ -2310,7 +2310,9 @@ void MarlinSettings::reset() {
       CONFIG_ECHO_START;
       SERIAL_ECHOPAIR("  M206 X", LINEAR_UNIT(home_offset[X_AXIS]));
       SERIAL_ECHOPAIR(" Y", LINEAR_UNIT(home_offset[Y_AXIS]));
-      SERIAL_ECHOLNPAIR(" Z", LINEAR_UNIT(home_offset[Z_AXIS]));
+      SERIAL_ECHOPAIR(" Z", LINEAR_UNIT(home_offset[Z_AXIS]));
+      SERIAL_ECHOLNPAIR(" E", LINEAR_UNIT(home_offset_E1));
+
     #endif
 
     #if HOTENDS > 1

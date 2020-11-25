@@ -24,6 +24,7 @@
 #define CONFIGURATION_STORE_H
 
 #include "MarlinConfig.h"
+#include "Skriware_Variables.h"
 
 class MarlinSettings {
   public:

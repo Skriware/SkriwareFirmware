@@ -13098,6 +13098,7 @@ void process_parsed_command() {
         case 108: gcode_M108(); break;                            // M108: Cancel Waiting
         case 112: gcode_M112(); break;                            // M112: Emergency Stop
         case 410: gcode_M410(); break;                            // M410: Quickstop. Abort all planned moves
+        case 411: gcode_M411(); break;							  // M411 Emergency parser Skriware 
       #else
         case 108: case 112: case 410: break;                      // Silently drop as handled by emergency parser
       #endif

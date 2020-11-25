@@ -242,3 +242,8 @@ void gcode_M190_confirm(){
         SERIAL_ECHOLN(parser.value_int());
       }
 }
+void gcode_M411(){
+  #ifndef EMERGENCY_PARSER
+    clear_gcode_byM411 = true;
+  #endif
+}
