@@ -8589,8 +8589,9 @@ inline void gcode_M105() {
    * This will stop the carriages mid-move, so most likely they
    * will be out of sync with the stepper position after this.
    */
-  inline void gcode_M410() { quickstop_stepper(); }
+
 #endif
+ inline void gcode_M410() { quickstop_stepper(); }
 
 /**
  * M109: Sxxx Wait for extruder(s) to reach temperature. Waits only when heating.
@@ -13094,13 +13095,13 @@ void process_parsed_command() {
       case 110: gcode_M110(); break;                              // M110: Set Current Line Number
       case 111: gcode_M111(); break;                              // M111: Set Debug Flags
 
+      case 410: gcode_M410(); break;                            // M410: Quickstop. Abort all planned moves
       #if DISABLED(EMERGENCY_PARSER)
         case 108: gcode_M108(); break;                            // M108: Cancel Waiting
-        case 112: gcode_M112(); break;                            // M112: Emergency Stop
-        case 410: gcode_M410(); break;                            // M410: Quickstop. Abort all planned moves
+        case 112: gcode_M112(); break;                            // M112: Emergency Stop       
         case 411: gcode_M411(); break;							  // M411 Emergency parser Skriware 
       #else
-        case 108: case 112: case 410: break;                      // Silently drop as handled by emergency parser
+        case 108: case 112: break;                      // Silently drop as handled by emergency parser
       #endif
 
       #if ENABLED(HOST_KEEPALIVE_FEATURE)
