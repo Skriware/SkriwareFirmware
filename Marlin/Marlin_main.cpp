@@ -9147,6 +9147,7 @@ inline void gcode_M83() { axis_relative_modes[E_CART] = true; }
 inline void gcode_M18_M84() {
   if (parser.seenval('S')) {
     stepper_inactive_time = parser.value_millis_from_seconds();
+    previous_move_ms = millis();								//Skriware
   }
   else {
     bool all_axis = !(parser.seen('X') || parser.seen('Y') || parser.seen('Z') || parser.seen('E'));
