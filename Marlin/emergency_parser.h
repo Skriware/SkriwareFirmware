@@ -136,6 +136,7 @@ public:
               break;
             case EP_M411:
               clear_gcode_byM411 = true;
+              wait_for_user = wait_for_heatup = false;
               break;
             default:
               break;

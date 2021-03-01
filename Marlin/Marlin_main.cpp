@@ -13100,11 +13100,11 @@ void process_parsed_command() {
       #if DISABLED(EMERGENCY_PARSER)
         case 108: gcode_M108(); break;                            // M108: Cancel Waiting
         case 112: gcode_M112(); break;                            // M112: Emergency Stop       
-        case 411: gcode_M411(); break;							  // M411 Emergency parser Skriware 
+        
       #else
         case 108: case 112: break;                      // Silently drop as handled by emergency parser
       #endif
-
+      case 411: gcode_M411(); break;							  // M411 Emergency parser Skriware 
       #if ENABLED(HOST_KEEPALIVE_FEATURE)
         case 113: gcode_M113(); break;                            // M113: Set Host Keepalive Interval
       #endif
