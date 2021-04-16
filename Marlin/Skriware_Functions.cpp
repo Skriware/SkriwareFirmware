@@ -176,9 +176,11 @@ void Extruder_Down(){
 void extruder_swap(uint8_t tmp_extruder,uint8_t active){
    bool extruder_change = tmp_extruder != active;        
       float tmp_Z = current_position[Z_AXIS];
+      float tmp_feedrate = feedrate_mm_s;
    if(extruder_type != 0 && tmp_extruder == 1 && extruder_change){
         planner.synchronize();
         destination[Z_AXIS] = tmp_Z+3.0;
+        feedrate_mm_s = 10;
         prepare_move_to_destination();
         planner.synchronize();
         Extruder_Down();
@@ -190,6 +192,7 @@ void extruder_swap(uint8_t tmp_extruder,uint8_t active){
         destination[Z_AXIS] = tmp_Z;
         prepare_move_to_destination();
         planner.synchronize();
+        feedrate_mm_s = tmp_feedrate;
     }
     if(extruder_type != 0 && tmp_extruder == 0 && extruder_change){
        planner.synchronize();
