@@ -97,7 +97,7 @@ long LeftRead;
 long RightRead;  
 
 HX711 LeftScale;
-//HX711 RightScale;
+HX711 RightScale;
 char out_buffer[32];
 byte frame[6];
 
@@ -123,7 +123,7 @@ void setup() {
   Wire.onReceive(receiveEvent); // register event
   Wire.onRequest(requestEvent);
   LeftScale.begin(SCALE1_DT, SCALE1_SCK, 64);
-  //RightScale.begin(SCALE2_DT, SCALE2_SCK, 64);
+  RightScale.begin(SCALE2_DT, SCALE2_SCK, 64);
   
   #ifdef DEBUG
   Serial.begin(9600);           // start serial for output
@@ -300,13 +300,6 @@ long measure_weight1() {
   long WL = 0;
   long weightLT[5];
   int i = 0;
-
-  while(!LeftScale.is_ready()){
-
-  }
-    LeftScale.set_gain(64);
-
-
   while(true){
     if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
     if(LeftScale.is_ready()) {
@@ -331,6 +324,8 @@ long measure_weight1() {
     minid = jj;
    }
   }
+
+
   for(byte kk = 0; kk <5 ; kk++){
     if(kk != maxid && kk != minid) WL += weightLT[kk];
   }
@@ -342,18 +337,10 @@ long measure_weight2() {
   long WR = 0;
   long weightRT[5];
   int i = 0;
-  while(!LeftScale.is_ready()){
-
-  }
-    LeftScale.set_gain(32);
   while(true){
     if(digitalRead(PowerButtonInterruptPin) == HIGH)PowerButtonPressed();
-    /*if(RightScale.is_ready()) {
+    if(RightScale.is_ready()) {
       weightRT[i] = RightScale.read_average(2);
-      i++;
-    }*/
-    if(LeftScale.is_ready()) {
-      weightRT[i] = LeftScale.read_average(2);
       i++;
     }
     if(i == 5)break;
@@ -378,6 +365,8 @@ long measure_weight2() {
   for(byte kk = 0; kk <5 ; kk++){
     if(kk != maxid && kk != minid) WR += weightRT[kk];
   }
+  
+
   return(WR/3);
 }
 
@@ -635,8 +624,3 @@ void PowerButtonPressed(){
     delay(2500);
     }
 }
-
-
-
-
-
